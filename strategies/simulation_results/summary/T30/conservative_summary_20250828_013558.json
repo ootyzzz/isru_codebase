@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "strategy": "conservative",
+    "time_horizon": 30,
+    "n_simulations": 50,
+    "timestamp": "20250828_013558",
+    "version": "2.0",
+    "base_seed": 42,
+    "simulation_type": "single_batch"
+  },
+  "statistics": {
+    "npv_mean": 10934293.67322246,
+    "npv_std": 7593966.378488553,
+    "npv_min": 2659813.799590727,
+    "npv_max": 44641604.475106105,
+    "npv_p5": 3047087.8103514807,
+    "npv_p95": 20950234.223862816,
+    "utilization_mean": 0.5648872251425621,
+    "utilization_std": 0.10145381900769063,
+    "self_sufficiency_mean": 0.6376082542737344,
+    "self_sufficiency_std": 0.12301608626909863,
+    "total_cost_mean": 88004395.52666827,
+    "total_cost_std": 72992827.53215946,
+    "npv_coefficient_of_variation": 0.6945090927167795,
+    "probability_positive_npv": 1.0,
+    "n_simulations": 50,
+    "strategy_name": "conservative"
+  },
+  "performance_metrics": {
+    "npv_median": 8950732.34937263,
+    "npv_q25": 5279893.677079731,
+    "npv_q75": 15086714.99899391,
+    "npv_iqr": 9806821.321914181,
+    "npv_skewness": 1.9626165670833762,
+    "success_rate_50pct": 0.5,
+    "worst_case_5pct": 3047087.8103514807,
+    "best_case_95pct": 20950234.223862816
+  }
+}

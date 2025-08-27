@@ -1,0 +1,32 @@
+{
+  "demand": {
+    "D0": 10,
+    "mu": 0.2,
+    "sigma": 0.2,
+    "dt": 1
+  },
+  "technology": {
+    "eta": 2,
+    "alpha": 50,
+    "beta": 0.2,
+    "M0": 0
+  },
+  "costs": {
+    "c_L": 2350,
+    "c_dev": 10000,
+    "c_op": 3000,
+    "c_bu": 23512,
+    "c_S": 18809,
+    "c_by": 50000,
+    "c_E": 20000
+  },
+  "economics": {
+    "P_m": 21160,
+    "r": 0.1,
+    "T": 19
+  },
+  "simulation": {
+    "n_scenarios": 1000,
+    "random_seed": 42
+  }
+}

@@ -1,0 +1,26 @@
+model:
+  name: "ISRU_Oxygen_Production_Optimization"
+  type: "linear_programming"
+  solver: "glpk"
+  
+paths:
+  parameters: "data/parameters.json"
+  output_dir: "results"
+  logs_dir: "logs"
+  
+simulation:
+  n_scenarios: 1000
+  random_seed: 42
+  parallel: false
+  
+solver:
+  glpk:
+    method: "simplex"
+    time_limit: 300
+    log_level: 1
+    
+output:
+  save_results: true
+  save_plots: true
+  plot_format: "png"
+  plot_dpi: 300

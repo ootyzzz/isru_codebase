@@ -1,0 +1,2468 @@
+{
+  "metadata": {
+    "strategy": "conservative",
+    "time_horizon": 10,
+    "n_simulations": 5,
+    "timestamp": "20250828_002732",
+    "version": "2.0",
+    "base_seed": 42,
+    "simulation_type": "single_batch"
+  },
+  "results": [
+    {
+      "strategy_name": "conservative",
+      "T": 10,
+      "demand_path": [
+        10.0,
+        13.222605775640428,
+        15.398576396518344,
+        20.98510228526576,
+        34.07005146587164,
+        38.92310632920808,
+        44.46759296660078,
+        73.01049800019095,
+        101.91001161985564,
+        111.07385136296867,
+        148.2214317926016
+      ],
+      "decisions": [
+        {
+          "time": 0,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 1,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 2,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 13.222605775640428,
+          "earth_supply_request": 0,
+          "inventory_target": 2.2478429818588728,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 39667.817326921286,
+          "supply_cost": 0
+        },
+        {
+          "time": 3,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 15.398576396518344,
+          "earth_supply_request": 0,
+          "inventory_target": 2.6177579874081185,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 46195.72918955503,
+          "supply_cost": 0
+        },
+        {
+          "time": 4,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 20.98510228526576,
+          "earth_supply_request": 0,
+          "inventory_target": 3.567467388495179,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 62955.30685579728,
+          "supply_cost": 0
+        },
+        {
+          "time": 5,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 34.07005146587164,
+          "earth_supply_request": 0,
+          "inventory_target": 5.791908749198179,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 102210.15439761493,
+          "supply_cost": 0
+        },
+        {
+          "time": 6,
+          "capacity_expansion": 1.7969093196198174,
+          "new_deployment": 0.8984546598099087,
+          "planned_production": 36.67696967968331,
+          "earth_supply_request": 2.2461366495247717,
+          "inventory_target": 6.616928075965374,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 17969.093196198173,
+          "operational_cost": 110030.90903904993,
+          "supply_cost": 44922.73299049543
+        },
+        {
+          "time": 7,
+          "capacity_expansion": 4.794971173838127,
+          "new_deployment": 2.3974855869190637,
+          "planned_production": 38.473878999303125,
+          "earth_supply_request": 5.9937139672976585,
+          "inventory_target": 7.559490804322134,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 47949.71173838127,
+          "operational_cost": 115421.63699790937,
+          "supply_cost": 119874.27934595317
+        },
+        {
+          "time": 8,
+          "capacity_expansion": 10.817212543285313,
+          "new_deployment": 5.408606271642657,
+          "planned_production": 43.26885017314125,
+          "earth_supply_request": 29.741647827049697,
+          "inventory_target": 12.411784660032462,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 108172.12543285314,
+          "operational_cost": 129806.55051942376,
+          "supply_cost": 594832.9565409939
+        },
+        {
+          "time": 9,
+          "capacity_expansion": 13.521515679106642,
+          "new_deployment": 6.760757839553321,
+          "planned_production": 54.08606271642657,
+          "earth_supply_request": 47.82394890342907,
+          "inventory_target": 17.324701975375458,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 135215.15679106643,
+          "operational_cost": 162258.1881492797,
+          "supply_cost": 956478.9780685814
+        }
+      ],
+      "states": [
+        {
+          "current_time": 1,
+          "total_capacity": 36.67696967968331,
+          "deployed_mass": 18.338484839841655,
+          "current_demand": 10.0,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0
+          ],
+          "production_history": [
+            10.0
+          ],
+          "capacity_history": [
+            36.67696967968331
+          ]
+        },
+        {
+          "current_time": 2,
+          "total_capacity": 36.67696967968331,
+          "deployed_mass": 18.338484839841655,
+          "current_demand": 13.222605775640428,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.222605775640428
+          ],
+          "production_history": [
+            10.0,
+            10.0
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331
+          ]
+        },
+        {
+          "current_time": 3,
+          "total_capacity": 36.67696967968331,
+          "deployed_mass": 18.338484839841655,
+          "current_demand": 15.398576396518344,
+          "actual_production": 13.222605775640428,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331
+          ]
+        },
+        {
+          "current_time": 4,
+          "total_capacity": 36.67696967968331,
+          "deployed_mass": 18.338484839841655,
+          "current_demand": 20.98510228526576,
+          "actual_production": 15.398576396518344,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428,
+            15.398576396518344
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331
+          ]
+        },
+        {
+          "current_time": 5,
+          "total_capacity": 36.67696967968331,
+          "deployed_mass": 18.338484839841655,
+          "current_demand": 34.07005146587164,
+          "actual_production": 20.98510228526576,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331
+          ]
+        },
+        {
+          "current_time": 6,
+          "total_capacity": 36.67696967968331,
+          "deployed_mass": 18.338484839841655,
+          "current_demand": 38.92310632920808,
+          "actual_production": 34.07005146587164,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            38.92310632920808
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331
+          ]
+        },
+        {
+          "current_time": 7,
+          "total_capacity": 38.473878999303125,
+          "deployed_mass": 19.236939499651562,
+          "current_demand": 44.46759296660078,
+          "actual_production": 36.67696967968331,
+          "inventory": 0,
+          "earth_supply": 2.2461366495247717,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            38.92310632920808,
+            44.46759296660078
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            36.67696967968331
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            38.473878999303125
+          ]
+        },
+        {
+          "current_time": 8,
+          "total_capacity": 43.26885017314125,
+          "deployed_mass": 21.634425086570626,
+          "current_demand": 73.01049800019095,
+          "actual_production": 38.473878999303125,
+          "inventory": 0,
+          "earth_supply": 5.9937139672976585,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            38.92310632920808,
+            44.46759296660078,
+            73.01049800019095
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            36.67696967968331,
+            38.473878999303125
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            38.473878999303125,
+            43.26885017314125
+          ]
+        },
+        {
+          "current_time": 9,
+          "total_capacity": 54.08606271642657,
+          "deployed_mass": 27.043031358213284,
+          "current_demand": 101.91001161985564,
+          "actual_production": 43.26885017314125,
+          "inventory": 0,
+          "earth_supply": 29.741647827049697,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            38.92310632920808,
+            44.46759296660078,
+            73.01049800019095,
+            101.91001161985564
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            36.67696967968331,
+            38.473878999303125,
+            43.26885017314125
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            38.473878999303125,
+            43.26885017314125,
+            54.08606271642657
+          ]
+        },
+        {
+          "current_time": 10,
+          "total_capacity": 67.60757839553321,
+          "deployed_mass": 33.803789197766605,
+          "current_demand": 111.07385136296867,
+          "actual_production": 54.08606271642657,
+          "inventory": 0,
+          "earth_supply": 47.82394890342907,
+          "demand_history": [
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            38.92310632920808,
+            44.46759296660078,
+            73.01049800019095,
+            101.91001161985564,
+            111.07385136296867
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.222605775640428,
+            15.398576396518344,
+            20.98510228526576,
+            34.07005146587164,
+            36.67696967968331,
+            38.473878999303125,
+            43.26885017314125,
+            54.08606271642657
+          ],
+          "capacity_history": [
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            36.67696967968331,
+            38.473878999303125,
+            43.26885017314125,
+            54.08606271642657,
+            67.60757839553321
+          ]
+        }
+      ],
+      "performance_metrics": {
+        "npv": 1822503.077324361,
+        "total_revenue": 5844013.1829275545,
+        "total_cost": 2853961.326580074,
+        "total_expansion_cost": 309306.08715849905,
+        "total_operational_cost": 828546.2924755513,
+        "total_supply_cost": 1716108.946946024,
+        "total_demand": 463.06139620212025,
+        "total_production": 276.1820974918504,
+        "total_earth_supply": 85.8054473473012,
+        "self_sufficiency_rate": 0.5964265208825582,
+        "avg_utilization": 0.7554091484149709,
+        "min_utilization": 0.2726506602735874,
+        "max_utilization": 1.0,
+        "utilization_std": 0.29400881924912226,
+        "final_capacity": 67.60757839553321,
+        "final_deployed_mass": 33.803789197766605,
+        "capacity_expansions": 4,
+        "final_inventory": 0,
+        "avg_inventory_days": 0.0
+      },
+      "simulation_params": {
+        "initial_capacity": 36.67696967968331,
+        "initial_deployed_mass": 18.338484839841655,
+        "strategy_params": {
+          "name": "conservative",
+          "description": "保守策略：谨慎扩张，重视成本控制",
+          "initial_deployment_ratio": 0.6,
+          "utilization_threshold": 0.85,
+          "expansion_ratio": 0.25,
+          "risk_tolerance": 0.3,
+          "cost_sensitivity": 0.8
+        },
+        "seed": 42
+      }
+    },
+    {
+      "strategy_name": "conservative",
+      "T": 10,
+      "demand_path": [
+        10.0,
+        12.60464098223109,
+        12.583278023160652,
+        13.966591694291523,
+        15.024542797989833,
+        21.355295031204836,
+        23.539920469284436,
+        31.13508879292452,
+        55.722013801298004,
+        85.87971020668691,
+        94.17027946978205
+      ],
+      "decisions": [
+        {
+          "time": 0,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 1,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 2,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 12.60464098223109,
+          "earth_supply_request": 0,
+          "inventory_target": 2.1427889669792854,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 37813.92294669327,
+          "supply_cost": 0
+        },
+        {
+          "time": 3,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 12.583278023160652,
+          "earth_supply_request": 0,
+          "inventory_target": 2.139157263937311,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 37749.834069481956,
+          "supply_cost": 0
+        },
+        {
+          "time": 4,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 13.966591694291523,
+          "earth_supply_request": 0,
+          "inventory_target": 2.374320588029559,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 41899.77508287457,
+          "supply_cost": 0
+        },
+        {
+          "time": 5,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 15.024542797989833,
+          "earth_supply_request": 0,
+          "inventory_target": 2.5541722756582717,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 45073.6283939695,
+          "supply_cost": 0
+        },
+        {
+          "time": 6,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 21.355295031204836,
+          "earth_supply_request": 0,
+          "inventory_target": 3.6304001553048217,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 64065.88509361451,
+          "supply_cost": 0
+        },
+        {
+          "time": 7,
+          "capacity_expansion": 0.7848310345225628,
+          "new_deployment": 0.3924155172612814,
+          "planned_production": 22.558881676131232,
+          "earth_supply_request": 0.9810387931532034,
+          "inventory_target": 4.001786479778354,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 7848.310345225627,
+          "operational_cost": 67676.6450283937,
+          "supply_cost": 19620.775863064067
+        },
+        {
+          "time": 8,
+          "capacity_expansion": 5.835928177663448,
+          "new_deployment": 2.917964088831724,
+          "planned_production": 23.343712710653794,
+          "earth_supply_request": 7.791376082270727,
+          "inventory_target": 5.292965094797168,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 58359.28177663448,
+          "operational_cost": 70031.13813196139,
+          "supply_cost": 155827.52164541453
+        },
+        {
+          "time": 9,
+          "capacity_expansion": 7.29491022207931,
+          "new_deployment": 3.647455111039655,
+          "planned_production": 29.17964088831724,
+          "earth_supply_request": 26.542372912980763,
+          "inventory_target": 9.472742346220661,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 72949.10222079311,
+          "operational_cost": 87538.92266495172,
+          "supply_cost": 530847.4582596152
+        }
+      ],
+      "states": [
+        {
+          "current_time": 1,
+          "total_capacity": 22.558881676131232,
+          "deployed_mass": 11.279440838065616,
+          "current_demand": 10.0,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0
+          ],
+          "production_history": [
+            10.0
+          ],
+          "capacity_history": [
+            22.558881676131232
+          ]
+        },
+        {
+          "current_time": 2,
+          "total_capacity": 22.558881676131232,
+          "deployed_mass": 11.279440838065616,
+          "current_demand": 12.60464098223109,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.60464098223109
+          ],
+          "production_history": [
+            10.0,
+            10.0
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232
+          ]
+        },
+        {
+          "current_time": 3,
+          "total_capacity": 22.558881676131232,
+          "deployed_mass": 11.279440838065616,
+          "current_demand": 12.583278023160652,
+          "actual_production": 12.60464098223109,
+          "inventory": 0.02136295907043717,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232
+          ]
+        },
+        {
+          "current_time": 4,
+          "total_capacity": 22.558881676131232,
+          "deployed_mass": 11.279440838065616,
+          "current_demand": 13.966591694291523,
+          "actual_production": 12.583278023160652,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109,
+            12.583278023160652
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232
+          ]
+        },
+        {
+          "current_time": 5,
+          "total_capacity": 22.558881676131232,
+          "deployed_mass": 11.279440838065616,
+          "current_demand": 15.024542797989833,
+          "actual_production": 13.966591694291523,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232
+          ]
+        },
+        {
+          "current_time": 6,
+          "total_capacity": 22.558881676131232,
+          "deployed_mass": 11.279440838065616,
+          "current_demand": 21.355295031204836,
+          "actual_production": 15.024542797989833,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232
+          ]
+        },
+        {
+          "current_time": 7,
+          "total_capacity": 22.558881676131232,
+          "deployed_mass": 11.279440838065616,
+          "current_demand": 23.539920469284436,
+          "actual_production": 21.355295031204836,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836,
+            23.539920469284436
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232
+          ]
+        },
+        {
+          "current_time": 8,
+          "total_capacity": 23.343712710653794,
+          "deployed_mass": 11.671856355326897,
+          "current_demand": 31.13508879292452,
+          "actual_production": 22.558881676131232,
+          "inventory": 0,
+          "earth_supply": 0.9810387931532034,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836,
+            23.539920469284436,
+            31.13508879292452
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836,
+            22.558881676131232
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            23.343712710653794
+          ]
+        },
+        {
+          "current_time": 9,
+          "total_capacity": 29.17964088831724,
+          "deployed_mass": 14.58982044415862,
+          "current_demand": 55.722013801298004,
+          "actual_production": 23.343712710653794,
+          "inventory": 0,
+          "earth_supply": 7.791376082270727,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836,
+            23.539920469284436,
+            31.13508879292452,
+            55.722013801298004
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836,
+            22.558881676131232,
+            23.343712710653794
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            23.343712710653794,
+            29.17964088831724
+          ]
+        },
+        {
+          "current_time": 10,
+          "total_capacity": 36.474551110396554,
+          "deployed_mass": 18.237275555198277,
+          "current_demand": 85.87971020668691,
+          "actual_production": 29.17964088831724,
+          "inventory": 0,
+          "earth_supply": 26.542372912980763,
+          "demand_history": [
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836,
+            23.539920469284436,
+            31.13508879292452,
+            55.722013801298004,
+            85.87971020668691
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            12.60464098223109,
+            12.583278023160652,
+            13.966591694291523,
+            15.024542797989833,
+            21.355295031204836,
+            22.558881676131232,
+            23.343712710653794,
+            29.17964088831724
+          ],
+          "capacity_history": [
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            22.558881676131232,
+            23.343712710653794,
+            29.17964088831724,
+            36.474551110396554
+          ]
+        }
+      ],
+      "performance_metrics": {
+        "npv": 1392494.1791246044,
+        "total_revenue": 3610246.9132922213,
+        "total_cost": 1357302.2015226877,
+        "total_expansion_cost": 139156.6943426532,
+        "total_operational_cost": 511849.7514119406,
+        "total_supply_cost": 706295.7557680939,
+        "total_demand": 281.8110817990718,
+        "total_production": 170.6165838039802,
+        "total_earth_supply": 35.31478778840469,
+        "self_sufficiency_rate": 0.6054289374100198,
+        "avg_utilization": 0.7791604112156804,
+        "min_utilization": 0.44328438543922377,
+        "max_utilization": 1.0,
+        "utilization_std": 0.21724314520786045,
+        "final_capacity": 36.474551110396554,
+        "final_deployed_mass": 18.237275555198277,
+        "capacity_expansions": 3,
+        "final_inventory": 0,
+        "avg_inventory_days": 0.0
+      },
+      "simulation_params": {
+        "initial_capacity": 22.558881676131232,
+        "initial_deployed_mass": 11.279440838065616,
+        "strategy_params": {
+          "name": "conservative",
+          "description": "保守策略：谨慎扩张，重视成本控制",
+          "initial_deployment_ratio": 0.6,
+          "utilization_threshold": 0.85,
+          "expansion_ratio": 0.25,
+          "risk_tolerance": 0.3,
+          "cost_sensitivity": 0.8
+        },
+        "seed": 43
+      }
+    },
+    {
+      "strategy_name": "conservative",
+      "T": 10,
+      "demand_path": [
+        10.0,
+        10.303278541042227,
+        16.0503974817146,
+        24.654553761798585,
+        21.412577263119317,
+        19.11263693985284,
+        16.237699114779623,
+        28.193526162234786,
+        34.35027340849995,
+        40.696640206907944,
+        54.44765961474495
+      ],
+      "decisions": [
+        {
+          "time": 0,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 1,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 2,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.303278541042227,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7515573519771785,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30909.83562312668,
+          "supply_cost": 0
+        },
+        {
+          "time": 3,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 16.0503974817146,
+          "earth_supply_request": 0,
+          "inventory_target": 2.728567571891482,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 48151.1924451438,
+          "supply_cost": 0
+        },
+        {
+          "time": 4,
+          "capacity_expansion": 4.131888637420422,
+          "new_deployment": 2.065944318710211,
+          "planned_production": 16.52755454968169,
+          "earth_supply_request": 8.126999212116896,
+          "inventory_target": 4.19127413950576,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 41318.88637420422,
+          "operational_cost": 49582.66364904507,
+          "supply_cost": 162539.98424233793
+        },
+        {
+          "time": 5,
+          "capacity_expansion": 0.6025072608137635,
+          "new_deployment": 0.30125363040688174,
+          "planned_production": 20.659443187102113,
+          "earth_supply_request": 0.7531340760172043,
+          "inventory_target": 3.640138134730284,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 6025.072608137635,
+          "operational_cost": 61978.32956130634,
+          "supply_cost": 15062.681520344086
+        },
+        {
+          "time": 6,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 19.11263693985284,
+          "earth_supply_request": 0,
+          "inventory_target": 3.249148279774983,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 57337.91081955852,
+          "supply_cost": 0
+        },
+        {
+          "time": 7,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 14.61392920330166,
+          "earth_supply_request": 1.6237699114779627,
+          "inventory_target": 2.7604088495125363,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 43841.78760990498,
+          "supply_cost": 32475.398229559254
+        },
+        {
+          "time": 8,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 21.261950447915876,
+          "earth_supply_request": 6.93157571431891,
+          "inventory_target": 4.792899447579914,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 63785.85134374763,
+          "supply_cost": 138631.5142863782
+        },
+        {
+          "time": 9,
+          "capacity_expansion": 5.315487611978969,
+          "new_deployment": 2.6577438059894845,
+          "planned_production": 21.261950447915876,
+          "earth_supply_request": 13.088322960584076,
+          "inventory_target": 5.839546479444992,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 53154.87611978969,
+          "operational_cost": 63785.85134374763,
+          "supply_cost": 261766.45921168153
+        }
+      ],
+      "states": [
+        {
+          "current_time": 1,
+          "total_capacity": 16.52755454968169,
+          "deployed_mass": 8.263777274840844,
+          "current_demand": 10.0,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0
+          ],
+          "production_history": [
+            10.0
+          ],
+          "capacity_history": [
+            16.52755454968169
+          ]
+        },
+        {
+          "current_time": 2,
+          "total_capacity": 16.52755454968169,
+          "deployed_mass": 8.263777274840844,
+          "current_demand": 10.303278541042227,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            10.303278541042227
+          ],
+          "production_history": [
+            10.0,
+            10.0
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169
+          ]
+        },
+        {
+          "current_time": 3,
+          "total_capacity": 16.52755454968169,
+          "deployed_mass": 8.263777274840844,
+          "current_demand": 16.0503974817146,
+          "actual_production": 10.303278541042227,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169
+          ]
+        },
+        {
+          "current_time": 4,
+          "total_capacity": 16.52755454968169,
+          "deployed_mass": 8.263777274840844,
+          "current_demand": 24.654553761798585,
+          "actual_production": 16.0503974817146,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            24.654553761798585
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227,
+            16.0503974817146
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169
+          ]
+        },
+        {
+          "current_time": 5,
+          "total_capacity": 20.659443187102113,
+          "deployed_mass": 10.329721593551056,
+          "current_demand": 21.412577263119317,
+          "actual_production": 16.52755454968169,
+          "inventory": 0,
+          "earth_supply": 4.885022713437628,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            24.654553761798585,
+            21.412577263119317
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            16.52755454968169
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            20.659443187102113
+          ]
+        },
+        {
+          "current_time": 6,
+          "total_capacity": 21.261950447915876,
+          "deployed_mass": 10.630975223957938,
+          "current_demand": 19.11263693985284,
+          "actual_production": 20.659443187102113,
+          "inventory": 1.5468062472492718,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            24.654553761798585,
+            21.412577263119317,
+            19.11263693985284
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            16.52755454968169,
+            20.659443187102113
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            20.659443187102113,
+            21.261950447915876
+          ]
+        },
+        {
+          "current_time": 7,
+          "total_capacity": 21.261950447915876,
+          "deployed_mass": 10.630975223957938,
+          "current_demand": 16.237699114779623,
+          "actual_production": 19.11263693985284,
+          "inventory": 4.42174407232249,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            24.654553761798585,
+            21.412577263119317,
+            19.11263693985284,
+            16.237699114779623
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            16.52755454968169,
+            20.659443187102113,
+            19.11263693985284
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            20.659443187102113,
+            21.261950447915876,
+            21.261950447915876
+          ]
+        },
+        {
+          "current_time": 8,
+          "total_capacity": 21.261950447915876,
+          "deployed_mass": 10.630975223957938,
+          "current_demand": 28.193526162234786,
+          "actual_production": 14.61392920330166,
+          "inventory": 0,
+          "earth_supply": 1.6237699114779627,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            24.654553761798585,
+            21.412577263119317,
+            19.11263693985284,
+            16.237699114779623,
+            28.193526162234786
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            16.52755454968169,
+            20.659443187102113,
+            19.11263693985284,
+            14.61392920330166
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            20.659443187102113,
+            21.261950447915876,
+            21.261950447915876,
+            21.261950447915876
+          ]
+        },
+        {
+          "current_time": 9,
+          "total_capacity": 21.261950447915876,
+          "deployed_mass": 10.630975223957938,
+          "current_demand": 34.35027340849995,
+          "actual_production": 21.261950447915876,
+          "inventory": 0,
+          "earth_supply": 6.93157571431891,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            24.654553761798585,
+            21.412577263119317,
+            19.11263693985284,
+            16.237699114779623,
+            28.193526162234786,
+            34.35027340849995
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            16.52755454968169,
+            20.659443187102113,
+            19.11263693985284,
+            14.61392920330166,
+            21.261950447915876
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            20.659443187102113,
+            21.261950447915876,
+            21.261950447915876,
+            21.261950447915876,
+            21.261950447915876
+          ]
+        },
+        {
+          "current_time": 10,
+          "total_capacity": 26.577438059894845,
+          "deployed_mass": 13.288719029947423,
+          "current_demand": 40.696640206907944,
+          "actual_production": 21.261950447915876,
+          "inventory": 0,
+          "earth_supply": 13.088322960584076,
+          "demand_history": [
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            24.654553761798585,
+            21.412577263119317,
+            19.11263693985284,
+            16.237699114779623,
+            28.193526162234786,
+            34.35027340849995,
+            40.696640206907944
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            10.303278541042227,
+            16.0503974817146,
+            16.52755454968169,
+            20.659443187102113,
+            19.11263693985284,
+            14.61392920330166,
+            21.261950447915876,
+            21.261950447915876
+          ],
+          "capacity_history": [
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            16.52755454968169,
+            20.659443187102113,
+            21.261950447915876,
+            21.261950447915876,
+            21.261950447915876,
+            21.261950447915876,
+            26.577438059894845
+          ]
+        }
+      ],
+      "performance_metrics": {
+        "npv": 1333660.9165398236,
+        "total_revenue": 3381180.5392968287,
+        "total_cost": 1190348.2949880133,
+        "total_expansion_cost": 100498.83510213155,
+        "total_operational_cost": 479373.4223955807,
+        "total_supply_cost": 610476.037490301,
+        "total_demand": 221.01158287994986,
+        "total_production": 159.79114079852687,
+        "total_earth_supply": 30.523801874515048,
+        "self_sufficiency_rate": 0.7229989429346922,
+        "avg_utilization": 0.8862190071272613,
+        "min_utilization": 0.6050501887584206,
+        "max_utilization": 1.0,
+        "utilization_std": 0.1533762445304659,
+        "final_capacity": 26.577438059894845,
+        "final_deployed_mass": 13.288719029947423,
+        "capacity_expansions": 3,
+        "final_inventory": 0,
+        "avg_inventory_days": 0.0
+      },
+      "simulation_params": {
+        "initial_capacity": 16.52755454968169,
+        "initial_deployed_mass": 8.263777274840844,
+        "strategy_params": {
+          "name": "conservative",
+          "description": "保守策略：谨慎扩张，重视成本控制",
+          "initial_deployment_ratio": 0.6,
+          "utilization_threshold": 0.85,
+          "expansion_ratio": 0.25,
+          "risk_tolerance": 0.3,
+          "cost_sensitivity": 0.8
+        },
+        "seed": 44
+      }
+    },
+    {
+      "strategy_name": "conservative",
+      "T": 10,
+      "demand_path": [
+        10.0,
+        12.035493160222464,
+        15.17917447152167,
+        16.791877368918417,
+        19.298649097970593,
+        17.916257978790664,
+        12.76022411382759,
+        16.187980524204377,
+        16.2746404412924,
+        21.082063891815643,
+        30.43044949489222
+      ],
+      "decisions": [
+        {
+          "time": 0,
+          "capacity_expansion": 0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 1,
+          "capacity_expansion": 0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 2,
+          "capacity_expansion": 0.6064676220920817,
+          "new_deployment": 0.30323381104604086,
+          "planned_production": 11.277408632607361,
+          "earth_supply_request": 0.758084527615102,
+          "inventory_target": 2.0460338372378186,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 6064.676220920817,
+          "operational_cost": 33832.225897822085,
+          "supply_cost": 15161.690552302041
+        },
+        {
+          "time": 3,
+          "capacity_expansion": 2.6362385734577813,
+          "new_deployment": 1.3181192867288907,
+          "planned_production": 11.883876254699443,
+          "earth_supply_request": 3.2952982168222267,
+          "inventory_target": 2.580459660158684,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 26362.385734577812,
+          "operational_cost": 35651.62876409833,
+          "supply_cost": 65905.96433644454
+        },
+        {
+          "time": 4,
+          "capacity_expansion": 1.8174100326089544,
+          "new_deployment": 0.9087050163044772,
+          "planned_production": 14.520114828157224,
+          "earth_supply_request": 2.271762540761193,
+          "inventory_target": 2.854619152716131,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 18174.100326089545,
+          "operational_cost": 43560.34448447167,
+          "supply_cost": 45435.25081522386
+        },
+        {
+          "time": 5,
+          "capacity_expansion": 2.36889938976353,
+          "new_deployment": 1.184449694881765,
+          "planned_production": 16.33752486076618,
+          "earth_supply_request": 2.9611242372044124,
+          "inventory_target": 3.2807703466550007,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 23688.9938976353,
+          "operational_cost": 49012.57458229854,
+          "supply_cost": 59222.48474408825
+        },
+        {
+          "time": 6,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 17.916257978790664,
+          "earth_supply_request": 0,
+          "inventory_target": 3.045763856394413,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 53748.773936371996,
+          "supply_cost": 0
+        },
+        {
+          "time": 7,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 11.484201702444832,
+          "earth_supply_request": 1.2760224113827583,
+          "inventory_target": 2.1692380993506903,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 34452.60510733449,
+          "supply_cost": 25520.448227655164
+        },
+        {
+          "time": 8,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 14.56918247178394,
+          "earth_supply_request": 1.6187980524204377,
+          "inventory_target": 2.7519566891147442,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 43707.547415351815,
+          "supply_cost": 32375.961048408753
+        },
+        {
+          "time": 9,
+          "capacity_expansion": 0,
+          "new_deployment": 0.0,
+          "planned_production": 14.647176397163161,
+          "earth_supply_request": 1.6274640441292405,
+          "inventory_target": 2.7666888750197085,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 0,
+          "operational_cost": 43941.529191489484,
+          "supply_cost": 32549.28088258481
+        }
+      ],
+      "states": [
+        {
+          "current_time": 1,
+          "total_capacity": 11.277408632607361,
+          "deployed_mass": 5.638704316303681,
+          "current_demand": 10.0,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0
+          ],
+          "production_history": [
+            10.0
+          ],
+          "capacity_history": [
+            11.277408632607361
+          ]
+        },
+        {
+          "current_time": 2,
+          "total_capacity": 11.277408632607361,
+          "deployed_mass": 5.638704316303681,
+          "current_demand": 12.035493160222464,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.035493160222464
+          ],
+          "production_history": [
+            10.0,
+            10.0
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361
+          ]
+        },
+        {
+          "current_time": 3,
+          "total_capacity": 11.883876254699443,
+          "deployed_mass": 5.941938127349721,
+          "current_demand": 15.17917447152167,
+          "actual_production": 11.277408632607361,
+          "inventory": 0,
+          "earth_supply": 0.758084527615102,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443
+          ]
+        },
+        {
+          "current_time": 4,
+          "total_capacity": 14.520114828157224,
+          "deployed_mass": 7.260057414078612,
+          "current_demand": 16.791877368918417,
+          "actual_production": 11.883876254699443,
+          "inventory": 0,
+          "earth_supply": 3.2952982168222267,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167,
+            16.791877368918417
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361,
+            11.883876254699443
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224
+          ]
+        },
+        {
+          "current_time": 5,
+          "total_capacity": 16.33752486076618,
+          "deployed_mass": 8.16876243038309,
+          "current_demand": 19.298649097970593,
+          "actual_production": 14.520114828157224,
+          "inventory": 0,
+          "earth_supply": 2.271762540761193,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167,
+            16.791877368918417,
+            19.298649097970593
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618
+          ]
+        },
+        {
+          "current_time": 6,
+          "total_capacity": 18.70642425052971,
+          "deployed_mass": 9.353212125264855,
+          "current_demand": 17.916257978790664,
+          "actual_production": 16.33752486076618,
+          "inventory": 0,
+          "earth_supply": 1.5787331180244841,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167,
+            16.791877368918417,
+            19.298649097970593,
+            17.916257978790664
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            18.70642425052971
+          ]
+        },
+        {
+          "current_time": 7,
+          "total_capacity": 18.70642425052971,
+          "deployed_mass": 9.353212125264855,
+          "current_demand": 12.76022411382759,
+          "actual_production": 17.916257978790664,
+          "inventory": 5.156033864963074,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167,
+            16.791877368918417,
+            19.298649097970593,
+            17.916257978790664,
+            12.76022411382759
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            17.916257978790664
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            18.70642425052971,
+            18.70642425052971
+          ]
+        },
+        {
+          "current_time": 8,
+          "total_capacity": 18.70642425052971,
+          "deployed_mass": 9.353212125264855,
+          "current_demand": 16.187980524204377,
+          "actual_production": 11.484201702444832,
+          "inventory": 1.7282774545862871,
+          "earth_supply": 1.2760224113827583,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167,
+            16.791877368918417,
+            19.298649097970593,
+            17.916257978790664,
+            12.76022411382759,
+            16.187980524204377
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            17.916257978790664,
+            11.484201702444832
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            18.70642425052971,
+            18.70642425052971,
+            18.70642425052971
+          ]
+        },
+        {
+          "current_time": 9,
+          "total_capacity": 18.70642425052971,
+          "deployed_mass": 9.353212125264855,
+          "current_demand": 16.2746404412924,
+          "actual_production": 14.56918247178394,
+          "inventory": 1.641617537498263,
+          "earth_supply": 1.6187980524204377,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167,
+            16.791877368918417,
+            19.298649097970593,
+            17.916257978790664,
+            12.76022411382759,
+            16.187980524204377,
+            16.2746404412924
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            17.916257978790664,
+            11.484201702444832,
+            14.56918247178394
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            18.70642425052971,
+            18.70642425052971,
+            18.70642425052971,
+            18.70642425052971
+          ]
+        },
+        {
+          "current_time": 10,
+          "total_capacity": 18.70642425052971,
+          "deployed_mass": 9.353212125264855,
+          "current_demand": 21.082063891815643,
+          "actual_production": 14.647176397163161,
+          "inventory": 0,
+          "earth_supply": 1.6274640441292405,
+          "demand_history": [
+            10.0,
+            12.035493160222464,
+            15.17917447152167,
+            16.791877368918417,
+            19.298649097970593,
+            17.916257978790664,
+            12.76022411382759,
+            16.187980524204377,
+            16.2746404412924,
+            21.082063891815643
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            17.916257978790664,
+            11.484201702444832,
+            14.56918247178394,
+            14.647176397163161
+          ],
+          "capacity_history": [
+            11.277408632607361,
+            11.277408632607361,
+            11.883876254699443,
+            14.520114828157224,
+            16.33752486076618,
+            18.70642425052971,
+            18.70642425052971,
+            18.70642425052971,
+            18.70642425052971,
+            18.70642425052971
+          ]
+        }
+      ],
+      "performance_metrics": {
+        "npv": 1223203.3824382257,
+        "total_revenue": 2806572.3245548946,
+        "total_cost": 748368.4661651694,
+        "total_expansion_cost": 74290.15617922347,
+        "total_operational_cost": 397907.2293792385,
+        "total_supply_cost": 276171.08060670743,
+        "total_demand": 157.5263610485638,
+        "total_production": 132.6357431264128,
+        "total_earth_supply": 13.80855403033537,
+        "self_sufficiency_rate": 0.8419907769311227,
+        "avg_utilization": 0.926199160793211,
+        "min_utilization": 0.6821305848158692,
+        "max_utilization": 1.0,
+        "utilization_std": 0.09808898653047397,
+        "final_capacity": 18.70642425052971,
+        "final_deployed_mass": 9.353212125264855,
+        "capacity_expansions": 4,
+        "final_inventory": 0,
+        "avg_inventory_days": 0.0
+      },
+      "simulation_params": {
+        "initial_capacity": 11.277408632607361,
+        "initial_deployed_mass": 5.638704316303681,
+        "strategy_params": {
+          "name": "conservative",
+          "description": "保守策略：谨慎扩张，重视成本控制",
+          "initial_deployment_ratio": 0.6,
+          "utilization_threshold": 0.85,
+          "expansion_ratio": 0.25,
+          "risk_tolerance": 0.3,
+          "cost_sensitivity": 0.8
+        },
+        "seed": 45
+      }
+    },
+    {
+      "strategy_name": "conservative",
+      "T": 10,
+      "demand_path": [
+        10.0,
+        13.457818805426612,
+        20.610474327169875,
+        29.0837460125348,
+        29.675856133769496,
+        38.58040235343659,
+        44.59015584270787,
+        52.60855345417221,
+        56.246591395455724,
+        66.09230947569279,
+        93.92650454130293
+      ],
+      "decisions": [
+        {
+          "time": 0,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 1,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 10.0,
+          "earth_supply_request": 0,
+          "inventory_target": 1.7,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 30000.0,
+          "supply_cost": 0
+        },
+        {
+          "time": 2,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 13.457818805426612,
+          "earth_supply_request": 0,
+          "inventory_target": 2.2878291969225244,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 40373.456416279834,
+          "supply_cost": 0
+        },
+        {
+          "time": 3,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 20.610474327169875,
+          "earth_supply_request": 0,
+          "inventory_target": 3.5037806356188783,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 61831.422981509626,
+          "supply_cost": 0
+        },
+        {
+          "time": 4,
+          "capacity_expansion": 0.0,
+          "new_deployment": 0.0,
+          "planned_production": 27.29234474050013,
+          "earth_supply_request": 1.791401272034669,
+          "inventory_target": 4.944236822130916,
+          "decision_reason": "",
+          "expansion_cost": 0.0,
+          "operational_cost": 81877.03422150039,
+          "supply_cost": 35828.02544069338
+        },
+        {
+          "time": 5,
+          "capacity_expansion": 1.9068091146154929,
+          "new_deployment": 0.9534045573077464,
+          "planned_production": 27.29234474050013,
+          "earth_supply_request": 2.383511393269366,
+          "inventory_target": 5.044895542740814,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 19068.09114615493,
+          "operational_cost": 81877.03422150039,
+          "supply_cost": 47670.227865387315
+        },
+        {
+          "time": 6,
+          "capacity_expansion": 7.2997884637789054,
+          "new_deployment": 3.6498942318894527,
+          "planned_production": 29.199153855115622,
+          "earth_supply_request": 9.381248498320968,
+          "inventory_target": 6.558668400084221,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 72997.88463778906,
+          "operational_cost": 87597.46156534686,
+          "supply_cost": 187624.96996641936
+        },
+        {
+          "time": 7,
+          "capacity_expansion": 6.472970819050676,
+          "new_deployment": 3.236485409525338,
+          "planned_production": 36.49894231889453,
+          "earth_supply_request": 8.091213523813344,
+          "inventory_target": 7.580326493260338,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 64729.70819050676,
+          "operational_cost": 109496.82695668358,
+          "supply_cost": 161824.2704762669
+        },
+        {
+          "time": 8,
+          "capacity_expansion": 7.709312252981602,
+          "new_deployment": 3.854656126490801,
+          "planned_production": 42.97191313794521,
+          "earth_supply_request": 9.636640316227002,
+          "inventory_target": 8.943454087209275,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 77093.12252981601,
+          "operational_cost": 128915.73941383562,
+          "supply_cost": 192732.80632454003
+        },
+        {
+          "time": 9,
+          "capacity_expansion": 4.45229280362313,
+          "new_deployment": 2.226146401811565,
+          "planned_production": 50.68122539092681,
+          "earth_supply_request": 5.5653660045289115,
+          "inventory_target": 9.561920537227474,
+          "decision_reason": "保守策略：满足连续高利用率和需求增长条件",
+          "expansion_cost": 44522.9280362313,
+          "operational_cost": 152043.67617278043,
+          "supply_cost": 111307.32009057823
+        }
+      ],
+      "states": [
+        {
+          "current_time": 1,
+          "total_capacity": 27.29234474050013,
+          "deployed_mass": 13.646172370250065,
+          "current_demand": 10.0,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0
+          ],
+          "production_history": [
+            10.0
+          ],
+          "capacity_history": [
+            27.29234474050013
+          ]
+        },
+        {
+          "current_time": 2,
+          "total_capacity": 27.29234474050013,
+          "deployed_mass": 13.646172370250065,
+          "current_demand": 13.457818805426612,
+          "actual_production": 10.0,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.457818805426612
+          ],
+          "production_history": [
+            10.0,
+            10.0
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013
+          ]
+        },
+        {
+          "current_time": 3,
+          "total_capacity": 27.29234474050013,
+          "deployed_mass": 13.646172370250065,
+          "current_demand": 20.610474327169875,
+          "actual_production": 13.457818805426612,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013
+          ]
+        },
+        {
+          "current_time": 4,
+          "total_capacity": 27.29234474050013,
+          "deployed_mass": 13.646172370250065,
+          "current_demand": 29.0837460125348,
+          "actual_production": 20.610474327169875,
+          "inventory": 0,
+          "earth_supply": 0,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            29.0837460125348
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612,
+            20.610474327169875
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013
+          ]
+        },
+        {
+          "current_time": 5,
+          "total_capacity": 27.29234474050013,
+          "deployed_mass": 13.646172370250065,
+          "current_demand": 29.675856133769496,
+          "actual_production": 27.29234474050013,
+          "inventory": 0,
+          "earth_supply": 1.791401272034669,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            29.0837460125348,
+            29.675856133769496
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            27.29234474050013
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013
+          ]
+        },
+        {
+          "current_time": 6,
+          "total_capacity": 29.199153855115622,
+          "deployed_mass": 14.599576927557811,
+          "current_demand": 38.58040235343659,
+          "actual_production": 27.29234474050013,
+          "inventory": 0,
+          "earth_supply": 2.383511393269366,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            29.0837460125348,
+            29.675856133769496,
+            38.58040235343659
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            27.29234474050013,
+            27.29234474050013
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622
+          ]
+        },
+        {
+          "current_time": 7,
+          "total_capacity": 36.49894231889453,
+          "deployed_mass": 18.249471159447264,
+          "current_demand": 44.59015584270787,
+          "actual_production": 29.199153855115622,
+          "inventory": 0,
+          "earth_supply": 9.381248498320968,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            29.0837460125348,
+            29.675856133769496,
+            38.58040235343659,
+            44.59015584270787
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622,
+            36.49894231889453
+          ]
+        },
+        {
+          "current_time": 8,
+          "total_capacity": 42.97191313794521,
+          "deployed_mass": 21.485956568972604,
+          "current_demand": 52.60855345417221,
+          "actual_production": 36.49894231889453,
+          "inventory": 0,
+          "earth_supply": 8.091213523813344,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            29.0837460125348,
+            29.675856133769496,
+            38.58040235343659,
+            44.59015584270787,
+            52.60855345417221
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622,
+            36.49894231889453
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622,
+            36.49894231889453,
+            42.97191313794521
+          ]
+        },
+        {
+          "current_time": 9,
+          "total_capacity": 50.68122539092681,
+          "deployed_mass": 25.340612695463406,
+          "current_demand": 56.246591395455724,
+          "actual_production": 42.97191313794521,
+          "inventory": 0,
+          "earth_supply": 9.636640316227002,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            29.0837460125348,
+            29.675856133769496,
+            38.58040235343659,
+            44.59015584270787,
+            52.60855345417221,
+            56.246591395455724
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622,
+            36.49894231889453,
+            42.97191313794521
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622,
+            36.49894231889453,
+            42.97191313794521,
+            50.68122539092681
+          ]
+        },
+        {
+          "current_time": 10,
+          "total_capacity": 55.13351819454994,
+          "deployed_mass": 27.56675909727497,
+          "current_demand": 66.09230947569279,
+          "actual_production": 50.68122539092681,
+          "inventory": 0,
+          "earth_supply": 5.5653660045289115,
+          "demand_history": [
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            29.0837460125348,
+            29.675856133769496,
+            38.58040235343659,
+            44.59015584270787,
+            52.60855345417221,
+            56.246591395455724,
+            66.09230947569279
+          ],
+          "production_history": [
+            10.0,
+            10.0,
+            13.457818805426612,
+            20.610474327169875,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622,
+            36.49894231889453,
+            42.97191313794521,
+            50.68122539092681
+          ],
+          "capacity_history": [
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            27.29234474050013,
+            29.199153855115622,
+            36.49894231889453,
+            42.97191313794521,
+            50.68122539092681,
+            55.13351819454994
+          ]
+        }
+      ],
+      "performance_metrics": {
+        "npv": 2135201.238454633,
+        "total_revenue": 5670969.238416695,
+        "total_cost": 1819412.00665382,
+        "total_expansion_cost": 278411.73454049806,
+        "total_operational_cost": 804012.6519494368,
+        "total_supply_cost": 736987.6201638852,
+        "total_demand": 360.94590780036594,
+        "total_production": 268.00421731647896,
+        "total_earth_supply": 36.84938100819426,
+        "self_sufficiency_rate": 0.7425052106830043,
+        "avg_utilization": 0.8614675966891255,
+        "min_utilization": 0.3664031102890411,
+        "max_utilization": 1.0,
+        "utilization_std": 0.22943874779964796,
+        "final_capacity": 55.13351819454994,
+        "final_deployed_mass": 27.56675909727497,
+        "capacity_expansions": 5,
+        "final_inventory": 0,
+        "avg_inventory_days": 0.0
+      },
+      "simulation_params": {
+        "initial_capacity": 27.29234474050013,
+        "initial_deployed_mass": 13.646172370250065,
+        "strategy_params": {
+          "name": "conservative",
+          "description": "保守策略：谨慎扩张，重视成本控制",
+          "initial_deployment_ratio": 0.6,
+          "utilization_threshold": 0.85,
+          "expansion_ratio": 0.25,
+          "risk_tolerance": 0.3,
+          "cost_sensitivity": 0.8
+        },
+        "seed": 46
+      }
+    }
+  ]
+}

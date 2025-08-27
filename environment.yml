@@ -1,0 +1,17 @@
+name: isru
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pyomo
+  - glpk
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - pyyaml
+  - jupyter
+  - seaborn
+  - pytest
+prefix: /opt/miniconda3/envs/isru

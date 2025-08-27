@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "strategy": "conservative",
+    "time_horizon": 10,
+    "n_simulations": 5,
+    "timestamp": "20250828_002619",
+    "version": "2.0",
+    "base_seed": 42,
+    "simulation_type": "single_batch"
+  },
+  "results": [
+    {
+      "strategy_name": "conservative",
+      "T": 10,
+      "demand_path": 
