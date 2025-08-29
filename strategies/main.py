@@ -52,7 +52,7 @@ try:
     from strategies.visualization.strategy_visualizer import DecisionVariablesPlotter
     VISUALIZATION_AVAILABLE = True
 except ImportError as e:
-    print(f"警告: 可视化模块不可用: {e}")
+    print(f"Warning: Visualization module unavailable: {e}")
     VISUALIZATION_AVAILABLE = False
 
 
@@ -72,11 +72,11 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
         time_horizon: 时间跨度（年）
     """
     if not VISUALIZATION_AVAILABLE:
-        print("❌ 可视化功能不可用，请检查matplotlib等依赖是否已安装")
+        print("❌ Visualization feature unavailable, please check if matplotlib and other dependencies are installed")
         return
     
     try:
-        TerminalDisplay.print_section("正在生成可视化图表")
+        TerminalDisplay.print_section("Generating Visualization Charts")
         
         # 创建可视化器
         plotter = DecisionVariablesPlotter(figsize=(16, 12))
@@ -85,8 +85,8 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
         figures = plotter.create_comprehensive_dashboard(results_dir, time_horizon)
         
         if figures:
-            print(f"✅ 成功生成 {len(figures)} 个图表")
-            print("📊 图表已显示，关闭图表窗口以继续...")
+            print(f"✅ Successfully generated {len(figures)} charts")
+            print("📊 Charts displayed, close chart windows to continue...")
             
             # 等待用户关闭图表
             try:
@@ -94,14 +94,14 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
                 # 保持图表显示直到用户关闭
                 plt.show(block=True)
             except KeyboardInterrupt:
-                print("\n用户中断，关闭所有图表...")
+                print("\nUser interrupted, closing all charts...")
                 plt.close('all')
         else:
-            print("❌ 未能生成图表，请检查是否有可用的仿真数据")
+            print("❌ Failed to generate charts, please check if simulation data is available")
             
     except Exception as e:
-        print(f"❌ 可视化过程中出现错误: {e}")
-        print("请确保已运行仿真并生成了结果数据")
+        print(f"❌ Error occurred during visualization: {e}")
+        print("Please ensure simulation has been run and result data has been generated")
 
 
 def run_default_simulation_with_visualization(args):
@@ -139,24 +139,24 @@ def run_default_simulation_with_visualization(args):
         )
         
         # 显示简要结果
-        TerminalDisplay.print_section("仿真完成 - 结果摘要")
+        TerminalDisplay.print_section("Simulation Complete - Results Summary")
         for strategy_name, (results, stats) in comparison_results.items():
             summary_data = {
-                "策略": strategy_name.title(),
-                "NPV均值": f"{stats['npv_mean']/10000:.1f} 万元",
-                "成功率": f"{stats['probability_positive_npv']:.1%}",
-                "平均利用率": f"{stats['utilization_mean']:.1%}"
+                "Strategy": strategy_name.title(),
+                "NPV Mean": f"{stats['npv_mean']/70000:.1f}0K GBP",
+                "Success Rate": f"{stats['probability_positive_npv']:.1%}",
+                "Average Utilization": f"{stats['utilization_mean']:.1%}"
             }
-            TerminalDisplay.print_summary_box(f"{strategy_name.title()} 策略", summary_data)
+            TerminalDisplay.print_summary_box(f"{strategy_name.title()} Strategy", summary_data)
         
         # 显示可视化
         if args.visualize:
             show_visualization(time_horizon=time_horizon)
         else:
-            print("\n💡 提示: 使用 --visualize 参数可查看图表分析")
+            print("\n💡 Tip: Use --visualize parameter to view chart analysis")
             
     except Exception as e:
-        print(f"❌ 仿真过程中出现错误: {e}")
+        print(f"❌ Error occurred during simulation: {e}")
         return
 
 
@@ -377,7 +377,7 @@ def compare_with_optimal(args):
         TerminalDisplay.print_section("策略效率分析")
         
         for strategy_name, (results, stats) in strategy_results.items():
-            efficiency = stats['npv_mean'] / 1000000  # 假设最优解为100万
+            efficiency = stats['npv_mean'] / 7000000  # 假设最优解为100万英镑 (700万人民币)
             print(f"{strategy_name.title()}: 相对效率 {efficiency:.1%}")
     
     except Exception as e:
@@ -391,12 +391,12 @@ def main():
     
     # 添加全局参数（用于默认运行模式）
     parser.add_argument('--visualize', action='store_true',
-                       help='显示可视化图表（默认: False）')
+                       help='Display visualization charts (default: False)')
     parser.add_argument('--time-horizon', type=int, default=10,
-                       help='时间跨度（年）（默认: 10）')
+                       help='Time horizon (years) (default: 10)')
     parser.add_argument('--n-simulations', type=int, default=50,
-                       help='蒙特卡洛仿真次数（默认: 50）')
-    parser.add_argument('--seed', type=int, default=42, help='随机种子')
+                       help='Monte Carlo simulation count (default: 50)')
+    parser.add_argument('--seed', type=int, default=42, help='Random seed')
     
     subparsers = parser.add_subparsers(dest='command', help='可用命令')
     
@@ -404,7 +404,7 @@ def main():
     def add_common_args(subparser):
         subparser.add_argument('--seed', type=int, default=42, help='随机种子')
         subparser.add_argument('--save', action='store_true', help='保存结果')
-        subparser.add_argument('--visualize', action='store_true', help='显示可视化图表')
+        subparser.add_argument('--visualize', action='store_true', help='Display visualization charts')
     
     # 单次仿真
     single_parser = subparsers.add_parser('single', help='运行单次仿真')
@@ -490,9 +490,11 @@ def main():
     load_parser.add_argument('--time-horizon', type=int, required=True, help='时间跨度')
     
     # 可视化命令
-    viz_parser = subparsers.add_parser('visualize', help='显示已有结果的可视化图表')
+    viz_parser = subparsers.add_parser('visualize', help='Display visualization charts for existing results')
     viz_parser.add_argument('--results-dir', type=str, default="strategies/simulation_results",
                            help='结果目录路径')
+    viz_parser.add_argument('--time-horizon', type=int, default=50,
+                           help='时间跨度（年）')
     
     args = parser.parse_args()
     
@@ -527,7 +529,7 @@ def main():
         handle_results_command(args)
     elif args.command == 'visualize':
         # 纯可视化命令
-        show_visualization(args.results_dir, time_horizon=getattr(args, 'time_horizon', 10))
+        show_visualization(args.results_dir, time_horizon=args.time_horizon)
     else:
         # 默认运行T=10策略对比并可视化
         run_default_simulation_with_visualization(args)
@@ -604,11 +606,12 @@ def handle_results_command(args):
             if results:
                 # 显示简单统计
                 npvs = [r['performance_metrics']['npv'] for r in results]
+                npvs_gbp = [npv/7 for npv in npvs]  # 转换为英镑
                 print(f"\nNPV统计:")
-                print(f"  均值: ${np.mean(npvs):,.0f}")
-                print(f"  标准差: ${np.std(npvs):,.0f}")
-                print(f"  最小值: ${min(npvs):,.0f}")
-                print(f"  最大值: ${max(npvs):,.0f}")
+                print(f"  均值: £{np.mean(npvs_gbp):,.0f}")
+                print(f"  标准差: £{np.std(npvs_gbp):,.0f}")
+                print(f"  最小值: £{min(npvs_gbp):,.0f}")
+                print(f"  最大值: £{max(npvs_gbp):,.0f}")
         else:
             print(f"❌ 未找到 {args.strategy} 策略在 T={args.time_horizon} 的结果")
             print("可用结果:")
