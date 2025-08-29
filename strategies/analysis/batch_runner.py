@@ -42,7 +42,7 @@ class BatchSimulationRunner:
         self.result_manager = ResultManager(self.results_dir)
         
         # 默认配置
-        self.default_strategies = ["conservative", "aggressive", "moderate"]
+        self.default_strategies = ["upfront_production", "gradual_production", "flexible_production"]
         self.default_time_horizons = [10, 20, 30, 40, 50]
         self.default_n_simulations = 100
     
@@ -418,22 +418,22 @@ if __name__ == "__main__":
     
     # 测试单个策略仿真
     print("\n--- 单策略仿真测试 ---")
-    results, stats = runner.run_single_batch("conservative", T=10, n_simulations=20)
+    results, stats = runner.run_single_batch("upfront_production", T=10, n_simulations=20)
     print(f"完成 {len(results)} 次仿真")
     print(f"NPV均值: ${stats['npv_mean']:,.0f}")
     
     # 测试策略对比
     print("\n--- 策略对比测试 ---")
     comparison = runner.run_strategy_comparison(
-        strategies=["conservative", "aggressive"], 
-        T=10, 
+        strategies=["upfront_production", "flexible_production"],
+        T=10,
         n_simulations=10
     )
     
     # 测试时间跨度分析
     print("\n--- 时间跨度分析测试 ---")
     horizon_analysis = runner.run_time_horizon_analysis(
-        time_horizons=[10, 20], 
-        strategies=["moderate"], 
+        time_horizons=[10, 20],
+        strategies=["gradual_production"],
         n_simulations=5
     )

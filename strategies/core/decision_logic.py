@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-决策逻辑引擎
-实现三种策略的具体决策逻辑
+决策逻辑引擎 - 生产策略版本
+实现三种新生产策略的具体决策逻辑
 """
 
 import sys
@@ -13,12 +13,12 @@ import numpy as np
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from strategies.core.strategy_definitions import StrategyParams, StrategyType
+from strategies.core.strategy_definitions import StrategyParams, StrategyType, calculate_production_for_year, calculate_required_capacity
 from strategies.core.state_manager import SystemState, Decision
 
 
 class DecisionEngine:
-    """策略决策引擎"""
+    """生产策略决策引擎"""
     
     def __init__(self, strategy: StrategyParams, params: Dict):
         """
@@ -40,10 +40,16 @@ class DecisionEngine:
         # 技术参数
         tech = params.get('technology', {})
         self.efficiency_ratio = tech.get('eta', 2)  # 产能效率比
+        
+        # 需求参数
+        demand_params = params.get('demand', {})
+        self.D0 = demand_params.get('D0', 10)  # 初始需求
+        self.mu = demand_params.get('mu', 0.2)  # 需求增长率
+        self.sigma = demand_params.get('sigma', 0.2)  # 需求波动率
     
     def make_decision(self, state: SystemState, demand_forecast: Optional[List[float]] = None) -> Decision:
         """
-        根据策略和当前状态做出决策
+        根据生产策略和当前状态做出决策
         
         Args:
             state: 当前系统状态
@@ -54,184 +60,91 @@ class DecisionEngine:
         """
         decision = Decision(time=state.current_time)
         
-        # 1. 评估是否需要扩张产能
-        expansion_needed, expansion_reason = self._evaluate_expansion_need(state, demand_forecast)
+        # 1. 计算最终需求（基于时间跨度T）
+        final_demand = self._estimate_final_demand(state)
         
-        if expansion_needed:
-            # 2. 计算扩张规模
-            expansion_amount = self._calculate_expansion_amount(state, demand_forecast)
-            decision.capacity_expansion = expansion_amount
-            decision.new_deployment = expansion_amount / self.efficiency_ratio
-            decision.expansion_cost = self._calculate_expansion_cost(expansion_amount)
-            decision.decision_reason = expansion_reason
+        # 2. 根据策略计算当年的目标生产量
+        target_production = self._calculate_target_production(state, final_demand)
         
-        # 3. 计算生产计划
-        decision.planned_production = self._calculate_production_plan(state)
+        # 3. 计算所需产能
+        required_capacity = calculate_required_capacity(self.strategy, target_production)
+        
+        # 4. 检查是否需要扩张产能
+        capacity_gap = max(0, required_capacity - state.total_capacity)
+        
+        if capacity_gap > 0:
+            decision.capacity_expansion = capacity_gap
+            decision.new_deployment = capacity_gap / self.efficiency_ratio
+            decision.expansion_cost = self._calculate_expansion_cost(capacity_gap)
+            decision.decision_reason = f"{self.strategy.production_type} production strategy capacity expansion"
+        
+        # 5. 设置生产计划
+        decision.planned_production = min(target_production, state.total_capacity + capacity_gap)
         decision.operational_cost = self._calculate_operational_cost(decision.planned_production)
         
-        # 4. 计算地球补给需求
+        # 6. 计算地球补给需求
         production_shortfall = max(0, state.current_demand - decision.planned_production)
-        decision.earth_supply_request = self._calculate_earth_supply(production_shortfall, state)
+        decision.earth_supply_request = production_shortfall
         decision.supply_cost = self._calculate_supply_cost(decision.earth_supply_request)
         
-        # 5. 设置库存目标
+        # 7. 设置库存目标
         decision.inventory_target = self._calculate_inventory_target(state)
         
         return decision
     
-    def _evaluate_expansion_need(self, state: SystemState, 
-                               demand_forecast: Optional[List[float]] = None) -> tuple[bool, str]:
-        """评估是否需要扩张产能"""
+    def _estimate_final_demand(self, state: SystemState) -> float:
+        """
+        估算最终年份的需求
         
-        # 基本利用率检查
-        if state.utilization_rate < self.strategy.utilization_threshold:
-            return False, "利用率未达到扩张阈值"
+        Args:
+            state: 当前系统状态
+            
+        Returns:
+            最终年份的预期需求
+        """
+        # 使用几何布朗运动模型估算最终需求
+        # D_T = D0 * exp(mu*T)
+        T = self.strategy.time_horizon
+        final_demand = self.D0 * np.exp(self.mu * T)
         
-        # 策略特定的扩张逻辑
-        if self.strategy.name == "conservative":
-            return self._conservative_expansion_logic(state, demand_forecast)
-        elif self.strategy.name == "aggressive":
-            return self._aggressive_expansion_logic(state, demand_forecast)
-        elif self.strategy.name == "moderate":
-            return self._moderate_expansion_logic(state, demand_forecast)
-        else:
-            return False, "未知策略类型"
+        return final_demand
     
-    def _conservative_expansion_logic(self, state: SystemState, 
-                                    demand_forecast: Optional[List[float]] = None) -> tuple[bool, str]:
-        """保守策略的扩张逻辑"""
+    def _calculate_target_production(self, state: SystemState, final_demand: float) -> float:
+        """
+        根据策略计算当年的目标生产量
         
-        # 需要连续高利用率
-        if len(state.demand_history) >= 2:
-            recent_utilizations = []
-            for i in range(-2, 0):
-                if abs(i) <= len(state.demand_history) and abs(i) <= len(state.capacity_history):
-                    demand = state.demand_history[i]
-                    capacity = state.capacity_history[i] if abs(i) <= len(state.capacity_history) else state.total_capacity
-                    util = min(demand / max(capacity, 1e-6), 1.0)
-                    recent_utilizations.append(util)
+        Args:
+            state: 当前系统状态
+            final_demand: 最终需求
             
-            if recent_utilizations and min(recent_utilizations) < self.strategy.utilization_threshold:
-                return False, "保守策略：需要连续高利用率才扩张"
+        Returns:
+            当年的目标生产量
+        """
+        current_year = state.current_time
+        current_demand = state.current_demand
         
-        # 检查需求增长趋势
-        if len(state.demand_history) >= 3:
-            recent_demands = state.demand_history[-3:]
-            growth_rates = [recent_demands[i+1]/recent_demands[i] - 1 for i in range(len(recent_demands)-1)]
-            avg_growth = np.mean(growth_rates)
-            
-            if avg_growth <= 0.05:  # 增长率低于5%
-                return False, "保守策略：需求增长趋势不明显"
-        
-        return True, "保守策略：满足连续高利用率和需求增长条件"
-    
-    def _aggressive_expansion_logic(self, state: SystemState, 
-                                  demand_forecast: Optional[List[float]] = None) -> tuple[bool, str]:
-        """激进策略的扩张逻辑"""
-        
-        # 激进策略：只要利用率达到阈值就扩张
-        if state.utilization_rate >= self.strategy.utilization_threshold:
-            return True, "激进策略：利用率达到阈值，立即扩张"
-        
-        # 预测性扩张：如果预测未来需求会增长
-        if demand_forecast and len(demand_forecast) > 0:
-            future_demand = demand_forecast[0]
-            if future_demand > state.current_demand * 1.1:  # 预测增长超过10%
-                return True, "激进策略：预测需求增长，提前扩张"
-        
-        return False, "激进策略：条件不满足"
-    
-    def _moderate_expansion_logic(self, state: SystemState, 
-                                demand_forecast: Optional[List[float]] = None) -> tuple[bool, str]:
-        """温和策略的扩张逻辑"""
-        
-        # 温和策略：平衡考虑当前利用率和未来趋势
-        if state.utilization_rate >= self.strategy.utilization_threshold:
-            
-            # 检查库存水平
-            if hasattr(state, 'inventory_days') and state.inventory_days < 30:  # 库存不足30天
-                return True, "温和策略：高利用率且库存不足"
-            
-            # 检查最近的需求趋势
-            if len(state.demand_history) >= 2:
-                recent_growth = (state.demand_history[-1] / state.demand_history[-2] - 1) if state.demand_history[-2] > 0 else 0
-                if recent_growth > 0.02:  # 最近增长超过2%
-                    return True, "温和策略：高利用率且需求有增长趋势"
-        
-        return False, "温和策略：条件不满足"
-    
-    def _calculate_expansion_amount(self, state: SystemState, 
-                                  demand_forecast: Optional[List[float]] = None) -> float:
-        """计算扩张数量"""
-        
-        # 基础扩张量
-        base_expansion = state.total_capacity * self.strategy.expansion_ratio
-        
-        # 当前需求缺口
-        current_gap = max(0, state.current_demand - state.total_capacity)
-        
-        # 策略特定的扩张计算
-        if self.strategy.name == "conservative":
-            # 保守策略：只满足当前缺口的80%，避免过度投资
-            expansion = min(base_expansion, current_gap * 0.8)
-            
-        elif self.strategy.name == "aggressive":
-            # 激进策略：不仅满足当前缺口，还要预留未来增长空间
-            future_buffer = state.current_demand * 0.3  # 30%的未来缓冲
-            expansion = max(base_expansion, current_gap + future_buffer)
-            
-        else:  # moderate
-            # 温和策略：满足当前缺口并适度预留
-            future_buffer = state.current_demand * 0.15  # 15%的未来缓冲
-            expansion = max(base_expansion, current_gap + future_buffer)
-        
-        # 确保扩张量不为负
-        return max(0, expansion)
-    
-    def _calculate_production_plan(self, state: SystemState) -> float:
-        """计算生产计划"""
-        # 生产计划受产能限制
-        max_production = state.total_capacity
-        
-        # 根据需求和库存情况调整生产计划
-        target_production = state.current_demand
-        
-        # 考虑库存情况
-        if state.inventory > state.current_demand * 0.1:  # 库存超过10%的年需求
-            # 减少生产，避免库存积压
-            target_production *= 0.9
-        
-        return min(target_production, max_production)
-    
-    def _calculate_earth_supply(self, production_shortfall: float, state: SystemState) -> float:
-        """计算地球补给需求"""
-        if production_shortfall <= 0:
-            return 0
-        
-        # 策略特定的补给逻辑
-        if self.strategy.name == "conservative":
-            # 保守策略：优先使用地球补给，避免过度投资
-            return production_shortfall
-            
-        elif self.strategy.name == "aggressive":
-            # 激进策略：尽量减少地球补给，推动本地生产
-            # 只在紧急情况下使用地球补给
-            emergency_threshold = state.current_demand * 0.2  # 20%的紧急阈值
-            return min(production_shortfall, emergency_threshold)
-            
-        else:  # moderate
-            # 温和策略：平衡使用地球补给
-            return production_shortfall * 0.8  # 补给80%的缺口
+        return calculate_production_for_year(
+            self.strategy,
+            current_year,
+            final_demand,
+            current_demand
+        )
     
     def _calculate_inventory_target(self, state: SystemState) -> float:
         """计算库存目标"""
-        # 基于策略的风险偏好设置库存目标
-        base_target = state.current_demand * 0.1  # 基础目标：10%的年需求
+        # 基础目标：10%的年需求
+        base_target = state.current_demand * 0.1
         
-        # 根据风险容忍度调整
-        risk_multiplier = 1 + (1 - self.strategy.risk_tolerance)
-        
-        return base_target * risk_multiplier
+        # 根据策略类型调整
+        if self.strategy.production_type == "upfront":
+            # 一次性满产策略：保持较高库存
+            return base_target * 1.5
+        elif self.strategy.production_type == "gradual":
+            # 渐进生产策略：中等库存
+            return base_target * 1.2
+        else:  # flexible
+            # 灵活生产策略：较低库存，依赖快速响应
+            return base_target * 0.8
     
     def _calculate_expansion_cost(self, expansion_amount: float) -> float:
         """计算扩张成本"""
@@ -255,7 +168,7 @@ class DecisionEngine:
 
 if __name__ == "__main__":
     # 测试代码
-    print("=== 决策逻辑引擎测试 ===")
+    print("=== 生产策略决策逻辑引擎测试 ===")
     
     # 导入策略定义
     from strategies.core.strategy_definitions import StrategyDefinitions
@@ -269,11 +182,17 @@ if __name__ == "__main__":
         },
         'technology': {
             'eta': 2
+        },
+        'demand': {
+            'D0': 10,
+            'mu': 0.2,
+            'sigma': 0.2
         }
     }
     
-    # 测试每种策略
-    strategies = StrategyDefinitions.get_all_strategies()
+    # 测试每种新策略
+    time_horizon = 20
+    strategies = StrategyDefinitions.get_all_strategies(time_horizon)
     
     for name, strategy in strategies.items():
         print(f"\n=== {name.upper()} 策略测试 ===")
@@ -283,20 +202,20 @@ if __name__ == "__main__":
         # 创建测试状态
         test_state = SystemState(
             current_time=5,
-            total_capacity=100.0,
-            current_demand=90.0,  # 90%利用率
-            inventory=10.0,
-            demand_history=[70, 75, 80, 85, 90],
-            capacity_history=[100, 100, 100, 100, 100]
+            total_capacity=50.0,
+            current_demand=60.0,  # 需求超过产能
+            inventory=5.0,
+            demand_history=[40, 45, 50, 55, 60],
+            capacity_history=[30, 35, 40, 45, 50]
         )
         
         # 做出决策
         decision = engine.make_decision(test_state)
         
         print(f"决策结果:")
+        print(f"  目标生产量: {decision.planned_production:.1f}")
         print(f"  产能扩张: {decision.capacity_expansion:.1f}")
         print(f"  新增部署: {decision.new_deployment:.1f}")
-        print(f"  计划产量: {decision.planned_production:.1f}")
         print(f"  地球补给: {decision.earth_supply_request:.1f}")
         print(f"  扩张成本: ${decision.expansion_cost:,.0f}")
         print(f"  决策原因: {decision.decision_reason}")

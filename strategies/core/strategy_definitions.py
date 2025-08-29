@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-ISRU策略定义模块 - 重构版本
-定义三种策略的参数和决策逻辑
+ISRU策略定义模块 - 生产策略版本
+定义三种新的生产策略的参数和决策逻辑
 """
 
 from dataclasses import dataclass
@@ -12,9 +12,9 @@ import numpy as np
 
 class StrategyType(Enum):
     """策略类型枚举"""
-    CONSERVATIVE = "conservative"
-    AGGRESSIVE = "aggressive"
-    MODERATE = "moderate"
+    UPFRONT_PRODUCTION = "upfront_production"
+    GRADUAL_PRODUCTION = "gradual_production"
+    FLEXIBLE_PRODUCTION = "flexible_production"
 
 
 @dataclass
@@ -23,90 +23,87 @@ class StrategyParams:
     name: str
     description: str
     
-    # 初始部署参数
-    initial_deployment_ratio: float  # 相对于预期总需求的初始部署比例
+    # 生产策略类型
+    production_type: str             # "upfront", "gradual", "flexible"
     
-    # 决策触发参数
-    utilization_threshold: float     # 触发扩张的利用率阈值
-    expansion_ratio: float           # 每次扩张的比例
+    # 时间跨度相关参数
+    time_horizon: int                # 总时间跨度T
     
-    # 风险偏好参数
-    risk_tolerance: float            # 风险容忍度 (0-1)
-    cost_sensitivity: float          # 成本敏感度 (0-1)
+    # 生产计算参数
+    max_production_ratio: float      # 相对于最终需求的最大生产比例
+    
+    # 产能建设策略
+    capacity_buffer: float           # 产能缓冲比例（确保有足够产能支持生产）
     
     def __post_init__(self):
         """验证参数有效性"""
-        assert 0 <= self.initial_deployment_ratio <= 2.0, "初始部署比例应在0-2.0之间"
-        assert 0.5 <= self.utilization_threshold <= 1.0, "利用率阈值应在0.5-1.0之间"
-        assert 0 <= self.expansion_ratio <= 1.0, "扩张比例应在0-1.0之间"
-        assert 0 <= self.risk_tolerance <= 1.0, "风险容忍度应在0-1.0之间"
-        assert 0 <= self.cost_sensitivity <= 1.0, "成本敏感度应在0-1.0之间"
+        assert self.production_type in ["upfront", "gradual", "flexible"], "生产类型必须是upfront, gradual, 或flexible"
+        assert self.time_horizon > 0, "时间跨度必须大于0"
+        assert 0 <= self.max_production_ratio <= 2.0, "最大生产比例应在0-2.0之间"
+        assert 0 <= self.capacity_buffer <= 1.0, "产能缓冲比例应在0-1.0之间"
 
 
 class StrategyDefinitions:
-    """策略定义类 - 重构版本"""
+    """策略定义类 - 生产策略版本"""
     
     @staticmethod
-    def get_conservative_strategy() -> StrategyParams:
+    def get_upfront_production_strategy(time_horizon: int = 20) -> StrategyParams:
         """
-        保守策略：谨慎扩张，重视成本控制
-        - 初期部署较少，避免过度投资
-        - 高利用率才扩张，确保需求确实存在
-        - 小幅扩张，控制风险
+        一次性满产策略：第一年就生产量拉满到最终需求水平
+        - 第一年就达到最终需求的生产水平
+        - 需要提前建设足够的产能支持满产
+        - 后续年份维持高生产水平
         """
         return StrategyParams(
-            name="conservative",
-            description="保守策略：谨慎扩张，重视成本控制",
-            initial_deployment_ratio=0.6,   # 初期只部署60%的预期需求
-            utilization_threshold=0.85,     # 85%利用率才扩张
-            expansion_ratio=0.25,           # 每次扩张25%
-            risk_tolerance=0.3,             # 低风险容忍度
-            cost_sensitivity=0.8            # 高成本敏感度
+            name="upfront_production",
+            description="Upfront Production: Reach maximum production in the first year",
+            production_type="upfront",
+            time_horizon=time_horizon,
+            max_production_ratio=1.0,       # 生产100%的最终需求
+            capacity_buffer=0.2             # 20%的产能缓冲
         )
     
     @staticmethod
-    def get_aggressive_strategy() -> StrategyParams:
+    def get_gradual_production_strategy(time_horizon: int = 20) -> StrategyParams:
         """
-        激进策略：快速扩张，追求市场占有
-        - 初期大规模部署，抢占市场
-        - 较低利用率就扩张，提前布局
-        - 大幅扩张，快速响应需求增长
+        渐进生产策略：生产量逐年平均增长
+        - 生产量从0逐步增长到最终需求水平
+        - 每年生产量 = (年份/T) * 最终需求
+        - 产能建设跟随生产计划
         """
         return StrategyParams(
-            name="aggressive",
-            description="激进策略：快速扩张，追求市场占有",
-            initial_deployment_ratio=1.2,   # 初期部署120%的预期需求
-            utilization_threshold=0.70,     # 70%利用率就扩张
-            expansion_ratio=0.50,           # 每次扩张50%
-            risk_tolerance=0.8,             # 高风险容忍度
-            cost_sensitivity=0.3            # 低成本敏感度
+            name="gradual_production",
+            description="Gradual Production: Gradually increase production to final demand level",
+            production_type="gradual",
+            time_horizon=time_horizon,
+            max_production_ratio=1.0,       # 生产100%的最终需求
+            capacity_buffer=0.1             # 10%的产能缓冲
         )
     
     @staticmethod
-    def get_moderate_strategy() -> StrategyParams:
+    def get_flexible_production_strategy(time_horizon: int = 20) -> StrategyParams:
         """
-        温和策略：平衡扩张，稳健发展
-        - 中等规模初期部署
-        - 中等利用率触发扩张
-        - 中等幅度扩张
+        灵活生产策略：根据当年实际需求动态调整生产量
+        - 每年根据当年的实际需求调整生产量
+        - 生产量 = min(当年需求, 当前产能)
+        - 产能建设根据需求预测进行
         """
         return StrategyParams(
-            name="moderate",
-            description="温和策略：平衡扩张，稳健发展",
-            initial_deployment_ratio=0.9,   # 初期部署90%的预期需求
-            utilization_threshold=0.80,     # 80%利用率扩张
-            expansion_ratio=0.35,           # 每次扩张35%
-            risk_tolerance=0.5,             # 中等风险容忍度
-            cost_sensitivity=0.5            # 中等成本敏感度
+            name="flexible_production",
+            description="Flexible Production: Adjust production based on actual annual demand",
+            production_type="flexible",
+            time_horizon=time_horizon,
+            max_production_ratio=1.0,       # 生产100%的当年需求
+            capacity_buffer=0.15            # 15%的产能缓冲
         )
     
     @classmethod
-    def get_strategy(cls, strategy_type: StrategyType) -> StrategyParams:
+    def get_strategy(cls, strategy_type: StrategyType, time_horizon: int = 20) -> StrategyParams:
         """根据策略类型获取策略参数"""
         strategy_map = {
-            StrategyType.CONSERVATIVE: cls.get_conservative_strategy,
-            StrategyType.AGGRESSIVE: cls.get_aggressive_strategy,
-            StrategyType.MODERATE: cls.get_moderate_strategy
+            StrategyType.UPFRONT_PRODUCTION: lambda: cls.get_upfront_production_strategy(time_horizon),
+            StrategyType.GRADUAL_PRODUCTION: lambda: cls.get_gradual_production_strategy(time_horizon),
+            StrategyType.FLEXIBLE_PRODUCTION: lambda: cls.get_flexible_production_strategy(time_horizon)
         }
         
         if strategy_type not in strategy_map:
@@ -115,28 +112,62 @@ class StrategyDefinitions:
         return strategy_map[strategy_type]()
     
     @classmethod
-    def get_all_strategies(cls) -> Dict[str, StrategyParams]:
+    def get_all_strategies(cls, time_horizon: int = 20) -> Dict[str, StrategyParams]:
         """获取所有策略"""
         return {
-            "conservative": cls.get_conservative_strategy(),
-            "aggressive": cls.get_aggressive_strategy(),
-            "moderate": cls.get_moderate_strategy()
+            "upfront_production": cls.get_upfront_production_strategy(time_horizon),
+            "gradual_production": cls.get_gradual_production_strategy(time_horizon),
+            "flexible_production": cls.get_flexible_production_strategy(time_horizon)
         }
 
 
-def calculate_initial_capacity(strategy: StrategyParams, 
-                             expected_total_demand: float) -> float:
+def calculate_production_for_year(strategy: StrategyParams, 
+                                year: int,
+                                final_demand: float,
+                                current_demand: float = 0) -> float:
     """
-    根据策略计算初始产能部署
+    根据策略计算某年的生产量
     
     Args:
         strategy: 策略参数
-        expected_total_demand: 预期总需求
+        year: 当前年份 (0-based)
+        final_demand: 最终年份的预期需求
+        current_demand: 当年的实际需求
         
     Returns:
-        初始产能
+        当年的目标生产量
     """
-    return strategy.initial_deployment_ratio * expected_total_demand
+    max_production = final_demand * strategy.max_production_ratio
+    
+    if strategy.production_type == "upfront":
+        # 一次性满产：从第一年就达到最大生产量
+        return max_production
+        
+    elif strategy.production_type == "gradual":
+        # 渐进生产：生产量逐年线性增长
+        progress = (year + 1) / strategy.time_horizon  # +1 因为year是0-based
+        return max_production * progress
+        
+    elif strategy.production_type == "flexible":
+        # 灵活生产：根据当年实际需求调整
+        return min(current_demand, max_production)
+    
+    return 0
+
+
+def calculate_required_capacity(strategy: StrategyParams,
+                              target_production: float) -> float:
+    """
+    根据目标生产量计算所需产能
+    
+    Args:
+        strategy: 策略参数
+        target_production: 目标生产量
+        
+    Returns:
+        所需产能（包含缓冲）
+    """
+    return target_production * (1 + strategy.capacity_buffer)
 
 
 def should_expand_capacity(strategy: StrategyParams, 
@@ -144,7 +175,7 @@ def should_expand_capacity(strategy: StrategyParams,
                           current_capacity: float,
                           demand_trend: Optional[List[float]] = None) -> bool:
     """
-    判断是否应该扩张产能
+    判断是否应该扩张产能 - 生产策略版本
     
     Args:
         strategy: 策略参数
@@ -155,26 +186,15 @@ def should_expand_capacity(strategy: StrategyParams,
     Returns:
         是否应该扩张
     """
-    # 基本判断：利用率是否超过阈值
-    if current_utilization < strategy.utilization_threshold:
-        return False
-    
-    # 对于保守策略，需要更严格的条件
-    if strategy.name == "conservative":
-        # 需要连续高利用率才扩张
-        if demand_trend and len(demand_trend) >= 3:
-            recent_growth = np.mean(np.diff(demand_trend[-3:]))
-            if recent_growth <= 0:  # 需求没有增长趋势
-                return False
-    
-    return True
+    # 生产策略基于产能需求而非利用率触发扩张
+    return False
 
 
 def calculate_expansion_amount(strategy: StrategyParams,
                              current_capacity: float,
                              current_demand: float) -> float:
     """
-    计算扩张数量
+    计算扩张数量 - 生产策略版本
     
     Args:
         strategy: 策略参数
@@ -184,49 +204,33 @@ def calculate_expansion_amount(strategy: StrategyParams,
     Returns:
         扩张数量
     """
-    base_expansion = current_capacity * strategy.expansion_ratio
-    
-    # 根据需求缺口调整扩张量
-    demand_gap = max(0, current_demand - current_capacity)
-    
-    if strategy.name == "aggressive":
-        # 激进策略：不仅满足当前缺口，还要预留更多产能
-        expansion = max(base_expansion, demand_gap * 1.5)
-    elif strategy.name == "conservative":
-        # 保守策略：只满足当前缺口的一部分
-        expansion = min(base_expansion, demand_gap * 0.8)
-    else:  # moderate
-        # 温和策略：满足当前缺口
-        expansion = max(base_expansion, demand_gap)
-    
-    return expansion
+    # 生产策略的扩张量由生产计划决定，这里返回0
+    return 0
 
 
 if __name__ == "__main__":
     # 测试代码
-    print("=== ISRU策略定义测试 ===")
+    print("=== ISRU生产策略定义测试 ===")
     
-    strategies = StrategyDefinitions.get_all_strategies()
+    time_horizon = 20
+    strategies = StrategyDefinitions.get_all_strategies(time_horizon)
     
     for name, strategy in strategies.items():
         print(f"\n{name.upper()} 策略:")
         print(f"  描述: {strategy.description}")
-        print(f"  初始部署比例: {strategy.initial_deployment_ratio:.1%}")
-        print(f"  利用率阈值: {strategy.utilization_threshold:.1%}")
-        print(f"  扩张比例: {strategy.expansion_ratio:.1%}")
-        print(f"  风险容忍度: {strategy.risk_tolerance:.1f}")
-        print(f"  成本敏感度: {strategy.cost_sensitivity:.1f}")
+        print(f"  生产类型: {strategy.production_type}")
+        print(f"  时间跨度: {strategy.time_horizon}")
+        print(f"  最大生产比例: {strategy.max_production_ratio:.1%}")
+        print(f"  产能缓冲: {strategy.capacity_buffer:.1%}")
         
-        # 测试决策逻辑
-        expected_demand = 1000
-        initial_capacity = calculate_initial_capacity(strategy, expected_demand)
-        print(f"  初始产能: {initial_capacity:.1f} kg")
+        # 测试生产逻辑
+        final_demand = 1000
+        print(f"  生产测试（最终需求: {final_demand} kg）:")
         
-        # 测试扩张决策
-        test_utilization = 0.9
-        should_expand = should_expand_capacity(strategy, test_utilization, initial_capacity)
-        print(f"  90%利用率时是否扩张: {should_expand}")
-        
-        if should_expand:
-            expansion = calculate_expansion_amount(strategy, initial_capacity, initial_capacity * test_utilization)
-            print(f"  扩张数量: {expansion:.1f} kg")
+        for year in range(min(5, time_horizon)):
+            current_demand = final_demand * (year + 1) / time_horizon  # 模拟需求增长
+            production = calculate_production_for_year(
+                strategy, year, final_demand, current_demand
+            )
+            required_capacity = calculate_required_capacity(strategy, production)
+            print(f"    第{year+1}年: 生产{production:.1f}kg, 需要产能{required_capacity:.1f}kg")

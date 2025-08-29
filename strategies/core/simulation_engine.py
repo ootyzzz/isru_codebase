@@ -87,7 +87,7 @@ class StrategySimulationEngine:
             仿真结果
         """
         # 获取策略参数
-        strategies = StrategyDefinitions.get_all_strategies()
+        strategies = StrategyDefinitions.get_all_strategies(T)
         if strategy_name not in strategies:
             raise ValueError(f"未知策略: {strategy_name}")
         
@@ -105,17 +105,16 @@ class StrategySimulationEngine:
         # 初始化仿真组件
         decision_engine = DecisionEngine(strategy, self.params)
         
-        # 计算初始产能
-        expected_total_demand = sum(demand_path)
-        initial_capacity = strategy.initial_deployment_ratio * (expected_total_demand / T)
-        initial_deployed_mass = initial_capacity / self.params.get('technology', {}).get('eta', 2)
+        # 新策略不需要在初始化时部署，所有部署都通过决策逻辑处理
+        initial_capacity = 0.0
+        initial_deployed_mass = 0.0
         
         # 创建初始状态
         initial_state = SystemState(
             current_time=0,
             total_capacity=initial_capacity,
             deployed_mass=initial_deployed_mass,
-            current_demand=demand_path[0] if len(demand_path) > 0 else 0,
+            current_demand=float(demand_path[0]) if len(demand_path) > 0 else 0.0,
             inventory=0.0
         )
         
@@ -133,7 +132,7 @@ class StrategySimulationEngine:
         
         # 执行仿真循环
         for t in range(T):
-            current_demand = demand_path[t] if t < len(demand_path) else 0
+            current_demand = float(demand_path[t]) if t < len(demand_path) else 0.0
             
             # 获取需求预测（简单的线性预测）
             demand_forecast = self._generate_demand_forecast(demand_path, t, forecast_horizon=3)
@@ -303,7 +302,7 @@ if __name__ == "__main__":
     
     # 测试单次仿真
     print("\n--- 单次仿真测试 ---")
-    result = engine.run_single_simulation("conservative", T=10, seed=42)
+    result = engine.run_single_simulation("upfront_production", T=10, seed=42)
     print(f"策略: {result.strategy_name}")
     print(f"时间范围: {result.T}")
     print(f"最终NPV: ${result.performance_metrics.get('npv', 0):,.0f}")
@@ -312,7 +311,7 @@ if __name__ == "__main__":
     
     # 测试蒙特卡洛仿真
     print("\n--- 蒙特卡洛仿真测试 ---")
-    mc_results = engine.run_monte_carlo_simulation("moderate", T=10, n_simulations=10, base_seed=42)
+    mc_results = engine.run_monte_carlo_simulation("gradual_production", T=10, n_simulations=10, base_seed=42)
     stats = engine.calculate_strategy_statistics(mc_results)
     print(f"NPV均值: ${stats['npv_mean']:,.0f}")
     print(f"NPV标准差: ${stats['npv_std']:,.0f}")
@@ -320,7 +319,7 @@ if __name__ == "__main__":
     
     # 测试策略比较
     print("\n--- 策略比较测试 ---")
-    comparison = engine.compare_strategies(["conservative", "aggressive"], T=10, n_simulations=5)
+    comparison = engine.compare_strategies(["upfront_production", "flexible_production"], T=10, n_simulations=5)
     for strategy, results in comparison.items():
         stats = engine.calculate_strategy_statistics(results)
         print(f"{strategy}: NPV=${stats['npv_mean']:,.0f}±${stats['npv_std']:,.0f}")
