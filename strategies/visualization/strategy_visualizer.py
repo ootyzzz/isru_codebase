@@ -362,6 +362,70 @@ class DecisionVariablesPlotter:
         
         return fig
     
+    def plot_npv_cdf(self, strategies_data: Dict[str, Any]) -> plt.Figure:
+        """
+        绘制NPV累积分布函数(CDF)图
+        
+        Args:
+            strategies_data: 包含所有策略数据的字典
+            
+        Returns:
+            matplotlib图形对象
+        """
+        fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+        
+        for strategy_name, data in strategies_data.items():
+            if not data or 'results' not in data:
+                continue
+                
+            # 提取所有仿真的NPV值
+            npv_values = []
+            for result in data['results']:
+                npv = result.get('performance_metrics', {}).get('npv', 0)
+                npv_values.append(npv / 10000)  # 转换为万元
+            
+            if npv_values:
+                # 排序NPV值
+                npv_sorted = np.sort(npv_values)
+                # 计算累积概率
+                cumulative_prob = np.arange(1, len(npv_sorted) + 1) / len(npv_sorted)
+                
+                # 绘制CDF曲线
+                ax.plot(npv_sorted, cumulative_prob,
+                       color=self.strategy_colors[strategy_name],
+                       label=self.strategy_labels[strategy_name],
+                       linewidth=2, marker='o', markersize=3, alpha=0.8)
+                
+                # 添加统计信息
+                mean_npv = np.mean(npv_values)
+                median_npv = np.median(npv_values)
+                
+                # 在图上标记均值和中位数
+                mean_prob = np.interp(mean_npv, npv_sorted, cumulative_prob)
+                median_prob = 0.5
+                
+                ax.axvline(x=mean_npv, color=self.strategy_colors[strategy_name],
+                          linestyle='--', alpha=0.6, linewidth=1)
+                ax.axvline(x=median_npv, color=self.strategy_colors[strategy_name],
+                          linestyle=':', alpha=0.6, linewidth=1)
+        
+        # 添加零NPV参考线
+        ax.axvline(x=0, color='red', linestyle='-', alpha=0.5, linewidth=1, label='Break-even (NPV=0)')
+        
+        ax.set_title('NPV Cumulative Distribution Function (CDF)', fontsize=14, fontweight='bold')
+        ax.set_xlabel('NPV (10K CNY)', fontsize=12)
+        ax.set_ylabel('Cumulative Probability', fontsize=12)
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=10)
+        
+        # 设置y轴范围为0-1
+        ax.set_ylim(0, 1)
+        
+        plt.tight_layout()
+        plt.show()
+        
+        return fig
+    
     def create_comprehensive_dashboard(self, results_dir: str = "strategies/simulation_results", time_horizon: int = 10) -> List[plt.Figure]:
         """
         创建综合仪表板
@@ -399,6 +463,11 @@ class DecisionVariablesPlotter:
             print("Generating cost analysis chart...")
             fig3 = self.plot_cost_analysis(strategies_data)
             figures.append(fig3)
+            
+            # 4. NPV累积分布函数图
+            print("Generating NPV CDF chart...")
+            fig4 = self.plot_npv_cdf(strategies_data)
+            figures.append(fig4)
             
             print("All charts generated successfully!")
         except Exception as e:
