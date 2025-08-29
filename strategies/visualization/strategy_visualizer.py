@@ -405,7 +405,8 @@ class DecisionVariablesPlotter:
                 median_prob = 0.5
                 
                 ax.axvline(x=mean_npv, color=self.strategy_colors[strategy_name],
-                          linestyle='--', alpha=0.6, linewidth=1)
+                          linestyle='--', alpha=0.8, linewidth=2,
+                          label=f'E[NPV] {self.strategy_labels[strategy_name]}')
                 ax.axvline(x=median_npv, color=self.strategy_colors[strategy_name],
                           linestyle=':', alpha=0.6, linewidth=1)
         
