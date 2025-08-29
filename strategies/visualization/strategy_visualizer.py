@@ -65,13 +65,13 @@ class DecisionVariablesPlotter:
             'aggressive': '#DC143C'     # 深红色 - 激进
         }
         self.strategy_labels = {
-            'conservative': '保守策略',
-            'moderate': '温和策略',
-            'aggressive': '激进策略'
+            'conservative': 'Conservative Strategy',
+            'moderate': 'Moderate Strategy',
+            'aggressive': 'Aggressive Strategy'
         }
         
-        # 设置中文字体
-        plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
+        # 设置字体
+        plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'sans-serif']
         plt.rcParams['axes.unicode_minus'] = False
         
     def load_simulation_data(self, results_dir: str = "strategies/simulation_results", time_horizon: int = 10) -> Dict[str, Any]:
@@ -97,7 +97,7 @@ class DecisionVariablesPlotter:
                     data = json.load(f)
                     strategies_data[strategy] = data
             else:
-                print(f"警告: 未找到 {strategy} 策略的数据文件: {latest_file}")
+                print(f"Warning: Data file not found for {strategy} strategy: {latest_file}")
                 
         return strategies_data
     
@@ -165,19 +165,19 @@ class DecisionVariablesPlotter:
         """
         # 创建子图布局 (3行2列)
         fig, axes = plt.subplots(3, 2, figsize=self.figsize)
-        fig.suptitle('ISRU决策变量对比分析', fontsize=16, fontweight='bold')
+        fig.suptitle('ISRU Decision Variables Comparison Analysis', fontsize=16, fontweight='bold')
         
         # 扁平化axes数组以便索引
         axes_flat = axes.flatten()
         
         # 定义要绘制的变量和对应的子图
         plot_configs = [
-            ('production', '生产量 (kg)', 0),
-            ('capacity', '产能 (kg)', 1), 
-            ('inventory', '库存水平 (kg)', 2),
-            ('earth_supply', '地球供应 (kg)', 3),
-            ('capacity_expansion', '产能扩张 (kg)', 4),
-            ('utilization', '利用率', 5)
+            ('production', 'Production (kg)', 0),
+            ('capacity', 'Capacity (kg)', 1),
+            ('inventory', 'Inventory Level (kg)', 2),
+            ('earth_supply', 'Earth Supply (kg)', 3),
+            ('capacity_expansion', 'Capacity Expansion (kg)', 4),
+            ('utilization', 'Utilization Rate', 5)
         ]
         
         # 为每个策略提取数据并绘图
@@ -206,7 +206,7 @@ class DecisionVariablesPlotter:
                            linewidth=2, marker='o', markersize=4)
             
             ax.set_title(var_label, fontsize=12, fontweight='bold')
-            ax.set_xlabel('时间步长 (年)', fontsize=10)
+            ax.set_xlabel('Time Step (Years)', fontsize=10)
             ax.set_ylabel(var_label, fontsize=10)
             ax.grid(True, alpha=0.3)
             ax.legend(fontsize=9)
@@ -214,7 +214,7 @@ class DecisionVariablesPlotter:
             # 特殊处理利用率图表
             if var_name == 'utilization':
                 ax.set_ylim(0, 1.1)
-                ax.axhline(y=1.0, color='red', linestyle='--', alpha=0.5, label='满负荷')
+                ax.axhline(y=1.0, color='red', linestyle='--', alpha=0.5, label='Full Capacity')
         
         # 调整布局
         plt.tight_layout()
@@ -265,7 +265,7 @@ class DecisionVariablesPlotter:
                 demand_time_steps = list(range(len(demand)))
                 ax.plot(demand_time_steps, demand, 
                        color='black', linewidth=3, linestyle='--', 
-                       label='需求', alpha=0.8)
+                       label='Demand', alpha=0.8)
                 demand_plotted = True
             
             # 绘制总供应线
@@ -273,12 +273,12 @@ class DecisionVariablesPlotter:
             if min_len > 0:
                 ax.plot(time_steps[:min_len], total_supply[:min_len],
                        color=self.strategy_colors[strategy_name],
-                       label=f'{self.strategy_labels[strategy_name]} - 总供应',
+                       label=f'{self.strategy_labels[strategy_name]} - Total Supply',
                        linewidth=2, marker='s', markersize=4)
         
-        ax.set_title('需求与供应对比分析', fontsize=14, fontweight='bold')
-        ax.set_xlabel('时间步长 (年)', fontsize=12)
-        ax.set_ylabel('数量 (kg)', fontsize=12)
+        ax.set_title('Demand vs Supply Comparison Analysis', fontsize=14, fontweight='bold')
+        ax.set_xlabel('Time Step (Years)', fontsize=12)
+        ax.set_ylabel('Quantity (kg)', fontsize=12)
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=10)
         
@@ -325,16 +325,16 @@ class DecisionVariablesPlotter:
         x = np.arange(len(strategies))
         width = 0.6
         
-        ax1.bar(x, expansion_costs, width, label='扩张成本', 
+        ax1.bar(x, expansion_costs, width, label='Expansion Cost',
                color='#FF6B6B', alpha=0.8)
-        ax1.bar(x, operational_costs, width, bottom=expansion_costs, 
-               label='运营成本', color='#4ECDC4', alpha=0.8)
-        ax1.bar(x, supply_costs, width, 
+        ax1.bar(x, operational_costs, width, bottom=expansion_costs,
+               label='Operational Cost', color='#4ECDC4', alpha=0.8)
+        ax1.bar(x, supply_costs, width,
                bottom=[e+o for e,o in zip(expansion_costs, operational_costs)],
-               label='供应成本', color='#45B7D1', alpha=0.8)
+               label='Supply Cost', color='#45B7D1', alpha=0.8)
         
-        ax1.set_title('成本构成对比', fontsize=12, fontweight='bold')
-        ax1.set_ylabel('成本 (万元)', fontsize=10)
+        ax1.set_title('Cost Composition Comparison', fontsize=12, fontweight='bold')
+        ax1.set_ylabel('Cost (10K CNY)', fontsize=10)
         ax1.set_xticks(x)
         ax1.set_xticklabels(strategies)
         ax1.legend()
@@ -344,8 +344,8 @@ class DecisionVariablesPlotter:
         colors = [self.strategy_colors[name] for name in strategies_data.keys() if strategies_data[name]]
         bars = ax2.bar(x, npvs, width, color=colors, alpha=0.8)
         
-        ax2.set_title('净现值(NPV)对比', fontsize=12, fontweight='bold')
-        ax2.set_ylabel('NPV (万元)', fontsize=10)
+        ax2.set_title('Net Present Value (NPV) Comparison', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('NPV (10K CNY)', fontsize=10)
         ax2.set_xticks(x)
         ax2.set_xticklabels(strategies)
         ax2.grid(True, alpha=0.3, axis='y')
@@ -354,7 +354,7 @@ class DecisionVariablesPlotter:
         for bar, npv in zip(bars, npvs):
             height = bar.get_height()
             ax2.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{npv/10000:.1f}万',
+                    f'{npv/10000:.1f}0K',
                     ha='center', va='bottom', fontsize=9)
         
         plt.tight_layout()
@@ -373,36 +373,36 @@ class DecisionVariablesPlotter:
         Returns:
             图形对象列表
         """
-        print("正在加载仿真数据...")
+        print("Loading simulation data...")
         strategies_data = self.load_simulation_data(results_dir, time_horizon)
         
         if not strategies_data:
-            print("错误: 未找到任何策略数据")
+            print("Error: No strategy data found")
             return []
         
-        print(f"已加载 {len(strategies_data)} 个策略的数据")
+        print(f"Loaded data for {len(strategies_data)} strategies")
         
         figures = []
         
         try:
             # 1. 主要决策变量对比图
-            print("正在生成决策变量对比图...")
+            print("Generating decision variables comparison chart...")
             fig1 = self.plot_decision_variables(strategies_data)
             figures.append(fig1)
             
             # 2. 需求与供应对比图
-            print("正在生成需求与供应对比图...")
+            print("Generating demand vs supply comparison chart...")
             fig2 = self.plot_demand_vs_supply(strategies_data)
             figures.append(fig2)
             
             # 3. 成本分析图
-            print("正在生成成本分析图...")
+            print("Generating cost analysis chart...")
             fig3 = self.plot_cost_analysis(strategies_data)
             figures.append(fig3)
             
-            print("所有图表已生成完成！")
+            print("All charts generated successfully!")
         except Exception as e:
-            print(f"生成图表时出现错误: {e}")
+            print(f"Error occurred while generating charts: {e}")
             
         return figures
 
