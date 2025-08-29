@@ -23,7 +23,7 @@
   "economics": {
     "P_m": 21160,
     "r": 0.1,
-    "T": 19
+    "T": 90
   },
   "simulation": {
     "n_scenarios": 1000,

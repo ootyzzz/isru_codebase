@@ -348,7 +348,7 @@ def compare_with_optimal(args):
     TerminalDisplay.print_section("计算全局最优解基准")
     
     try:
-        from test_fixed_model import main as run_optimal
+        from optimal.optimal_solu import main as run_optimal
         import io
         import contextlib
         

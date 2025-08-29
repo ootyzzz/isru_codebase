@@ -53,7 +53,7 @@ cd c:/Users/feifa/Documents/lgy/isru_codebase
 
 ```bash
 # 🔥 最常用：运行50年时间跨度的策略对比仿真并显示可视化图表
-python strategies/main.py --time-horizon 50 --visualize --n-simulations 1000
+python strategies/main.py --time-horizon 20 --visualize --n-simulations 100
 
 # 快速测试：运行10年时间跨度的策略对比仿真（默认）
 python strategies/main.py --visualize
