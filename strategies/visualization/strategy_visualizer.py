@@ -60,14 +60,14 @@ class DecisionVariablesPlotter:
         """
         self.figsize = figsize
         self.strategy_colors = {
-            'conservative': '#2E8B57',  # 海绿色 - 保守
-            'moderate': '#4169E1',      # 皇家蓝 - 温和  
-            'aggressive': '#DC143C'     # 深红色 - 激进
+            'upfront_deployment': '#2E8B57',    # 海绿色 - 一次性部署
+            'gradual_deployment': '#4169E1',    # 皇家蓝 - 渐进部署
+            'flexible_deployment': '#DC143C'    # 深红色 - 灵活部署
         }
         self.strategy_labels = {
-            'conservative': 'Conservative Strategy',
-            'moderate': 'Moderate Strategy',
-            'aggressive': 'Aggressive Strategy'
+            'upfront_deployment': 'Upfront Deployment',
+            'gradual_deployment': 'Gradual Deployment',
+            'flexible_deployment': 'Flexible Deployment'
         }
         
         # 设置字体
@@ -89,7 +89,7 @@ class DecisionVariablesPlotter:
         strategies_data = {}
         
         # 加载三个策略的最新结果
-        for strategy in ['conservative', 'moderate', 'aggressive']:
+        for strategy in ['upfront_deployment', 'gradual_deployment', 'flexible_deployment']:
             latest_file = results_path / "raw" / f"T{time_horizon}" / f"{strategy}_latest.json"
             
             if latest_file.exists():

@@ -118,7 +118,7 @@ def run_default_simulation_with_visualization(args):
     runner = BatchSimulationRunner(params)
     
     # 运行策略对比 (T=10, 三个策略)
-    strategies = ["conservative", "aggressive", "moderate"]
+    strategies = ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
     time_horizon = args.time_horizon
     n_simulations = getattr(args, 'n_simulations', 50)  # 默认50次仿真
     
@@ -236,7 +236,7 @@ def run_strategy_comparison(args):
     params = load_parameters()
     runner = BatchSimulationRunner(params)
     
-    strategies = args.strategies if args.strategies else ["conservative", "aggressive", "moderate"]
+    strategies = args.strategies if args.strategies else ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
     
     comparison_results = runner.run_strategy_comparison(
         strategies=strategies,
@@ -272,7 +272,7 @@ def run_time_horizon_analysis(args):
     runner = BatchSimulationRunner(params)
     
     time_horizons = args.time_horizons if args.time_horizons else [10, 20, 30, 40, 50]
-    strategies = args.strategies if args.strategies else ["conservative", "aggressive", "moderate"]
+    strategies = args.strategies if args.strategies else ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
     
     horizon_results = runner.run_time_horizon_analysis(
         time_horizons=time_horizons,
@@ -311,7 +311,7 @@ def run_parallel_batch(args):
     runner = BatchSimulationRunner(params)
     
     time_horizons = args.time_horizons if args.time_horizons else [10, 20, 30, 40, 50]
-    strategies = args.strategies if args.strategies else ["conservative", "aggressive", "moderate"]
+    strategies = args.strategies if args.strategies else ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
     
     results = runner.run_parallel_batch(
         strategies=strategies,
@@ -336,7 +336,7 @@ def compare_with_optimal(args):
     runner = BatchSimulationRunner(params)
     
     strategy_results = runner.run_strategy_comparison(
-        strategies=args.strategies or ["conservative", "aggressive", "moderate"],
+        strategies=args.strategies or ["upfront_deployment", "gradual_deployment", "flexible_deployment"],
         T=args.time_horizon,
         n_simulations=args.n_simulations,
         base_seed=args.seed,
@@ -408,23 +408,23 @@ def main():
     
     # 单次仿真
     single_parser = subparsers.add_parser('single', help='运行单次仿真')
-    single_parser.add_argument('--strategy', choices=['conservative', 'aggressive', 'moderate'], 
-                              default='moderate', help='策略类型')
+    single_parser.add_argument('--strategy', choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
+                              default='gradual_deployment', help='策略类型')
     single_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
     add_common_args(single_parser)
     
     # 蒙特卡洛仿真
     mc_parser = subparsers.add_parser('monte-carlo', help='运行蒙特卡洛仿真')
-    mc_parser.add_argument('--strategy', choices=['conservative', 'aggressive', 'moderate'], 
-                          default='moderate', help='策略类型')
+    mc_parser.add_argument('--strategy', choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
+                          default='gradual_deployment', help='策略类型')
     mc_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
     mc_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
     add_common_args(mc_parser)
     
     # 策略对比
     compare_parser = subparsers.add_parser('compare', help='运行策略对比')
-    compare_parser.add_argument('--strategies', nargs='+', 
-                               choices=['conservative', 'aggressive', 'moderate'],
+    compare_parser.add_argument('--strategies', nargs='+',
+                               choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
                                help='要对比的策略')
     compare_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
     compare_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
@@ -435,8 +435,8 @@ def main():
     horizon_parser = subparsers.add_parser('horizon', help='运行时间跨度分析')
     horizon_parser.add_argument('--time-horizons', nargs='+', type=int, 
                                default=[10, 20, 30, 40, 50], help='时间跨度列表')
-    horizon_parser.add_argument('--strategies', nargs='+', 
-                               choices=['conservative', 'aggressive', 'moderate'],
+    horizon_parser.add_argument('--strategies', nargs='+',
+                               choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
                                help='要分析的策略')
     horizon_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
     horizon_parser.add_argument('--detailed-analysis', action='store_true', help='详细分析')
@@ -446,8 +446,8 @@ def main():
     parallel_parser = subparsers.add_parser('parallel', help='运行并行批量仿真')
     parallel_parser.add_argument('--time-horizons', nargs='+', type=int, 
                                 default=[10, 20, 30, 40, 50], help='时间跨度列表')
-    parallel_parser.add_argument('--strategies', nargs='+', 
-                                choices=['conservative', 'aggressive', 'moderate'],
+    parallel_parser.add_argument('--strategies', nargs='+',
+                                choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
                                 help='要分析的策略')
     parallel_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
     parallel_parser.add_argument('--max-workers', type=int, help='最大并行进程数')
@@ -456,7 +456,7 @@ def main():
     # 与最优解对比
     optimal_parser = subparsers.add_parser('optimal', help='与全局最优解对比')
     optimal_parser.add_argument('--strategies', nargs='+',
-                               choices=['conservative', 'aggressive', 'moderate'],
+                               choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
                                help='要对比的策略')
     optimal_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
     optimal_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
@@ -469,7 +469,7 @@ def main():
     # 导出到Excel
     export_parser = results_subparsers.add_parser('export', help='导出结果到Excel')
     export_parser.add_argument('--strategies', nargs='+',
-                              choices=['conservative', 'aggressive', 'moderate'],
+                              choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
                               help='要导出的策略')
     export_parser.add_argument('--time-horizons', nargs='+', type=int,
                               help='要导出的时间跨度')
@@ -485,7 +485,7 @@ def main():
     # 加载结果
     load_parser = results_subparsers.add_parser('load', help='加载之前的结果')
     load_parser.add_argument('--strategy', required=True,
-                            choices=['conservative', 'aggressive', 'moderate'],
+                            choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
                             help='策略名称')
     load_parser.add_argument('--time-horizon', type=int, required=True, help='时间跨度')
     
@@ -543,7 +543,7 @@ def handle_results_command(args):
     if args.results_command == 'export':
         TerminalDisplay.print_header("导出结果到Excel", width=70)
         
-        strategies = args.strategies or ["conservative", "aggressive", "moderate"]
+        strategies = args.strategies or ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
         time_horizons = args.time_horizons or [10, 20, 30, 40, 50]
         output_file = Path(args.output) if args.output else None
         

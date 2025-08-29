@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-ISRU策略定义模块 - 重构版本
-定义三种策略的参数和决策逻辑
+ISRU策略定义模块 - 新策略版本
+定义三种新的部署策略的参数和决策逻辑
 """
 
 from dataclasses import dataclass
@@ -12,9 +12,9 @@ import numpy as np
 
 class StrategyType(Enum):
     """策略类型枚举"""
-    CONSERVATIVE = "conservative"
-    AGGRESSIVE = "aggressive"
-    MODERATE = "moderate"
+    UPFRONT_DEPLOYMENT = "upfront_deployment"
+    GRADUAL_DEPLOYMENT = "gradual_deployment"
+    FLEXIBLE_DEPLOYMENT = "flexible_deployment"
 
 
 @dataclass
@@ -23,90 +23,87 @@ class StrategyParams:
     name: str
     description: str
     
-    # 初始部署参数
-    initial_deployment_ratio: float  # 相对于预期总需求的初始部署比例
+    # 部署策略类型
+    deployment_type: str             # "upfront", "gradual", "flexible"
     
-    # 决策触发参数
-    utilization_threshold: float     # 触发扩张的利用率阈值
-    expansion_ratio: float           # 每次扩张的比例
+    # 时间跨度相关参数
+    time_horizon: int                # 总时间跨度T
     
-    # 风险偏好参数
-    risk_tolerance: float            # 风险容忍度 (0-1)
-    cost_sensitivity: float          # 成本敏感度 (0-1)
+    # 部署计算参数
+    total_deployment_ratio: float    # 相对于最终需求的总部署比例
+    
+    # 灵活策略特有参数
+    response_threshold: float        # 响应阈值（供需差异比例）
     
     def __post_init__(self):
         """验证参数有效性"""
-        assert 0 <= self.initial_deployment_ratio <= 2.0, "初始部署比例应在0-2.0之间"
-        assert 0.5 <= self.utilization_threshold <= 1.0, "利用率阈值应在0.5-1.0之间"
-        assert 0 <= self.expansion_ratio <= 1.0, "扩张比例应在0-1.0之间"
-        assert 0 <= self.risk_tolerance <= 1.0, "风险容忍度应在0-1.0之间"
-        assert 0 <= self.cost_sensitivity <= 1.0, "成本敏感度应在0-1.0之间"
+        assert self.deployment_type in ["upfront", "gradual", "flexible"], "部署类型必须是upfront, gradual, 或flexible"
+        assert self.time_horizon > 0, "时间跨度必须大于0"
+        assert 0 <= self.total_deployment_ratio <= 2.0, "总部署比例应在0-2.0之间"
+        assert 0 <= self.response_threshold <= 1.0, "响应阈值应在0-1.0之间"
 
 
 class StrategyDefinitions:
-    """策略定义类 - 重构版本"""
+    """策略定义类 - 新策略版本"""
     
     @staticmethod
-    def get_conservative_strategy() -> StrategyParams:
+    def get_upfront_deployment_strategy(time_horizon: int = 20) -> StrategyParams:
         """
-        保守策略：谨慎扩张，重视成本控制
-        - 初期部署较少，避免过度投资
-        - 高利用率才扩张，确保需求确实存在
-        - 小幅扩张，控制风险
+        一次性全部部署策略：第一年部署最终的总部署量
+        - 前期大量投资，一次性部署到位
+        - 后续年份不再新增部署，仅维持运营
+        - 基于T年的需求预期确定总部署量
         """
         return StrategyParams(
-            name="conservative",
-            description="保守策略：谨慎扩张，重视成本控制",
-            initial_deployment_ratio=0.6,   # 初期只部署60%的预期需求
-            utilization_threshold=0.85,     # 85%利用率才扩张
-            expansion_ratio=0.25,           # 每次扩张25%
-            risk_tolerance=0.3,             # 低风险容忍度
-            cost_sensitivity=0.8            # 高成本敏感度
+            name="upfront_deployment",
+            description="Upfront Deployment: Deploy all capacity in the first year",
+            deployment_type="upfront",
+            time_horizon=time_horizon,
+            total_deployment_ratio=1.0,     # 部署100%的最终需求
+            response_threshold=0.0          # 不适用
         )
     
     @staticmethod
-    def get_aggressive_strategy() -> StrategyParams:
+    def get_gradual_deployment_strategy(time_horizon: int = 20) -> StrategyParams:
         """
-        激进策略：快速扩张，追求市场占有
-        - 初期大规模部署，抢占市场
-        - 较低利用率就扩张，提前布局
-        - 大幅扩张，快速响应需求增长
+        平均分布部署策略：将总部署量平均分配到每一年
+        - 均匀分布投资，稳步扩张
+        - 每年新增量 = 最终总部署量 / T
+        - 系统开始时就知道时间跨度T
         """
         return StrategyParams(
-            name="aggressive",
-            description="激进策略：快速扩张，追求市场占有",
-            initial_deployment_ratio=1.2,   # 初期部署120%的预期需求
-            utilization_threshold=0.70,     # 70%利用率就扩张
-            expansion_ratio=0.50,           # 每次扩张50%
-            risk_tolerance=0.8,             # 高风险容忍度
-            cost_sensitivity=0.3            # 低成本敏感度
+            name="gradual_deployment",
+            description="Gradual Deployment: Distribute total capacity evenly across all years",
+            deployment_type="gradual",
+            time_horizon=time_horizon,
+            total_deployment_ratio=1.0,     # 部署100%的最终需求
+            response_threshold=0.0          # 不适用
         )
     
     @staticmethod
-    def get_moderate_strategy() -> StrategyParams:
+    def get_flexible_deployment_strategy(time_horizon: int = 20) -> StrategyParams:
         """
-        温和策略：平衡扩张，稳健发展
-        - 中等规模初期部署
-        - 中等利用率触发扩张
-        - 中等幅度扩张
+        灵活部署策略：根据实际供需情况动态调整
+        - 响应式部署，根据供需差异动态调整
+        - 如果第t年供应量 < 需求量，则第t+1年新增部署差额
+        - 刻舟求剑式策略，总是试图弥补上一年的缺口
         """
         return StrategyParams(
-            name="moderate",
-            description="温和策略：平衡扩张，稳健发展",
-            initial_deployment_ratio=0.9,   # 初期部署90%的预期需求
-            utilization_threshold=0.80,     # 80%利用率扩张
-            expansion_ratio=0.35,           # 每次扩张35%
-            risk_tolerance=0.5,             # 中等风险容忍度
-            cost_sensitivity=0.5            # 中等成本敏感度
+            name="flexible_deployment",
+            description="Flexible Deployment: Respond to supply-demand gaps dynamically",
+            deployment_type="flexible",
+            time_horizon=time_horizon,
+            total_deployment_ratio=1.0,     # 理论上的最大部署比例
+            response_threshold=0.05         # 5%的响应阈值
         )
     
     @classmethod
-    def get_strategy(cls, strategy_type: StrategyType) -> StrategyParams:
+    def get_strategy(cls, strategy_type: StrategyType, time_horizon: int = 20) -> StrategyParams:
         """根据策略类型获取策略参数"""
         strategy_map = {
-            StrategyType.CONSERVATIVE: cls.get_conservative_strategy,
-            StrategyType.AGGRESSIVE: cls.get_aggressive_strategy,
-            StrategyType.MODERATE: cls.get_moderate_strategy
+            StrategyType.UPFRONT_DEPLOYMENT: lambda: cls.get_upfront_deployment_strategy(time_horizon),
+            StrategyType.GRADUAL_DEPLOYMENT: lambda: cls.get_gradual_deployment_strategy(time_horizon),
+            StrategyType.FLEXIBLE_DEPLOYMENT: lambda: cls.get_flexible_deployment_strategy(time_horizon)
         }
         
         if strategy_type not in strategy_map:
@@ -115,28 +112,72 @@ class StrategyDefinitions:
         return strategy_map[strategy_type]()
     
     @classmethod
-    def get_all_strategies(cls) -> Dict[str, StrategyParams]:
+    def get_all_strategies(cls, time_horizon: int = 20) -> Dict[str, StrategyParams]:
         """获取所有策略"""
         return {
-            "conservative": cls.get_conservative_strategy(),
-            "aggressive": cls.get_aggressive_strategy(),
-            "moderate": cls.get_moderate_strategy()
+            "upfront_deployment": cls.get_upfront_deployment_strategy(time_horizon),
+            "gradual_deployment": cls.get_gradual_deployment_strategy(time_horizon),
+            "flexible_deployment": cls.get_flexible_deployment_strategy(time_horizon)
         }
 
 
-def calculate_initial_capacity(strategy: StrategyParams, 
-                             expected_total_demand: float) -> float:
+def calculate_deployment_for_year(strategy: StrategyParams,
+                                year: int,
+                                final_demand: float,
+                                previous_supply: float = 0,
+                                previous_demand: float = 0) -> float:
     """
-    根据策略计算初始产能部署
+    根据策略计算某年的部署量
     
     Args:
         strategy: 策略参数
-        expected_total_demand: 预期总需求
+        year: 当前年份 (0-based)
+        final_demand: 最终年份的预期需求
+        previous_supply: 上一年的总供应量（仅灵活策略使用）
+        previous_demand: 上一年的需求量（仅灵活策略使用）
         
     Returns:
-        初始产能
+        当年的新增部署量
     """
-    return strategy.initial_deployment_ratio * expected_total_demand
+    total_capacity_needed = final_demand * strategy.total_deployment_ratio
+    
+    print(f"[STRATEGY DEBUG] {strategy.deployment_type} - Year {year}")
+    print(f"[STRATEGY DEBUG] Final demand: {final_demand:.1f}, Total capacity needed: {total_capacity_needed:.1f}")
+    
+    if strategy.deployment_type == "upfront":
+        # 一次性全部部署：第一年部署全部，其他年份为0
+        deployment = total_capacity_needed if year == 0 else 0
+        print(f"[STRATEGY DEBUG] Upfront deployment: {deployment:.1f}")
+        return deployment
+        
+    elif strategy.deployment_type == "gradual":
+        # 平均分布部署：每年部署相同数量
+        deployment = total_capacity_needed / strategy.time_horizon
+        print(f"[STRATEGY DEBUG] Gradual deployment: {deployment:.1f} (total/{strategy.time_horizon})")
+        return deployment
+        
+    elif strategy.deployment_type == "flexible":
+        # 灵活部署：根据上一年的供需差异决定
+        if year == 0:
+            # 第一年部署一个基础量（比如20%的最终需求）
+            deployment = total_capacity_needed * 0.2
+            print(f"[STRATEGY DEBUG] Flexible deployment (Year 0): {deployment:.1f}")
+            return deployment
+        else:
+            # 根据上一年的供需差异决定
+            print(f"[STRATEGY DEBUG] Previous supply: {previous_supply:.1f}, Previous demand: {previous_demand:.1f}")
+            if previous_demand > previous_supply:
+                gap = previous_demand - previous_supply
+                gap_ratio = gap / previous_demand if previous_demand > 0 else 0
+                print(f"[STRATEGY DEBUG] Gap: {gap:.1f}, Gap ratio: {gap_ratio:.3f}, Threshold: {strategy.response_threshold:.3f}")
+                # 如果差异超过阈值，则部署差额
+                if gap_ratio > strategy.response_threshold:
+                    print(f"[STRATEGY DEBUG] Flexible deployment (Gap response): {gap:.1f}")
+                    return gap
+            print(f"[STRATEGY DEBUG] Flexible deployment: 0 (no gap or below threshold)")
+            return 0
+    
+    return 0
 
 
 def should_expand_capacity(strategy: StrategyParams, 
@@ -144,7 +185,7 @@ def should_expand_capacity(strategy: StrategyParams,
                           current_capacity: float,
                           demand_trend: Optional[List[float]] = None) -> bool:
     """
-    判断是否应该扩张产能
+    判断是否应该扩张产能 - 新策略版本
     
     Args:
         strategy: 策略参数
@@ -155,26 +196,16 @@ def should_expand_capacity(strategy: StrategyParams,
     Returns:
         是否应该扩张
     """
-    # 基本判断：利用率是否超过阈值
-    if current_utilization < strategy.utilization_threshold:
-        return False
-    
-    # 对于保守策略，需要更严格的条件
-    if strategy.name == "conservative":
-        # 需要连续高利用率才扩张
-        if demand_trend and len(demand_trend) >= 3:
-            recent_growth = np.mean(np.diff(demand_trend[-3:]))
-            if recent_growth <= 0:  # 需求没有增长趋势
-                return False
-    
-    return True
+    # 新策略不使用传统的利用率触发扩张
+    # 扩张决策完全由策略的部署逻辑决定
+    return False
 
 
 def calculate_expansion_amount(strategy: StrategyParams,
                              current_capacity: float,
                              current_demand: float) -> float:
     """
-    计算扩张数量
+    计算扩张数量 - 新策略版本
     
     Args:
         strategy: 策略参数
@@ -184,49 +215,33 @@ def calculate_expansion_amount(strategy: StrategyParams,
     Returns:
         扩张数量
     """
-    base_expansion = current_capacity * strategy.expansion_ratio
-    
-    # 根据需求缺口调整扩张量
-    demand_gap = max(0, current_demand - current_capacity)
-    
-    if strategy.name == "aggressive":
-        # 激进策略：不仅满足当前缺口，还要预留更多产能
-        expansion = max(base_expansion, demand_gap * 1.5)
-    elif strategy.name == "conservative":
-        # 保守策略：只满足当前缺口的一部分
-        expansion = min(base_expansion, demand_gap * 0.8)
-    else:  # moderate
-        # 温和策略：满足当前缺口
-        expansion = max(base_expansion, demand_gap)
-    
-    return expansion
+    # 新策略的扩张量由部署逻辑决定，这里返回0
+    return 0
 
 
 if __name__ == "__main__":
     # 测试代码
-    print("=== ISRU策略定义测试 ===")
+    print("=== ISRU新策略定义测试 ===")
     
-    strategies = StrategyDefinitions.get_all_strategies()
+    time_horizon = 20
+    strategies = StrategyDefinitions.get_all_strategies(time_horizon)
     
     for name, strategy in strategies.items():
         print(f"\n{name.upper()} 策略:")
         print(f"  描述: {strategy.description}")
-        print(f"  初始部署比例: {strategy.initial_deployment_ratio:.1%}")
-        print(f"  利用率阈值: {strategy.utilization_threshold:.1%}")
-        print(f"  扩张比例: {strategy.expansion_ratio:.1%}")
-        print(f"  风险容忍度: {strategy.risk_tolerance:.1f}")
-        print(f"  成本敏感度: {strategy.cost_sensitivity:.1f}")
+        print(f"  部署类型: {strategy.deployment_type}")
+        print(f"  时间跨度: {strategy.time_horizon}")
+        print(f"  总部署比例: {strategy.total_deployment_ratio:.1%}")
+        print(f"  响应阈值: {strategy.response_threshold:.1%}")
         
-        # 测试决策逻辑
-        expected_demand = 1000
-        initial_capacity = calculate_initial_capacity(strategy, expected_demand)
-        print(f"  初始产能: {initial_capacity:.1f} kg")
+        # 测试部署逻辑
+        final_demand = 1000
+        print(f"  部署测试（最终需求: {final_demand} kg）:")
         
-        # 测试扩张决策
-        test_utilization = 0.9
-        should_expand = should_expand_capacity(strategy, test_utilization, initial_capacity)
-        print(f"  90%利用率时是否扩张: {should_expand}")
-        
-        if should_expand:
-            expansion = calculate_expansion_amount(strategy, initial_capacity, initial_capacity * test_utilization)
-            print(f"  扩张数量: {expansion:.1f} kg")
+        for year in range(min(5, time_horizon)):
+            deployment = calculate_deployment_for_year(
+                strategy, year, final_demand, 
+                previous_supply=800 if year > 0 else 0,
+                previous_demand=900 if year > 0 else 0
+            )
+            print(f"    第{year+1}年部署: {deployment:.1f} kg")
