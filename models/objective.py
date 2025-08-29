@@ -114,16 +114,36 @@ def calculate_detailed_costs(model: ConcreteModel, params: dict) -> dict:
 
 def print_cost_breakdown(costs: dict) -> None:
     """打印成本分解"""
-    print("\n成本分解:")
-    print(f"  总收入: ${costs['revenue']:,.2f}")
-    print(f"  开发成本: ${costs['development_cost']:,.2f}")
-    print(f"  运营成本: ${costs['operating_cost']:,.2f}")
-    print(f"  发射成本: ${costs['launch_cost']:,.2f}")
-    print(f"  建设成本: ${costs['build_cost']:,.2f}" if 'build_cost' in costs else "  建设成本: $0.00")
-    print(f"  存储成本: ${costs['storage_cost']:,.2f}")
-    print(f"  短缺惩罚: ${costs['shortage_cost']:,.2f}" if 'shortage_cost' in costs else "  短缺惩罚: $0.00")
-    print(f"  副产物成本: ${costs['byproduct_cost']:,.2f}")
-    print(f"  总成本: ${costs['total_cost']:,.2f}")
-    print(f"  地球供氧成本: ${costs['earth_supply_cost']:,.2f}")
-    print(f"  净现值: ${costs['NPV']:,.2f}")
+    print(f"\n经济分析")
+    print(f"{'─'*40}")
+    
+    # 收入部分
+    print(f"收入")
+    print(f"  总收入            : ${costs['revenue']:>15,.2f}")
+    
+    # 成本部分 - 按逻辑分组
+    print(f"\n成本构成")
+    print(f"  开发成本          : ${costs['development_cost']:>15,.2f}")
+    print(f"  运营成本          : ${costs['operating_cost']:>15,.2f}")
+    print(f"  发射成本          : ${costs['launch_cost']:>15,.2f}")
+    print(f"  存储成本          : ${costs['storage_cost']:>15,.2f}")
+    print(f"  副产物成本        : ${costs['byproduct_cost']:>15,.2f}")
+    print(f"  地球供氧成本      : ${costs['earth_supply_cost']:>15,.2f}")
+    
+    # 惩罚成本（如果有）
+    shortage_cost = costs.get('shortage_cost', 0)
+    if shortage_cost > 0:
+        print(f"  短缺惩罚          : ${shortage_cost:>15,.2f}")
+    
+    build_cost = costs.get('build_cost', 0)
+    if build_cost > 0:
+        print(f"  建设成本          : ${build_cost:>15,.2f}")
+    
+    # 汇总
+    print(f"  {'─'*32}")
+    print(f"  总成本            : ${costs['total_cost']:>15,.2f}")
+    
+    # 净现值
+    print(f"\n最终结果")
+    print(f"  净现值 (NPV)      : ${costs['NPV']:>15,.2f}")
 

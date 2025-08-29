@@ -75,9 +75,9 @@ def solve_isru_optimization(T_years, params_file="data/parameters.json", random_
     # 打印结果（如果需要）
     if verbose:
         if result["status"] == "optimal":
-            print(f"✅ T={T_years}: NPV = {result['objective_value']:,.2f}")
+            print(f"T={T_years}: NPV = {result['objective_value']:,.2f}")
         else:
-            print(f"❌ T={T_years}: 求解失败 - {result['status']}")
+            print(f"T={T_years}: 求解失败 - {result['status']}")
             if "termination_condition" in result:
                 print(f"   原因: {result['termination_condition']}")
     

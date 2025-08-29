@@ -102,7 +102,7 @@ class ISRUOptimizationModel:
             
             # 求解
             logger.info(f"使用{solver_name}求解器求解模型...")
-            results = solver.solve(self.model, tee=True)
+            results = solver.solve(self.model, tee=False)
             
             # 检查求解状态
             if str(results.solver.termination_condition).lower() == 'optimal':
@@ -194,17 +194,52 @@ class ISRUOptimizationModel:
             print("模型尚未求解")
             return
         
-        print("\n=== 求解结果摘要 ===")
-        print(f"净现值 (NPV): ${self.solution['NPV']:,.2f}")
-        print(f"总交付氧气: {sum(self.solution['Qt'].values()):,.2f} kg")
-        print(f"总短缺: {sum(self.solution['St'].values()):,.2f} kg")
-        print(f"总剩余: {sum(self.solution['Et'].values()):,.2f} kg")
-        print(f"最大ISRU质量: {max(self.solution['Mt'].values()):,.2f} kg")
-        print(f"总新增部署: {sum(self.solution['delta_Mt'].values()):,.2f} kg")
+        T = self.params['economics']['T']
         
+        print(f"\n{'='*60}")
+        print(f"ISRU优化结果 (T={T}年)")
+        print(f"{'='*60}")
+        
+        # 核心指标
+        print(f"\n核心指标")
+        print(f"{'─'*40}")
+        print(f"净现值 (NPV)      : ${self.solution['NPV']:>15,.2f}")
+        print(f"求解状态          : {'最优解' if self.solution else '失败'}")
+        
+        # 输入参数 (关键假设)
+        print(f"\n关键输入参数")
+        print(f"{'─'*40}")
+        econ = self.params['economics']
+        demand = self.params['demand']
+        print(f"时间范围          : {T:>15} 年")
+        print(f"贴现率            : {econ['r']*100:>14.1f}%")
+        print(f"初始需求 (D0)     : {demand['D0']:>11,.0f} kg/年")
+        print(f"需求增长率 (μ)    : {demand['mu']*100:>14.1f}%")
+        print(f"需求波动率 (σ)    : {demand['sigma']*100:>14.1f}%")
+        
+        # 决策变量汇总
+        print(f"\n决策变量汇总")
+        print(f"{'─'*40}")
+        total_delivery = sum(self.solution['Qt'].values())
+        total_shortage = sum(self.solution['St'].values())
+        total_excess = sum(self.solution['Et'].values())
+        max_isru_mass = max(self.solution['Mt'].values())
+        total_deployment = sum(self.solution['delta_Mt'].values())
+        total_leo_mass = sum(self.solution['M_leo'].values())
+        
+        print(f"总交付氧气        : {total_delivery:>11,.0f} kg")
+        print(f"总短缺量          : {total_shortage:>11,.0f} kg")
+        print(f"总剩余量          : {total_excess:>11,.0f} kg")
+        print(f"最大ISRU质量      : {max_isru_mass:>11,.0f} kg")
+        print(f"总新增部署        : {total_deployment:>11,.0f} kg")
+        print(f"总LEO运输质量     : {total_leo_mass:>11,.0f} kg")
+        
+        # 经济分析
         if 'costs' in self.solution:
             from .objective import print_cost_breakdown
             print_cost_breakdown(self.solution['costs'])
+        
+        print(f"\n{'='*60}")
 
 
 # 便捷函数

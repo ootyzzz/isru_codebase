@@ -11,12 +11,15 @@ import os
 import glob
 from datetime import datetime
 
-# 设置中文字体和图表样式
+# 设置matplotlib后端和图表样式
+import matplotlib
+matplotlib.use('TkAgg')  # 确保使用正确的后端
 plt.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sans']
 plt.rcParams['axes.unicode_minus'] = False
 sns.set_style("whitegrid")
-plt.rcParams['figure.dpi'] = 300
+plt.rcParams['figure.dpi'] = 100  # 降低DPI以提高性能
 plt.rcParams['savefig.dpi'] = 300
+# 不设置 plt.ioff()，保持默认的交互模式
 
 def load_latest_results(results_dir="optimal/results"):
     """
@@ -46,9 +49,62 @@ def load_latest_results(results_dir="optimal/results"):
     
     return df, latest_file
 
-def create_npv_vs_t_visualization(df, output_dir="charts"):
+def create_simple_npv_plot(df, output_dir="optimal/charts"):
     """
-    创建NPV vs T的可视化图表
+    创建简化的NPV vs T主图
+    
+    Args:
+        df: 包含分析结果的DataFrame
+        output_dir: 输出目录
+    """
+    # 确保输出目录存在
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # 过滤成功求解的案例
+    df_success = df[df['Status'] == 'optimal'].copy()
+    
+    if df_success.empty:
+        print("❌ 没有成功求解的案例，无法生成图表")
+        return
+    
+    # 创建单一主图
+    plt.close('all')
+    fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+    
+    # NPV vs T 主图
+    ax.plot(df_success['T'], df_success['NPV'], 'b-', linewidth=3, marker='o', markersize=6, label='NPV')
+    ax.axhline(y=0, color='r', linestyle='--', alpha=0.7, linewidth=2, label='Break-even')
+    ax.set_xlabel('Time Horizon (Years)', fontsize=12)
+    ax.set_ylabel('NPV (Currency Units)', fontsize=12)
+    ax.set_title('ISRU Project NPV vs Time Horizon', fontsize=14, fontweight='bold')
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=11)
+    
+    # 标注最优点
+    max_npv_idx = df_success['NPV'].idxmax()
+    max_npv_t = df_success.loc[max_npv_idx, 'T']
+    max_npv_value = df_success.loc[max_npv_idx, 'NPV']
+    ax.annotate(f'Optimal Point\nT={max_npv_t} years\nNPV={max_npv_value:,.0f}',
+                xy=(max_npv_t, max_npv_value),
+                xytext=(max_npv_t+5, max_npv_value+max_npv_value*0.15),
+                arrowprops=dict(arrowstyle='->', color='red', lw=2),
+                fontsize=11,
+                bbox=dict(boxstyle="round,pad=0.5", facecolor="yellow", alpha=0.8))
+    
+    # 保存图表
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_file = f"{output_dir}/npv_main_plot_{timestamp}.png"
+    plt.savefig(output_file, bbox_inches='tight', dpi=300, facecolor='white')
+    print(f"📈 主图已保存到: {output_file}")
+    
+    # 显示图表
+    plt.show()
+    
+    return output_file
+
+def create_npv_vs_t_visualization(df, output_dir="optimal/charts"):
+    """
+    创建NPV vs T的可视化图表 - 分别显示在4个独立窗口
     
     Args:
         df: 包含分析结果的DataFrame
@@ -67,79 +123,101 @@ def create_npv_vs_t_visualization(df, output_dir="charts"):
     
     print(f"📈 成功案例数量: {len(df_success)}")
     
-    # 创建图表
-    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-    fig.suptitle('ISRU Project NPV Analysis vs Time Horizon', fontsize=16, fontweight='bold')
+    # 关闭所有现有图表
+    plt.close('all')
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_files = []
+    
+    # 使用matplotlib默认行为
     
     # 1. 主图：NPV vs T
-    ax1 = axes[0, 0]
-    ax1.plot(df_success['T'], df_success['NPV'], 'b-', linewidth=2, marker='o', markersize=4)
-    ax1.axhline(y=0, color='r', linestyle='--', alpha=0.7, label='Break-even')
-    ax1.set_xlabel('Time Horizon (Years)')
-    ax1.set_ylabel('NPV (Currency Units)')
-    ax1.set_title('NPV vs Time Horizon')
-    ax1.grid(True, alpha=0.3)
-    ax1.legend()
+    fig1 = plt.figure(1, figsize=(10, 6))
+    plt.plot(df_success['T'], df_success['NPV'], 'b-', linewidth=2, marker='o', markersize=6)
+    plt.axhline(y=0, color='r', linestyle='--', alpha=0.7, label='Break-even')
+    plt.xlabel('Time Horizon (Years)', fontsize=12)
+    plt.ylabel('NPV (Currency Units)', fontsize=12)
+    plt.title('NPV vs Time Horizon', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    plt.legend()
     
     # 标注最优点
     max_npv_idx = df_success['NPV'].idxmax()
     max_npv_t = df_success.loc[max_npv_idx, 'T']
     max_npv_value = df_success.loc[max_npv_idx, 'NPV']
-    ax1.annotate(f'Max NPV\nT={max_npv_t}, NPV={max_npv_value:,.0f}',
+    plt.annotate(f'Max NPV\nT={max_npv_t}, NPV={max_npv_value:,.0f}',
                 xy=(max_npv_t, max_npv_value), xytext=(max_npv_t+5, max_npv_value+max_npv_value*0.1),
                 arrowprops=dict(arrowstyle='->', color='red'), fontsize=10,
                 bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.7))
     
+    plt.tight_layout()
+    output_file1 = f"{output_dir}/npv_main_plot_{timestamp}.png"
+    plt.savefig(output_file1, bbox_inches='tight', dpi=300, facecolor='white')
+    output_files.append(output_file1)
+    print(f"📈 主图已保存到: {output_file1}")
+    
     # 2. NPV增长率
-    ax2 = axes[0, 1]
+    fig2 = plt.figure(2, figsize=(10, 6))
     df_success_sorted = df_success.sort_values('T')
     npv_growth = df_success_sorted['NPV'].pct_change() * 100
-    ax2.plot(df_success_sorted['T'].iloc[1:], npv_growth.iloc[1:], 'g-', linewidth=2, marker='s', markersize=4)
-    ax2.axhline(y=0, color='r', linestyle='--', alpha=0.7)
-    ax2.set_xlabel('Time Horizon (Years)')
-    ax2.set_ylabel('NPV Growth Rate (%)')
-    ax2.set_title('NPV Period-over-Period Growth Rate')
-    ax2.grid(True, alpha=0.3)
+    plt.plot(df_success_sorted['T'].iloc[1:], npv_growth.iloc[1:], 'g-', linewidth=2, marker='s', markersize=6)
+    plt.axhline(y=0, color='r', linestyle='--', alpha=0.7)
+    plt.xlabel('Time Horizon (Years)', fontsize=12)
+    plt.ylabel('NPV Growth Rate (%)', fontsize=12)
+    plt.title('NPV Period-over-Period Growth Rate', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    output_file2 = f"{output_dir}/npv_growth_rate_{timestamp}.png"
+    plt.savefig(output_file2, bbox_inches='tight', dpi=300, facecolor='white')
+    output_files.append(output_file2)
+    print(f"📈 增长率图已保存到: {output_file2}")
     
     # 3. 求解时间分析
-    ax3 = axes[1, 0]
-    ax3.scatter(df_success['T'], df_success['Solve_Time'], alpha=0.6, s=50)
-    ax3.set_xlabel('Time Horizon (Years)')
-    ax3.set_ylabel('Solve Time (Seconds)')
-    ax3.set_title('Computational Time vs Problem Size')
-    ax3.grid(True, alpha=0.3)
+    fig3 = plt.figure(3, figsize=(10, 6))
+    plt.scatter(df_success['T'], df_success['Solve_Time'], alpha=0.6, s=60, color='blue')
+    plt.xlabel('Time Horizon (Years)', fontsize=12)
+    plt.ylabel('Solve Time (Seconds)', fontsize=12)
+    plt.title('Computational Time vs Problem Size', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
     
     # 添加趋势线
     z = np.polyfit(df_success['T'], df_success['Solve_Time'], 1)
     p = np.poly1d(z)
-    ax3.plot(df_success['T'], p(df_success['T']), "r--", alpha=0.8, linewidth=2)
+    plt.plot(df_success['T'], p(df_success['T']), "r--", alpha=0.8, linewidth=2, label='Trend Line')
+    plt.legend()
+    
+    plt.tight_layout()
+    output_file3 = f"{output_dir}/solve_time_analysis_{timestamp}.png"
+    plt.savefig(output_file3, bbox_inches='tight', dpi=300, facecolor='white')
+    output_files.append(output_file3)
+    print(f"📈 求解时间图已保存到: {output_file3}")
     
     # 4. NPV分布直方图
-    ax4 = axes[1, 1]
-    ax4.hist(df_success['NPV'], bins=20, alpha=0.7, edgecolor='black')
-    ax4.axvline(x=df_success['NPV'].mean(), color='r', linestyle='--', 
+    fig4 = plt.figure(4, figsize=(10, 6))
+    plt.hist(df_success['NPV'], bins=20, alpha=0.7, edgecolor='black', color='skyblue')
+    plt.axvline(x=df_success['NPV'].mean(), color='r', linestyle='--', linewidth=2,
                 label=f'Mean: {df_success["NPV"].mean():,.0f}')
-    ax4.axvline(x=df_success['NPV'].median(), color='g', linestyle='--', 
+    plt.axvline(x=df_success['NPV'].median(), color='g', linestyle='--', linewidth=2,
                 label=f'Median: {df_success["NPV"].median():,.0f}')
-    ax4.set_xlabel('NPV (Currency Units)')
-    ax4.set_ylabel('Frequency')
-    ax4.set_title('NPV Distribution')
-    ax4.legend()
-    ax4.grid(True, alpha=0.3)
+    plt.xlabel('NPV (Currency Units)', fontsize=12)
+    plt.ylabel('Frequency', fontsize=12)
+    plt.title('NPV Distribution', fontsize=14, fontweight='bold')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
     
-    # 调整子图间距
     plt.tight_layout()
+    output_file4 = f"{output_dir}/npv_distribution_{timestamp}.png"
+    plt.savefig(output_file4, bbox_inches='tight', dpi=300, facecolor='white')
+    output_files.append(output_file4)
+    print(f"📈 分布图已保存到: {output_file4}")
     
-    # 保存图表
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_file = f"{output_dir}/npv_vs_time_analysis_{timestamp}.png"
-    plt.savefig(output_file, bbox_inches='tight', dpi=300)
-    print(f"📈 图表已保存到: {output_file}")
-    
-    # 显示图表
+    # 显示所有图表 - 使用默认行为
     plt.show()
     
-    return output_file
+    print(f"\n🎯 已生成4个独立的图表窗口!")
+    
+    return output_files
 
 def print_analysis_summary(df):
     """
@@ -204,8 +282,10 @@ def main():
         # 打印分析摘要
         print_analysis_summary(df)
         
-        # 创建可视化
-        chart_file = create_npv_vs_t_visualization(df)
+        # 直接创建4个独立窗口的可视化
+        print("\n📊 正在生成4个独立图表窗口...")
+        chart_files = create_npv_vs_t_visualization(df)
+        chart_file = f"4个图表文件: {', '.join([f.split('/')[-1] for f in chart_files])}"
         
         print(f"\n🎯 分析完成！")
         print(f"   数据文件: {data_file}")
