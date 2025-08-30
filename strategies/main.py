@@ -5,7 +5,7 @@ Refactored strategy simulation and comparison analysis system
 
 Quick Start Examples:
     # Run 50-year time horizon strategy comparison simulation with visualization
-    python strategies/main.py --time-horizon 50 --visualize --n-simulations 1000
+    python strategies/main.py --time-horizon 50 --visualize --n-simulations 100
 
     # Run 10-year time horizon strategy comparison simulation (default)
     python strategies/main.py --visualize
