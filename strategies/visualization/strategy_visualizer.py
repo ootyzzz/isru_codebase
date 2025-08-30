@@ -408,9 +408,9 @@ class DecisionVariablesPlotter:
                           label=f'E[NPV] {self.strategy_labels[strategy_name]}')
                 ax.axvline(x=median_npv, color=self.strategy_colors[strategy_name],
                           linestyle=':', alpha=0.6, linewidth=1)
-       
-       # Add zero NPV reference line
-       ax.axvline(x=0, color='red', linestyle='-', alpha=0.5, linewidth=1, label='Break-even (NPV=0)')
+        
+        # Add zero NPV reference line
+        ax.axvline(x=0, color='red', linestyle='-', alpha=0.5, linewidth=1, label='Break-even (NPV=0)')
         
         ax.set_title('NPV Cumulative Distribution Function (CDF)', fontsize=14, fontweight='bold')
         ax.set_xlabel('NPV (10K CNY)', fontsize=12)
