@@ -1,12 +1,12 @@
 """
-ISRU策略可视化模块
-提供ISRU策略仿真结果的图表可视化功能
+ISRU Strategy Visualization Module
+Provides chart visualization functionality for ISRU strategy simulation results
 
-主要功能:
-    - 决策变量对比图
-    - 需求与供应对比图
-    - 成本分析图
-    - 综合仪表板
+Main features:
+    - Decision variables comparison charts
+    - Demand vs supply comparison charts
+    - Cost analysis charts
+    - Comprehensive dashboard
 """
 
 from .strategy_visualizer import DecisionVariablesPlotter

@@ -407,31 +407,31 @@ def load_parameters() -> Dict:
 
 
 if __name__ == "__main__":
-    # 测试代码
-    print("=== 批量仿真执行器测试 ===")
+    # Test code
+    print("=== Batch Simulation Runner Test ===")
     
-    # 加载参数
+    # Load parameters
     params = load_parameters()
     
-    # 创建批量执行器
+    # Create batch runner
     runner = BatchSimulationRunner(params)
     
-    # 测试单个策略仿真
-    print("\n--- 单策略仿真测试 ---")
+    # Test single strategy simulation
+    print("\n--- Single Strategy Simulation Test ---")
     results, stats = runner.run_single_batch("upfront_deployment", T=10, n_simulations=20)
-    print(f"完成 {len(results)} 次仿真")
-    print(f"NPV均值: ${stats['npv_mean']:,.0f}")
+    print(f"Completed {len(results)} simulations")
+    print(f"NPV Mean: ${stats['npv_mean']:,.0f}")
     
-    # 测试策略对比
-    print("\n--- 策略对比测试 ---")
+    # Test strategy comparison
+    print("\n--- Strategy Comparison Test ---")
     comparison = runner.run_strategy_comparison(
         strategies=["upfront_deployment", "flexible_deployment"],
         T=10,
         n_simulations=10
     )
     
-    # 测试时间跨度分析
-    print("\n--- 时间跨度分析测试 ---")
+    # Test time horizon analysis
+    print("\n--- Time Horizon Analysis Test ---")
     horizon_analysis = runner.run_time_horizon_analysis(
         time_horizons=[10, 20],
         strategies=["gradual_deployment"],

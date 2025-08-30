@@ -37,7 +37,7 @@ from pathlib import Path
 from typing import List, Optional
 import numpy as np
 
-# 添加项目根目录到路径
+# Add project root directory to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -47,7 +47,7 @@ from strategies.analysis.performance_analyzer import PerformanceAnalyzer
 from strategies.utils.terminal_display import TerminalDisplay
 from strategies.utils.result_manager import ResultManager
 
-# 导入可视化模块
+# Import visualization module
 try:
     from strategies.visualization.strategy_visualizer import DecisionVariablesPlotter
     VISUALIZATION_AVAILABLE = True
@@ -57,7 +57,7 @@ except ImportError as e:
 
 
 def load_parameters() -> dict:
-    """加载系统参数"""
+    """Load system parameters"""
     params_path = project_root / "data" / "parameters.json"
     with open(params_path, 'r') as f:
         return json.load(f)
@@ -65,11 +65,11 @@ def load_parameters() -> dict:
 
 def show_visualization(results_dir: str = "strategies/simulation_results", time_horizon: int = 10):
     """
-    显示可视化图表
+    Display visualization charts
     
     Args:
-        results_dir: 结果目录路径
-        time_horizon: 时间跨度（年）
+        results_dir: Results directory path
+        time_horizon: Time horizon (years)
     """
     if not VISUALIZATION_AVAILABLE:
         print("ERROR: Visualization feature unavailable, please check if matplotlib and other dependencies are installed")
@@ -78,20 +78,20 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
     try:
         TerminalDisplay.print_section("Generating Visualization Charts")
         
-        # 创建可视化器
+        # Create visualizer
         plotter = DecisionVariablesPlotter(figsize=(16, 12))
         
-        # 生成综合仪表板，传递时间跨度参数
+        # Generate comprehensive dashboard, pass time horizon parameter
         figures = plotter.create_comprehensive_dashboard(results_dir, time_horizon)
         
         if figures:
             print(f"SUCCESS: Successfully generated {len(figures)} charts")
             print("INFO: Charts displayed, close chart windows to continue...")
             
-            # 等待用户关闭图表
+            # Wait for user to close charts
             try:
                 import matplotlib.pyplot as plt
-                # 保持图表显示直到用户关闭
+                # Keep charts displayed until user closes them
                 plt.show(block=True)
             except KeyboardInterrupt:
                 print("\nUser interrupted, closing all charts...")
@@ -106,39 +106,39 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
 
 def run_default_simulation_with_visualization(args):
     """
-    运行默认的T=10策略对比仿真并显示可视化
+    Run default T=10 strategy comparison simulation with visualization
     
     Args:
-        args: 命令行参数
+        args: Command line arguments
     """
-    TerminalDisplay.print_header("ISRU策略仿真系统 - 默认运行模式", width=70)
+    TerminalDisplay.print_header("ISRU Strategy Simulation System - Default Mode", width=70)
     
-    # 设置默认参数
+    # Set default parameters
     params = load_parameters()
     runner = BatchSimulationRunner(params)
     
-    # 运行策略对比 (T=10, 三个策略)
+    # Run strategy comparison (T=10, three strategies)
     strategies = ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
     time_horizon = args.time_horizon
-    n_simulations = getattr(args, 'n_simulations', 50)  # 默认50次仿真
+    n_simulations = getattr(args, 'n_simulations', 50)  # Default 50 simulations
     
-    TerminalDisplay.print_section(f"运行 T={time_horizon} 策略对比仿真")
-    print(f"策略: {', '.join([s.title() for s in strategies])}")
-    print(f"仿真次数: {n_simulations}")
-    print(f"时间跨度: {time_horizon} 年")
+    TerminalDisplay.print_section(f"Running T={time_horizon} Strategy Comparison Simulation")
+    print(f"Strategies: {', '.join([s.title() for s in strategies])}")
+    print(f"Simulations: {n_simulations}")
+    print(f"Time Horizon: {time_horizon} years")
     
     try:
-        # 运行策略对比
+        # Run strategy comparison
         comparison_results = runner.run_strategy_comparison(
             strategies=strategies,
             T=time_horizon,
             n_simulations=n_simulations,
             base_seed=getattr(args, 'seed', 42),
-            save_results=True,  # 强制保存结果以便可视化
+            save_results=True,  # Force save results for visualization
             show_progress=True
         )
         
-        # 显示简要结果
+        # Display brief results
         TerminalDisplay.print_section("Simulation Complete - Results Summary")
         for strategy_name, (results, stats) in comparison_results.items():
             summary_data = {
@@ -149,7 +149,7 @@ def run_default_simulation_with_visualization(args):
             }
             TerminalDisplay.print_summary_box(f"{strategy_name.title()} Strategy", summary_data)
         
-        # 显示可视化
+        # Display visualization
         if args.visualize:
             show_visualization(time_horizon=time_horizon)
         else:
@@ -161,8 +161,8 @@ def run_default_simulation_with_visualization(args):
 
 
 def run_single_simulation(args):
-    """运行单次仿真"""
-    TerminalDisplay.print_header("单次策略仿真", width=70)
+    """Run single simulation"""
+    TerminalDisplay.print_header("Single Strategy Simulation", width=70)
     
     params = load_parameters()
     engine = StrategySimulationEngine(params)
@@ -173,21 +173,21 @@ def run_single_simulation(args):
         seed=args.seed
     )
     
-    # 显示结果
-    TerminalDisplay.print_section(f"{args.strategy.title()} 策略仿真结果")
+    # Display results
+    TerminalDisplay.print_section(f"{args.strategy.title()} Strategy Simulation Results")
     
     summary_data = {
-        "策略": args.strategy.title(),
-        "时间跨度": f"{args.time_horizon}年",
+        "Strategy": args.strategy.title(),
+        "Time Horizon": f"{args.time_horizon} years",
         "NPV": result.performance_metrics.get('npv', 0),
-        "平均利用率": result.performance_metrics.get('avg_utilization', 0),
-        "自给自足率": result.performance_metrics.get('self_sufficiency_rate', 0),
-        "总成本": result.performance_metrics.get('total_cost', 0)
+        "Average Utilization": result.performance_metrics.get('avg_utilization', 0),
+        "Self-Sufficiency Rate": result.performance_metrics.get('self_sufficiency_rate', 0),
+        "Total Cost": result.performance_metrics.get('total_cost', 0)
     }
     
-    TerminalDisplay.print_summary_box("仿真结果", summary_data)
+    TerminalDisplay.print_summary_box("Simulation Results", summary_data)
     
-    # 保存结果
+    # Save results
     if args.save:
         output_dir = Path("strategies/simulation_results") / f"T{args.time_horizon}"
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -196,12 +196,12 @@ def run_single_simulation(args):
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(result.to_dict(), f, indent=2, ensure_ascii=False)
         
-        print(f"结果已保存到: {output_file}")
+        print(f"Results saved to: {output_file}")
 
 
 def run_monte_carlo_simulation(args):
-    """运行蒙特卡洛仿真"""
-    TerminalDisplay.print_header("蒙特卡洛策略仿真", width=70)
+    """Run Monte Carlo simulation"""
+    TerminalDisplay.print_header("Monte Carlo Strategy Simulation", width=70)
     
     params = load_parameters()
     runner = BatchSimulationRunner(params)
@@ -215,23 +215,23 @@ def run_monte_carlo_simulation(args):
         show_progress=True
     )
     
-    # 显示统计结果
-    TerminalDisplay.print_section("蒙特卡洛仿真统计结果")
+    # Display statistical results
+    TerminalDisplay.print_section("Monte Carlo Simulation Statistical Results")
     
     stats_data = {
-        "仿真次数": len(results),
-        "NPV均值": stats['npv_mean'],
-        "NPV标准差": stats['npv_std'],
-        "成功率": stats['probability_positive_npv'],
-        "平均利用率": stats['utilization_mean']
+        "Simulations": len(results),
+        "NPV Mean": stats['npv_mean'],
+        "NPV Std Dev": stats['npv_std'],
+        "Success Rate": stats['probability_positive_npv'],
+        "Average Utilization": stats['utilization_mean']
     }
     
-    TerminalDisplay.print_summary_box(f"{args.strategy.title()} 策略统计", stats_data)
+    TerminalDisplay.print_summary_box(f"{args.strategy.title()} Strategy Statistics", stats_data)
 
 
 def run_strategy_comparison(args):
-    """运行策略对比"""
-    TerminalDisplay.print_header("策略对比分析", width=70)
+    """Run strategy comparison"""
+    TerminalDisplay.print_header("Strategy Comparison Analysis", width=70)
     
     params = load_parameters()
     runner = BatchSimulationRunner(params)
@@ -247,26 +247,26 @@ def run_strategy_comparison(args):
         show_progress=True
     )
     
-    # 性能分析
+    # Performance analysis
     if args.detailed_analysis:
-        TerminalDisplay.print_section("详细性能分析")
+        TerminalDisplay.print_section("Detailed Performance Analysis")
         
         analyzer = PerformanceAnalyzer()
         strategy_results = {name: results for name, (results, _) in comparison_results.items()}
         
-        # 生成分析报告
+        # Generate analysis report
         if args.save:
             report_file = Path("strategies/simulation_results") / f"comparison_report_T{args.time_horizon}.txt"
             report = analyzer.generate_performance_report(strategy_results, report_file)
-            print(f"详细报告已保存到: {report_file}")
+            print(f"Detailed report saved to: {report_file}")
         else:
             report = analyzer.generate_performance_report(strategy_results)
             print(report)
 
 
 def run_time_horizon_analysis(args):
-    """运行时间跨度分析"""
-    TerminalDisplay.print_header("时间跨度影响分析", width=70)
+    """Run time horizon analysis"""
+    TerminalDisplay.print_header("Time Horizon Impact Analysis", width=70)
     
     params = load_parameters()
     runner = BatchSimulationRunner(params)
@@ -283,29 +283,29 @@ def run_time_horizon_analysis(args):
         show_progress=True
     )
     
-    # 时间跨度影响分析
+    # Time horizon impact analysis
     if args.detailed_analysis:
-        TerminalDisplay.print_section("时间跨度影响分析")
+        TerminalDisplay.print_section("Time Horizon Impact Analysis")
         
         analyzer = PerformanceAnalyzer()
         
-        # 重组数据格式
+        # Reorganize data format
         formatted_results = {}
         for T, strategy_data in horizon_results.items():
             formatted_results[T] = {name: results for name, (results, _) in strategy_data.items()}
         
         horizon_analysis = analyzer.analyze_time_horizon_impact(formatted_results)
         
-        # 显示趋势分析
+        # Display trend analysis
         trends = horizon_analysis.get('trends', {})
         for strategy, trend_data in trends.items():
-            trend_direction = "上升" if trend_data['is_improving'] else "下降"
-            print(f"{strategy.title()} 策略: NPV随时间跨度呈{trend_direction}趋势")
+            trend_direction = "increasing" if trend_data['is_improving'] else "decreasing"
+            print(f"{strategy.title()} Strategy: NPV shows {trend_direction} trend with time horizon")
 
 
 def run_parallel_batch(args):
-    """运行并行批量仿真"""
-    TerminalDisplay.print_header("并行批量仿真", width=70)
+    """Run parallel batch simulation"""
+    TerminalDisplay.print_header("Parallel Batch Simulation", width=70)
     
     params = load_parameters()
     runner = BatchSimulationRunner(params)
@@ -322,16 +322,16 @@ def run_parallel_batch(args):
         save_results=args.save
     )
     
-    TerminalDisplay.print_section("并行仿真完成")
-    print(f"完成 {len(strategies)} 个策略 × {len(time_horizons)} 个时间跨度的仿真")
-    print(f"总仿真次数: {len(strategies) * len(time_horizons) * args.n_simulations}")
+    TerminalDisplay.print_section("Parallel Simulation Complete")
+    print(f"Completed {len(strategies)} strategies × {len(time_horizons)} time horizons simulation")
+    print(f"Total simulations: {len(strategies) * len(time_horizons) * args.n_simulations}")
 
 
 def compare_with_optimal(args):
-    """与全局最优解对比"""
-    TerminalDisplay.print_header("策略与全局最优解对比", width=70)
+    """Compare with global optimal solution"""
+    TerminalDisplay.print_header("Strategy vs Global Optimal Solution Comparison", width=70)
     
-    # 运行策略仿真
+    # Run strategy simulation
     params = load_parameters()
     runner = BatchSimulationRunner(params)
     
@@ -344,50 +344,50 @@ def compare_with_optimal(args):
         show_progress=True
     )
     
-    # 运行全局最优解
-    TerminalDisplay.print_section("计算全局最优解基准")
+    # Run global optimal solution
+    TerminalDisplay.print_section("Computing Global Optimal Solution Benchmark")
     
     try:
         from optimal.optimal_solu import main as run_optimal
         import io
         import contextlib
         
-        # 临时修改参数文件中的T值
+        # Temporarily modify T value in parameters file
         original_T = params['economics']['T']
         params['economics']['T'] = args.time_horizon
         
-        # 保存临时参数文件
+        # Save temporary parameters file
         temp_params_file = project_root / "data" / "parameters_temp.json"
         with open(temp_params_file, 'w') as f:
             json.dump(params, f, indent=2)
         
-        # 运行全局最优解（捕获输出）
+        # Run global optimal solution (capture output)
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
-            # 这里需要修改test_fixed_model.py来返回结果而不是只打印
+            # Need to modify test_fixed_model.py to return results instead of just printing
             pass
         
-        # 恢复原始参数
+        # Restore original parameters
         params['economics']['T'] = original_T
         temp_params_file.unlink(missing_ok=True)
         
-        print("全局最优解计算完成")
+        print("Global optimal solution computation complete")
         
-        # 显示对比结果
-        TerminalDisplay.print_section("策略效率分析")
+        # Display comparison results
+        TerminalDisplay.print_section("Strategy Efficiency Analysis")
         
         for strategy_name, (results, stats) in strategy_results.items():
-            efficiency = stats['npv_mean'] / 7000000  # 假设最优解为100万英镑 (700万人民币)
-            print(f"{strategy_name.title()}: 相对效率 {efficiency:.1%}")
+            efficiency = stats['npv_mean'] / 7000000  # Assume optimal solution is 1M GBP (7M RMB)
+            print(f"{strategy_name.title()}: Relative efficiency {efficiency:.1%}")
     
     except Exception as e:
-        print(f"无法运行全局最优解对比: {e}")
-        print("请确保test_fixed_model.py可以正常运行")
+        print(f"Unable to run global optimal solution comparison: {e}")
+        print("Please ensure test_fixed_model.py can run normally")
 
 
 def main():
-    """主函数"""
-    parser = argparse.ArgumentParser(description='ISRU策略仿真系统')
+    """Main function"""
+    parser = argparse.ArgumentParser(description='ISRU Strategy Simulation System')
     
     # 添加全局参数（用于默认运行模式）
     parser.add_argument('--visualize', action='store_true',
@@ -398,129 +398,129 @@ def main():
                        help='Monte Carlo simulation count (default: 50)')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     
-    subparsers = parser.add_subparsers(dest='command', help='可用命令')
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
-    # 通用参数
+    # Common arguments
     def add_common_args(subparser):
-        subparser.add_argument('--seed', type=int, default=42, help='随机种子')
-        subparser.add_argument('--save', action='store_true', help='保存结果')
+        subparser.add_argument('--seed', type=int, default=42, help='Random seed')
+        subparser.add_argument('--save', action='store_true', help='Save results')
         subparser.add_argument('--visualize', action='store_true', help='Display visualization charts')
     
-    # 单次仿真
-    single_parser = subparsers.add_parser('single', help='运行单次仿真')
+    # Single simulation
+    single_parser = subparsers.add_parser('single', help='Run single simulation')
     single_parser.add_argument('--strategy', choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                              default='gradual_deployment', help='策略类型')
-    single_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
+                              default='gradual_deployment', help='Strategy type')
+    single_parser.add_argument('--time-horizon', type=int, default=30, help='Time horizon')
     add_common_args(single_parser)
     
-    # 蒙特卡洛仿真
-    mc_parser = subparsers.add_parser('monte-carlo', help='运行蒙特卡洛仿真')
+    # Monte Carlo simulation
+    mc_parser = subparsers.add_parser('monte-carlo', help='Run Monte Carlo simulation')
     mc_parser.add_argument('--strategy', choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                          default='gradual_deployment', help='策略类型')
-    mc_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
-    mc_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
+                          default='gradual_deployment', help='Strategy type')
+    mc_parser.add_argument('--time-horizon', type=int, default=30, help='Time horizon')
+    mc_parser.add_argument('--n-simulations', type=int, default=100, help='Number of simulations')
     add_common_args(mc_parser)
     
-    # 策略对比
-    compare_parser = subparsers.add_parser('compare', help='运行策略对比')
+    # Strategy comparison
+    compare_parser = subparsers.add_parser('compare', help='Run strategy comparison')
     compare_parser.add_argument('--strategies', nargs='+',
                                choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                               help='要对比的策略')
-    compare_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
-    compare_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
-    compare_parser.add_argument('--detailed-analysis', action='store_true', help='详细分析')
+                               help='Strategies to compare')
+    compare_parser.add_argument('--time-horizon', type=int, default=30, help='Time horizon')
+    compare_parser.add_argument('--n-simulations', type=int, default=100, help='Number of simulations')
+    compare_parser.add_argument('--detailed-analysis', action='store_true', help='Detailed analysis')
     add_common_args(compare_parser)
     
-    # 时间跨度分析
-    horizon_parser = subparsers.add_parser('horizon', help='运行时间跨度分析')
-    horizon_parser.add_argument('--time-horizons', nargs='+', type=int, 
-                               default=[10, 20, 30, 40, 50], help='时间跨度列表')
+    # Time horizon analysis
+    horizon_parser = subparsers.add_parser('horizon', help='Run time horizon analysis')
+    horizon_parser.add_argument('--time-horizons', nargs='+', type=int,
+                               default=[10, 20, 30, 40, 50], help='Time horizon list')
     horizon_parser.add_argument('--strategies', nargs='+',
                                choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                               help='要分析的策略')
-    horizon_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
-    horizon_parser.add_argument('--detailed-analysis', action='store_true', help='详细分析')
+                               help='Strategies to analyze')
+    horizon_parser.add_argument('--n-simulations', type=int, default=100, help='Number of simulations')
+    horizon_parser.add_argument('--detailed-analysis', action='store_true', help='Detailed analysis')
     add_common_args(horizon_parser)
     
-    # 并行批量仿真
-    parallel_parser = subparsers.add_parser('parallel', help='运行并行批量仿真')
-    parallel_parser.add_argument('--time-horizons', nargs='+', type=int, 
-                                default=[10, 20, 30, 40, 50], help='时间跨度列表')
+    # Parallel batch simulation
+    parallel_parser = subparsers.add_parser('parallel', help='Run parallel batch simulation')
+    parallel_parser.add_argument('--time-horizons', nargs='+', type=int,
+                                default=[10, 20, 30, 40, 50], help='Time horizon list')
     parallel_parser.add_argument('--strategies', nargs='+',
                                 choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                                help='要分析的策略')
-    parallel_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
-    parallel_parser.add_argument('--max-workers', type=int, help='最大并行进程数')
+                                help='Strategies to analyze')
+    parallel_parser.add_argument('--n-simulations', type=int, default=100, help='Number of simulations')
+    parallel_parser.add_argument('--max-workers', type=int, help='Maximum parallel processes')
     add_common_args(parallel_parser)
     
-    # 与最优解对比
-    optimal_parser = subparsers.add_parser('optimal', help='与全局最优解对比')
+    # Compare with optimal solution
+    optimal_parser = subparsers.add_parser('optimal', help='Compare with global optimal solution')
     optimal_parser.add_argument('--strategies', nargs='+',
                                choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                               help='要对比的策略')
-    optimal_parser.add_argument('--time-horizon', type=int, default=30, help='时间跨度')
-    optimal_parser.add_argument('--n-simulations', type=int, default=100, help='仿真次数')
+                               help='Strategies to compare')
+    optimal_parser.add_argument('--time-horizon', type=int, default=30, help='Time horizon')
+    optimal_parser.add_argument('--n-simulations', type=int, default=100, help='Number of simulations')
     add_common_args(optimal_parser)
     
-    # 结果管理
-    results_parser = subparsers.add_parser('results', help='结果管理')
-    results_subparsers = results_parser.add_subparsers(dest='results_command', help='结果管理命令')
+    # Results management
+    results_parser = subparsers.add_parser('results', help='Results management')
+    results_subparsers = results_parser.add_subparsers(dest='results_command', help='Results management commands')
     
-    # 导出到Excel
-    export_parser = results_subparsers.add_parser('export', help='导出结果到Excel')
+    # Export to Excel
+    export_parser = results_subparsers.add_parser('export', help='Export results to Excel')
     export_parser.add_argument('--strategies', nargs='+',
                               choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                              help='要导出的策略')
+                              help='Strategies to export')
     export_parser.add_argument('--time-horizons', nargs='+', type=int,
-                              help='要导出的时间跨度')
-    export_parser.add_argument('--output', type=str, help='输出文件路径')
+                              help='Time horizons to export')
+    export_parser.add_argument('--output', type=str, help='Output file path')
     
-    # 查看可用结果
-    list_parser = results_subparsers.add_parser('list', help='查看可用结果')
+    # View available results
+    list_parser = results_subparsers.add_parser('list', help='View available results')
     
-    # 清理旧结果
-    cleanup_parser = results_subparsers.add_parser('cleanup', help='清理旧结果')
-    cleanup_parser.add_argument('--keep-days', type=int, default=30, help='保留天数')
+    # Clean old results
+    cleanup_parser = results_subparsers.add_parser('cleanup', help='Clean old results')
+    cleanup_parser.add_argument('--keep-days', type=int, default=30, help='Days to keep')
     
-    # 加载结果
-    load_parser = results_subparsers.add_parser('load', help='加载之前的结果')
+    # Load results
+    load_parser = results_subparsers.add_parser('load', help='Load previous results')
     load_parser.add_argument('--strategy', required=True,
                             choices=['upfront_deployment', 'gradual_deployment', 'flexible_deployment'],
-                            help='策略名称')
-    load_parser.add_argument('--time-horizon', type=int, required=True, help='时间跨度')
+                            help='Strategy name')
+    load_parser.add_argument('--time-horizon', type=int, required=True, help='Time horizon')
     
-    # 可视化命令
+    # Visualization command
     viz_parser = subparsers.add_parser('visualize', help='Display visualization charts for existing results')
     viz_parser.add_argument('--results-dir', type=str, default="strategies/simulation_results",
-                           help='结果目录路径')
+                           help='Results directory path')
     viz_parser.add_argument('--time-horizon', type=int, default=50,
-                           help='时间跨度（年）')
+                           help='Time horizon (years)')
     
     args = parser.parse_args()
     
     if args.command == 'single':
         run_single_simulation(args)
-        # 单次仿真后可视化
+        # Visualization after single simulation
         if args.visualize:
             show_visualization(time_horizon=args.time_horizon)
     elif args.command == 'monte-carlo':
         run_monte_carlo_simulation(args)
-        # 蒙特卡洛仿真后可视化
+        # Visualization after Monte Carlo simulation
         if args.visualize:
             show_visualization(time_horizon=args.time_horizon)
     elif args.command == 'compare':
         run_strategy_comparison(args)
-        # 策略对比后可视化
+        # Visualization after strategy comparison
         if args.visualize:
             show_visualization(time_horizon=args.time_horizon)
     elif args.command == 'horizon':
         run_time_horizon_analysis(args)
-        # 时间跨度分析后可视化
+        # Visualization after time horizon analysis
         if args.visualize:
             show_visualization(time_horizon=args.time_horizon)
     elif args.command == 'parallel':
         run_parallel_batch(args)
-        # 并行仿真后可视化
+        # Visualization after parallel simulation
         if args.visualize:
             show_visualization(time_horizon=args.time_horizon)
     elif args.command == 'optimal':
@@ -528,20 +528,20 @@ def main():
     elif args.command == 'results':
         handle_results_command(args)
     elif args.command == 'visualize':
-        # 纯可视化命令
+        # Pure visualization command
         show_visualization(args.results_dir, time_horizon=args.time_horizon)
     else:
-        # 默认运行T=10策略对比并可视化
+        # Default run T=10 strategy comparison with visualization
         run_default_simulation_with_visualization(args)
 
 
 def handle_results_command(args):
-    """处理结果管理命令"""
+    """Handle results management commands"""
     params = load_parameters()
     runner = BatchSimulationRunner(params)
     
     if args.results_command == 'export':
-        TerminalDisplay.print_header("导出结果到Excel", width=70)
+        TerminalDisplay.print_header("Export Results to Excel", width=70)
         
         strategies = args.strategies or ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
         time_horizons = args.time_horizons or [10, 20, 30, 40, 50]
@@ -551,41 +551,41 @@ def handle_results_command(args):
             excel_file = runner.export_results_to_excel(strategies, time_horizons, output_file)
             
             summary_data = {
-                "导出策略": ", ".join(strategies),
-                "时间跨度": ", ".join(map(str, time_horizons)),
-                "输出文件": str(excel_file),
-                "文件大小": f"{excel_file.stat().st_size / 1024:.1f} KB"
+                "Exported Strategies": ", ".join(strategies),
+                "Time Horizons": ", ".join(map(str, time_horizons)),
+                "Output File": str(excel_file),
+                "File Size": f"{excel_file.stat().st_size / 1024:.1f} KB"
             }
             
-            TerminalDisplay.print_summary_box("导出完成", summary_data, 'green')
+            TerminalDisplay.print_summary_box("Export Complete", summary_data, 'green')
             
         except Exception as e:
-            print(f"ERROR: 导出失败: {e}")
+            print(f"ERROR: Export failed: {e}")
     
     elif args.results_command == 'list':
-        TerminalDisplay.print_header("可用结果列表", width=70)
+        TerminalDisplay.print_header("Available Results List", width=70)
         
         available = runner.get_available_results()
         
         if not available:
-            print("INFO: 暂无可用结果")
-            print("请先运行仿真生成结果：")
+            print("INFO: No available results")
+            print("Please run simulation to generate results first:")
             print("  python strategies/main.py compare --save")
         else:
             for time_horizon, strategies in available.items():
-                TerminalDisplay.print_section(f"{time_horizon} 时间跨度")
+                TerminalDisplay.print_section(f"{time_horizon} Time Horizon")
                 for strategy in strategies:
-                    print(f"  - {strategy.title()} 策略")
+                    print(f"  - {strategy.title()} Strategy")
     
     elif args.results_command == 'cleanup':
-        TerminalDisplay.print_header("清理旧结果", width=70)
+        TerminalDisplay.print_header("Clean Old Results", width=70)
         
-        print(f"清理 {args.keep_days} 天前的结果文件...")
+        print(f"Cleaning result files older than {args.keep_days} days...")
         runner.cleanup_old_results(args.keep_days)
-        print("SUCCESS: 清理完成")
+        print("SUCCESS: Cleanup complete")
     
     elif args.results_command == 'load':
-        TerminalDisplay.print_header("加载历史结果", width=70)
+        TerminalDisplay.print_header("Load Historical Results", width=70)
         
         result_data = runner.load_previous_results(args.strategy, args.time_horizon)
         
@@ -594,33 +594,33 @@ def handle_results_command(args):
             results = result_data.get('results', [])
             
             summary_data = {
-                "策略": args.strategy.title(),
-                "时间跨度": f"{args.time_horizon}年",
-                "仿真次数": len(results),
-                "生成时间": metadata.get('timestamp', '未知'),
-                "版本": metadata.get('version', '未知')
+                "Strategy": args.strategy.title(),
+                "Time Horizon": f"{args.time_horizon} years",
+                "Simulations": len(results),
+                "Generated Time": metadata.get('timestamp', 'Unknown'),
+                "Version": metadata.get('version', 'Unknown')
             }
             
-            TerminalDisplay.print_summary_box("结果信息", summary_data)
+            TerminalDisplay.print_summary_box("Result Information", summary_data)
             
             if results:
-                # 显示简单统计
+                # Display simple statistics
                 npvs = [r['performance_metrics']['npv'] for r in results]
-                npvs_gbp = [npv/7 for npv in npvs]  # 转换为英镑
-                print(f"\nNPV统计:")
-                print(f"  均值: £{np.mean(npvs_gbp):,.0f}")
-                print(f"  标准差: £{np.std(npvs_gbp):,.0f}")
-                print(f"  最小值: £{min(npvs_gbp):,.0f}")
-                print(f"  最大值: £{max(npvs_gbp):,.0f}")
+                npvs_gbp = [npv/7 for npv in npvs]  # Convert to GBP
+                print(f"\nNPV Statistics:")
+                print(f"  Mean: £{np.mean(npvs_gbp):,.0f}")
+                print(f"  Std Dev: £{np.std(npvs_gbp):,.0f}")
+                print(f"  Min: £{min(npvs_gbp):,.0f}")
+                print(f"  Max: £{max(npvs_gbp):,.0f}")
         else:
-            print(f"ERROR: 未找到 {args.strategy} 策略在 T={args.time_horizon} 的结果")
-            print("可用结果:")
+            print(f"ERROR: Results not found for {args.strategy} strategy at T={args.time_horizon}")
+            print("Available results:")
             available = runner.get_available_results()
             for th, strategies in available.items():
                 print(f"  {th}: {', '.join(strategies)}")
     
     else:
-        print("请指定结果管理命令: export, list, cleanup, load")
+        print("Please specify results management command: export, list, cleanup, load")
 
 
 if __name__ == "__main__":

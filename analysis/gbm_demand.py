@@ -1,6 +1,6 @@
 """
 Geometric Brownian Motion (GBM) Demand Generator
-用于生成月球氧气需求的蒙特卡洛仿真路径
+For generating Monte Carlo simulation paths of lunar oxygen demand
 """
 
 import numpy as np
@@ -13,21 +13,21 @@ logger = logging.getLogger(__name__)
 
 class GBMDemandGenerator:
     """
-    几何布朗运动需求生成器
+    Geometric Brownian Motion demand generator
     
-    实现公式: D_t = D_{t-1} * exp((μ - 0.5σ²)dt + σ√dt * Z_t)
-    其中 Z_t ~ N(0,1) 是标准正态随机变量
+    Implements formula: D_t = D_{t-1} * exp((μ - 0.5σ²)dt + σ√dt * Z_t)
+    where Z_t ~ N(0,1) is a standard normal random variable
     """
     
     def __init__(self, D0: float, mu: float, sigma: float, dt: float = 1.0):
         """
-        初始化GBM生成器
+        Initialize GBM generator
         
         Args:
-            D0: 初始需求
-            mu: 漂移率 (drift)
-            sigma: 波动率 (volatility)
-            dt: 时间步长
+            D0: Initial demand
+            mu: Drift rate
+            sigma: Volatility
+            dt: Time step
         """
         self.D0 = D0
         self.mu = mu
@@ -36,27 +36,27 @@ class GBMDemandGenerator:
         
     def generate_single_path(self, T: int, seed: Optional[int] = None) -> np.ndarray:
         """
-        生成单条需求路径
+        Generate single demand path
         
         Args:
-            T: 时间范围（年数）
-            seed: 随机种子
+            T: Time range (years)
+            seed: Random seed
             
         Returns:
-            需求路径数组，形状为 (T+1,)
+            Demand path array with shape (T+1,)
         """
         if seed is not None:
             np.random.seed(seed)
             
-        # 初始化路径
+        # Initialize path
         path = np.zeros(T + 1)
         path[0] = self.D0
         
-        # GBM参数
+        # GBM parameters
         drift = (self.mu - 0.5 * self.sigma**2) * self.dt
         diffusion = self.sigma * np.sqrt(self.dt)
         
-        # 生成路径
+        # Generate path
         for t in range(1, T + 1):
             z = np.random.standard_normal()
             path[t] = path[t-1] * np.exp(drift + diffusion * z)
@@ -66,15 +66,15 @@ class GBMDemandGenerator:
     def generate_multiple_paths(self, T: int, n_scenarios: int, 
                                seed: Optional[int] = None) -> pd.DataFrame:
         """
-        生成多条需求路径
+        Generate multiple demand paths
         
         Args:
-            T: 时间范围（年数）
-            n_scenarios: 场景数量
-            seed: 随机种子
+            T: Time range (years)
+            n_scenarios: Number of scenarios
+            seed: Random seed
             
         Returns:
-            DataFrame，每列是一条需求路径
+            DataFrame where each column is a demand path
         """
         if seed is not None:
             np.random.seed(seed)
@@ -84,7 +84,7 @@ class GBMDemandGenerator:
             path = self.generate_single_path(T)
             paths.append(path)
             
-        # 创建DataFrame
+        # Create DataFrame
         df = pd.DataFrame(
             np.array(paths).T,
             columns=[f'scenario_{i+1}' for i in range(n_scenarios)],
@@ -96,10 +96,10 @@ class GBMDemandGenerator:
     def generate_scenarios_with_stats(self, T: int, n_scenarios: int, 
                                     seed: Optional[int] = None) -> dict:
         """
-        生成需求场景并计算统计量
+        Generate demand scenarios and calculate statistics
         
         Returns:
-            包含路径和统计量的字典
+            Dictionary containing paths and statistics
         """
         df = self.generate_multiple_paths(T, n_scenarios, seed)
         
@@ -116,26 +116,26 @@ class GBMDemandGenerator:
         return stats
     
     def save_scenarios(self, df: pd.DataFrame, filepath: str) -> None:
-        """保存需求场景到CSV文件"""
+        """Save demand scenarios to CSV file"""
         df.to_csv(filepath)
-        logger.info(f"需求场景已保存到: {filepath}")
+        logger.info(f"Demand scenarios saved to: {filepath}")
         
     def load_scenarios(self, filepath: str) -> pd.DataFrame:
-        """从CSV文件加载需求场景"""
+        """Load demand scenarios from CSV file"""
         df = pd.read_csv(filepath, index_col=0)
-        logger.info(f"需求场景已从 {filepath} 加载")
+        logger.info(f"Demand scenarios loaded from {filepath}")
         return df
 
 
 def create_demand_generator_from_params(params: dict) -> GBMDemandGenerator:
     """
-    从参数字典创建GBM生成器
+    Create GBM generator from parameter dictionary
     
     Args:
-        params: 包含需求参数的参数字典
+        params: Parameter dictionary containing demand parameters
         
     Returns:
-        GBMDemandGenerator实例
+        GBMDemandGenerator instance
     """
     demand_params = params['demand']
     return GBMDemandGenerator(
@@ -147,28 +147,28 @@ def create_demand_generator_from_params(params: dict) -> GBMDemandGenerator:
 
 
 if __name__ == "__main__":
-    # 测试代码
+    # Test code
     import json
     
-    # 加载参数
+    # Load parameters
     with open('data/parameters.json', 'r') as f:
         params = json.load(f)
     
-    # 创建生成器
+    # Create generator
     generator = create_demand_generator_from_params(params)
     
-    # 生成场景
+    # Generate scenarios
     T = params['economics']['T']
     n_scenarios = params['simulation']['n_scenarios']
     seed = params['simulation']['random_seed']
     
     stats = generator.generate_scenarios_with_stats(T, n_scenarios, seed)
     
-    # 保存结果
+    # Save results
     generator.save_scenarios(stats['paths'], 'data/demand_scenarios.csv')
     
-    # 打印统计信息
-    print("需求场景统计信息:")
+    # Print statistics
+    print("Demand scenario statistics:")
     print(stats['mean'])
-    print(f"\n场景数量: {n_scenarios}")
-    print(f"时间范围: {T} 年")
+    print(f"\nNumber of scenarios: {n_scenarios}")
+    print(f"Time range: {T} years")

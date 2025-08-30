@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-ISRU 模型基本使用示例
-展示如何加载参数、生成需求路径并求解模型
+ISRU Model Basic Usage Example
+Demonstrates how to load parameters, generate demand paths, and solve the model
 """
 
 import sys
@@ -14,22 +14,22 @@ from models.isru_model import create_and_solve_model
 from analysis.gbm_demand import GBMDemandGenerator
 
 def main():
-    """运行基本示例"""
-    print("=== ISRU 模型基本示例 ===\n")
+    """Run basic example"""
+    print("=== ISRU Model Basic Example ===\n")
     
-    # 1. 加载参数
-    print("1. 加载参数...")
+    # 1. Load parameters
+    print("1. Loading parameters...")
     with open("data/parameters.json") as f:
         params = json.load(f)
     
-    # 打印关键参数
+    # Print key parameters
     T = params['economics']['T']
-    print(f"   时间周期: {T} 个月")
-    print(f"   氧气售价: ${params['economics']['P_m']:,}")
-    print(f"   初始需求: {params['demand']['D0']} kg")
+    print(f"   Time period: {T} months")
+    print(f"   Oxygen price: ${params['economics']['P_m']:,}")
+    print(f"   Initial demand: {params['demand']['D0']} kg")
     
-    # 2. 创建需求生成器
-    print("\n2. 创建GBM需求生成器...")
+    # 2. Create demand generator
+    print("\n2. Creating GBM demand generator...")
     demand_params = params['demand']
     gbm_generator = GBMDemandGenerator(
         D0=demand_params['D0'],
@@ -38,38 +38,38 @@ def main():
         dt=demand_params['dt']
     )
     
-    # 3. 生成需求路径
-    print("\n3. 生成需求路径...")
-    np.random.seed(42)  # 确保结果可重现
+    # 3. Generate demand path
+    print("\n3. Generating demand path...")
+    np.random.seed(42)  # Ensure reproducible results
     demand_path = gbm_generator.generate_single_path(T)
     
-    print(f"   需求路径长度: {len(demand_path)}")
-    print(f"   初始需求: {demand_path[0]:.2f} kg")
-    print(f"   最终需求: {demand_path[-1]:.2f} kg")
-    print(f"   平均需求: {np.mean(demand_path):.2f} kg")
+    print(f"   Demand path length: {len(demand_path)}")
+    print(f"   Initial demand: {demand_path[0]:.2f} kg")
+    print(f"   Final demand: {demand_path[-1]:.2f} kg")
+    print(f"   Average demand: {np.mean(demand_path):.2f} kg")
     
-    # 4. 求解模型
-    print("\n4. 求解优化模型...")
+    # 4. Solve model
+    print("\n4. Solving optimization model...")
     result = create_and_solve_model(params, demand_path, solver_name="glpk")
     
     if result['status'] == 'optimal':
-        print("   ✅ 求解成功!")
+        print("   ✅ Solving successful!")
         print(f"   NPV: ${result['objective_value']:,.2f}")
         
-        # 提取关键决策变量
+        # Extract key decision variables
         solution = result['solution']
         Mt_total = sum(solution['delta_Mt'].values())
-        print(f"   总开采量: {Mt_total:.2f} kg")
+        print(f"   Total extraction: {Mt_total:.2f} kg")
         
-        # 打印各期决策
-        print("\n5. 各期决策:")
+        # Print period-by-period decisions
+        print("\n5. Period-by-period decisions:")
         for t in range(T):
-            print(f"   月份 {t+1:2d}: "
-                  f"开采 {solution['delta_Mt'][t]:6.2f} kg, "
-                  f"库存 {solution['St'][t]:6.2f} kg, "
-                  f"需求 {demand_path[t+1]:6.2f} kg")
+            print(f"   Month {t+1:2d}: "
+                  f"Extract {solution['delta_Mt'][t]:6.2f} kg, "
+                  f"Inventory {solution['St'][t]:6.2f} kg, "
+                  f"Demand {demand_path[t+1]:6.2f} kg")
         
-        # 保存结果
+        # Save results
         with open('data/example_results.json', 'w') as f:
             json.dump({
                 'parameters': params,
@@ -77,10 +77,10 @@ def main():
                 'solution': solution,
                 'npv': result['objective_value']
             }, f, indent=2)
-        print("\n6. 结果已保存到 data/example_results.json")
+        print("\n6. Results saved to data/example_results.json")
         
     else:
-        print(f"   ❌ 求解失败: {result['status']}")
+        print(f"   ❌ Solving failed: {result['status']}")
 
 if __name__ == "__main__":
     main()

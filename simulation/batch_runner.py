@@ -1,6 +1,6 @@
 """
-批量仿真运行器
-支持多场景、多参数组合的批量仿真
+Batch Simulation Runner
+Supports batch simulation with multiple scenarios and parameter combinations
 """
 
 import logging
@@ -22,35 +22,35 @@ logger = logging.getLogger(__name__)
 
 class BatchRunner:
     """
-    批量仿真运行器
+    Batch simulation runner
     
-    支持以下功能：
-    - 多场景批量仿真
-    - 并行计算
-    - 结果聚合和分析
-    - 进度跟踪
+    Supports the following features:
+    - Multi-scenario batch simulation
+    - Parallel computing
+    - Result aggregation and analysis
+    - Progress tracking
     """
     
     def __init__(self, params: Dict[str, Any], output_dir: str = "results"):
         """
-        初始化批量运行器
+        Initialize batch runner
         
         Args:
-            params: 基础参数字典
-            output_dir: 输出目录
+            params: Base parameter dictionary
+            output_dir: Output directory
         """
         self.params = params
         self.output_dir = output_dir
         self.results = []
         
-        # 创建输出目录
+        # Create output directory
         os.makedirs(output_dir, exist_ok=True)
         
-        # 设置日志
+        # Setup logging
         self._setup_logging()
     
     def _setup_logging(self) -> None:
-        """设置日志配置"""
+        """Setup logging configuration"""
         log_file = os.path.join(self.output_dir, f"batch_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
         
         logging.basicConfig(
@@ -64,40 +64,40 @@ class BatchRunner:
     
     def run_single_scenario(self, scenario: Dict[str, Any]) -> Dict[str, Any]:
         """
-        运行单个场景
+        Run single scenario
         
         Args:
-            scenario: 场景配置
+            scenario: Scenario configuration
             
         Returns:
-            场景结果
+            Scenario result
         """
-        logger.info(f"运行场景: {scenario.get('name', 'unnamed')}")
+        logger.info(f"Running scenario: {scenario.get('name', 'unnamed')}")
         
         try:
-            # 合并参数
+            # Merge parameters
             scenario_params = self._merge_params(self.params, scenario.get('params', {}))
             
-            # 生成需求路径
+            # Generate demand path
             demand_generator = GBMDemandGenerator(scenario_params)
             demand_path = demand_generator.generate_path(
                 n_scenarios=1,
                 random_seed=scenario.get('seed', 42)
             )[0]
             
-            # 创建并求解模型
+            # Create and solve model
             model = ISRUOptimizationModel(scenario_params)
             model.build_model(demand_path)
             result = model.solve()
             
-            # 添加场景信息
+            # Add scenario information
             result['scenario'] = scenario
             result['demand_path'] = demand_path
             
             return result
             
         except Exception as e:
-            logger.error(f"场景运行失败: {e}")
+            logger.error(f"Scenario execution failed: {e}")
             return {
                 'status': 'error',
                 'error': str(e),
@@ -107,26 +107,26 @@ class BatchRunner:
     def run_batch(self, scenarios: List[Dict[str, Any]], 
                   parallel: bool = True, max_workers: int = None) -> List[Dict[str, Any]]:
         """
-        运行批量仿真
+        Run batch simulation
         
         Args:
-            scenarios: 场景列表
-            parallel: 是否并行运行
-            max_workers: 最大工作进程数
+            scenarios: Scenario list
+            parallel: Whether to run in parallel
+            max_workers: Maximum number of worker processes
             
         Returns:
-            所有场景的结果列表
+            List of results from all scenarios
         """
         if max_workers is None:
             max_workers = min(mp.cpu_count(), len(scenarios))
         
-        logger.info(f"开始批量仿真，共{len(scenarios)}个场景")
+        logger.info(f"Starting batch simulation with {len(scenarios)} scenarios")
         
         if parallel and len(scenarios) > 1:
-            # 并行运行
+            # Parallel execution
             with ProcessPoolExecutor(max_workers=max_workers) as executor:
                 future_to_scenario = {
-                    executor.submit(self.run_single_scenario, scenario): scenario 
+                    executor.submit(self.run_single_scenario, scenario): scenario
                     for scenario in scenarios
                 }
                 
@@ -134,27 +134,27 @@ class BatchRunner:
                     result = future.result()
                     self.results.append(result)
                     
-                    # 保存中间结果
+                    # Save intermediate result
                     self._save_intermediate_result(result)
                     
         else:
-            # 串行运行
+            # Serial execution
             for scenario in scenarios:
                 result = self.run_single_scenario(scenario)
                 self.results.append(result)
                 
-                # 保存中间结果
+                # Save intermediate result
                 self._save_intermediate_result(result)
         
-        logger.info("批量仿真完成")
+        logger.info("Batch simulation completed")
         
-        # 保存完整结果
+        # Save complete results
         self._save_all_results()
         
         return self.results
     
     def _merge_params(self, base_params: Dict, override_params: Dict) -> Dict:
-        """合并参数字典"""
+        """Merge parameter dictionaries"""
         merged = base_params.copy()
         
         def deep_merge(d1, d2):
@@ -168,29 +168,29 @@ class BatchRunner:
         return merged
     
     def _save_intermediate_result(self, result: Dict[str, Any]) -> None:
-        """保存中间结果"""
+        """Save intermediate result"""
         scenario_name = result['scenario'].get('name', 'unnamed')
         filename = f"result_{scenario_name}_{datetime.now().strftime('%H%M%S')}.json"
         filepath = os.path.join(self.output_dir, filename)
         
-        # 转换为可序列化的格式
+        # Convert to serializable format
         serializable_result = self._make_serializable(result)
         
         with open(filepath, 'w') as f:
             json.dump(serializable_result, f, indent=2, default=str)
     
     def _save_all_results(self) -> None:
-        """保存所有结果"""
+        """Save all results"""
         filename = f"all_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pkl"
         filepath = os.path.join(self.output_dir, filename)
         
         with open(filepath, 'wb') as f:
             pickle.dump(self.results, f)
         
-        logger.info(f"所有结果已保存到: {filepath}")
+        logger.info(f"All results saved to: {filepath}")
     
     def _make_serializable(self, obj: Any) -> Any:
-        """将对象转换为可序列化格式"""
+        """Convert object to serializable format"""
         if isinstance(obj, dict):
             return {k: self._make_serializable(v) for k, v in obj.items()}
         elif isinstance(obj, list):
@@ -203,7 +203,7 @@ class BatchRunner:
             return obj
     
     def get_results_summary(self) -> pd.DataFrame:
-        """获取结果摘要"""
+        """Get results summary"""
         if not self.results:
             return pd.DataFrame()
         
@@ -222,7 +222,7 @@ class BatchRunner:
                     'total_mass': max(result['solution']['Mt'].values()) if 'solution' in result else 0
                 }
                 
-                # 添加场景参数
+                # Add scenario parameters
                 for key, value in result['scenario'].get('params', {}).items():
                     if isinstance(value, (int, float, str)):
                         summary[f'param_{key}'] = value
@@ -239,41 +239,41 @@ class BatchRunner:
         return pd.DataFrame(summary_data)
     
     def save_summary_report(self) -> str:
-        """保存摘要报告"""
+        """Save summary report"""
         summary_df = self.get_results_summary()
         
         if summary_df.empty:
-            logger.warning("没有可保存的结果")
+            logger.warning("No results to save")
             return ""
         
         filename = f"summary_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
         filepath = os.path.join(self.output_dir, filename)
         
         summary_df.to_csv(filepath, index=False)
-        logger.info(f"摘要报告已保存到: {filepath}")
+        logger.info(f"Summary report saved to: {filepath}")
         
         return filepath
 
 
 class ScenarioGenerator:
-    """场景生成器"""
+    """Scenario generator"""
     
     @staticmethod
     def generate_parameter_sweep(base_params: Dict, 
                                  param_ranges: Dict[str, List]) -> List[Dict[str, Any]]:
         """
-        生成参数扫描场景
+        Generate parameter sweep scenarios
         
         Args:
-            base_params: 基础参数
-            param_ranges: 参数范围字典
+            base_params: Base parameters
+            param_ranges: Parameter range dictionary
             
         Returns:
-            场景列表
+            Scenario list
         """
         scenarios = []
         
-        # 生成参数组合
+        # Generate parameter combinations
         param_names = list(param_ranges.keys())
         param_values = [param_ranges[name] for name in param_names]
         
@@ -285,7 +285,7 @@ class ScenarioGenerator:
                 'params': {}
             }
             
-            # 构建参数层次结构
+            # Build parameter hierarchy
             for name, value in zip(param_names, combination):
                 keys = name.split('.')
                 current = scenario['params']
@@ -305,14 +305,14 @@ class ScenarioGenerator:
     def generate_demand_scenarios(base_params: Dict, 
                                   demand_configs: List[Dict]) -> List[Dict[str, Any]]:
         """
-        生成需求场景
+        Generate demand scenarios
         
         Args:
-            base_params: 基础参数
-            demand_configs: 需求配置列表
+            base_params: Base parameters
+            demand_configs: Demand configuration list
             
         Returns:
-            场景列表
+            Scenario list
         """
         scenarios = []
         
@@ -332,18 +332,18 @@ class ScenarioGenerator:
     def generate_uncertainty_scenarios(base_params: Dict, 
                                        uncertainty_factors: Dict[str, List]) -> List[Dict[str, Any]]:
         """
-        生成不确定性场景
+        Generate uncertainty scenarios
         
         Args:
-            base_params: 基础参数
-            uncertainty_factors: 不确定性因子
+            base_params: Base parameters
+            uncertainty_factors: Uncertainty factors
             
         Returns:
-            场景列表
+            Scenario list
         """
         scenarios = []
         
-        # 生成不确定性组合
+        # Generate uncertainty combinations
         factor_names = list(uncertainty_factors.keys())
         factor_values = [uncertainty_factors[name] for name in factor_names]
         
@@ -359,7 +359,7 @@ class ScenarioGenerator:
                 }
             }
             
-            # 应用不确定性因子
+            # Apply uncertainty factors
             for name, value in zip(factor_names, combination):
                 if name.startswith('cost_'):
                     scenario['params']['costs'][name[5:]] = base_params['costs'][name[5:]] * value
@@ -373,19 +373,19 @@ class ScenarioGenerator:
         return scenarios
 
 
-# 便捷函数
-def run_parameter_sweep(params: Dict, param_ranges: Dict, 
+# Convenience functions
+def run_parameter_sweep(params: Dict, param_ranges: Dict,
                         output_dir: str = "results") -> pd.DataFrame:
     """
-    运行参数扫描
+    Run parameter sweep
     
     Args:
-        params: 基础参数
-        param_ranges: 参数范围
-        output_dir: 输出目录
+        params: Base parameters
+        param_ranges: Parameter ranges
+        output_dir: Output directory
         
     Returns:
-        结果摘要DataFrame
+        Results summary DataFrame
     """
     generator = ScenarioGenerator()
     scenarios = generator.generate_parameter_sweep(params, param_ranges)
@@ -397,14 +397,14 @@ def run_parameter_sweep(params: Dict, param_ranges: Dict,
 
 
 if __name__ == "__main__":
-    # 测试批量运行器
+    # Test batch runner
     import json
     
-    # 加载参数
+    # Load parameters
     with open('data/parameters.json', 'r') as f:
         params = json.load(f)
     
-    # 创建测试场景
+    # Create test scenarios
     scenarios = [
         {
             'name': 'baseline',
@@ -424,10 +424,10 @@ if __name__ == "__main__":
         }
     ]
     
-    # 运行批量仿真
+    # Run batch simulation
     runner = BatchRunner(params)
     results = runner.run_batch(scenarios, parallel=False)
     
-    # 保存摘要
+    # Save summary
     summary_file = runner.save_summary_report()
-    print(f"结果摘要已保存到: {summary_file}")
+    print(f"Results summary saved to: {summary_file}")

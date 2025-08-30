@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 """
-ISRU策略可视化器
-实现多策略决策变量的对比可视化和分析图表生成
+ISRU Strategy Visualizer
+Implements multi-strategy decision variable comparison visualization and analysis chart generation
 
-主要功能:
-    - 决策变量对比图: 生产量、产能、库存、地球供应、产能扩张、利用率
-    - 需求与供应对比图: 需求曲线与各策略供应能力对比
-    - 成本分析图: 成本构成堆叠图和NPV对比图
+Main features:
+    - Decision variables comparison charts: production, capacity, inventory, earth supply, capacity expansion, utilization
+    - Demand vs supply comparison charts: demand curves vs strategy supply capacity comparison
+    - Cost analysis charts: cost composition stacked charts and NPV comparison charts
 
-使用示例:
-    # 基本使用
+Usage examples:
+    # Basic usage
     plotter = DecisionVariablesPlotter()
     figures = plotter.create_comprehensive_dashboard("strategies/simulation_results", time_horizon=50)
     
-    # 单独生成图表
+    # Generate individual charts
     strategies_data = plotter.load_simulation_data("strategies/simulation_results", 30)
     fig1 = plotter.plot_decision_variables(strategies_data)
     fig2 = plotter.plot_demand_vs_supply(strategies_data)
     fig3 = plotter.plot_cost_analysis(strategies_data)
 
-支持的时间跨度: T10, T20, T30, T40, T50
+Supported time horizons: T10, T20, T30, T40, T50
 """
 
 import matplotlib.pyplot as plt
@@ -30,38 +30,38 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 import warnings
 
-# 设置matplotlib为交互模式
+# Set matplotlib to interactive mode
 plt.ion()
 
-# 忽略matplotlib的一些警告
+# Ignore some matplotlib warnings
 warnings.filterwarnings('ignore', category=UserWarning, module='matplotlib')
 
 
 class DecisionVariablesPlotter:
     """
-    ISRU策略可视化绘图器
+    ISRU Strategy Visualization Plotter
     
-    用于生成ISRU策略仿真结果的可视化图表，支持多策略对比分析。
-    自动适配不同时间跨度的数据，提供中文界面和交互式图表。
+    Used to generate visualization charts for ISRU strategy simulation results, supporting multi-strategy comparison analysis.
+    Automatically adapts to data from different time horizons, providing interactive charts.
     
     Attributes:
-        figsize: 图表尺寸 (宽, 高)
-        strategy_colors: 策略颜色映射
-        strategy_labels: 策略中文标签映射
+        figsize: Chart size (width, height)
+        strategy_colors: Strategy color mapping
+        strategy_labels: Strategy label mapping
     """
     
     def __init__(self, figsize: Tuple[int, int] = (16, 12)):
         """
-        初始化绘图器
+        Initialize plotter
         
         Args:
-            figsize: 图表尺寸 (宽, 高)
+            figsize: Chart size (width, height)
         """
         self.figsize = figsize
         self.strategy_colors = {
-            'upfront_deployment': '#2E8B57',    # 海绿色 - 一次性部署
-            'gradual_deployment': '#4169E1',    # 皇家蓝 - 渐进部署
-            'flexible_deployment': '#DC143C'    # 深红色 - 灵活部署
+            'upfront_deployment': '#2E8B57',    # Sea green - Upfront deployment
+            'gradual_deployment': '#4169E1',    # Royal blue - Gradual deployment
+            'flexible_deployment': '#DC143C'    # Deep red - Flexible deployment
         }
         self.strategy_labels = {
             'upfront_deployment': 'Upfront Deployment',
@@ -69,25 +69,25 @@ class DecisionVariablesPlotter:
             'flexible_deployment': 'Flexible Deployment'
         }
         
-        # 设置字体
+        # Set fonts
         plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'sans-serif']
         plt.rcParams['axes.unicode_minus'] = False
         
     def load_simulation_data(self, results_dir: str = "strategies/simulation_results", time_horizon: int = 10) -> Dict[str, Any]:
         """
-        加载仿真结果数据
+        Load simulation result data
         
         Args:
-            results_dir: 结果目录路径
-            time_horizon: 时间跨度（年）
+            results_dir: Results directory path
+            time_horizon: Time horizon (years)
             
         Returns:
-            包含三个策略数据的字典
+            Dictionary containing data for three strategies
         """
         results_path = Path(results_dir)
         strategies_data = {}
         
-        # 加载三个策略的最新结果
+        # Load latest results for three strategies
         for strategy in ['upfront_deployment', 'gradual_deployment', 'flexible_deployment']:
             latest_file = results_path / "raw" / f"T{time_horizon}" / f"{strategy}_latest.json"
             
@@ -102,47 +102,47 @@ class DecisionVariablesPlotter:
     
     def extract_decision_variables(self, simulation_data: Dict[str, Any]) -> Dict[str, List[float]]:
         """
-        从仿真数据中提取决策变量
+        Extract decision variables from simulation data
         
         Args:
-            simulation_data: 单个策略的仿真数据
+            simulation_data: Simulation data for a single strategy
             
         Returns:
-            决策变量字典
+            Decision variables dictionary
         """
         if not simulation_data or 'results' not in simulation_data:
             return {}
             
-        # 取第一个仿真结果（通常包含多个随机种子的结果）
+        # Take first simulation result (usually contains results from multiple random seeds)
         result = simulation_data['results'][0]
         
-        # 提取时间序列
+        # Extract time series
         time_steps = list(range(len(result['decisions'])))
         
-        # 提取各种决策变量
+        # Extract various decision variables
         variables = {
             'time_steps': time_steps,
-            'production': [],           # 生产量
-            'capacity': [],            # 产能
-            'inventory': [],           # 库存
-            'earth_supply': [],        # 地球供应
-            'capacity_expansion': [],  # 产能扩张
-            'utilization': [],         # 利用率
-            'demand': result.get('demand_path', [])  # 需求路径
+            'production': [],           # Production
+            'capacity': [],            # Capacity
+            'inventory': [],           # Inventory
+            'earth_supply': [],        # Earth supply
+            'capacity_expansion': [],  # Capacity expansion
+            'utilization': [],         # Utilization
+            'demand': result.get('demand_path', [])  # Demand path
         }
         
-        # 从decisions中提取数据
+        # Extract data from decisions
         for decision in result['decisions']:
             variables['production'].append(decision.get('planned_production', 0))
             variables['capacity_expansion'].append(decision.get('capacity_expansion', 0))
             variables['earth_supply'].append(decision.get('earth_supply_request', 0))
         
-        # 从states中提取数据
+        # Extract data from states
         for state in result['states']:
             variables['capacity'].append(state.get('total_capacity', 0))
             variables['inventory'].append(state.get('inventory', 0))
             
-            # 计算利用率
+            # Calculate utilization
             capacity = state.get('total_capacity', 1)
             production = state.get('actual_production', 0)
             utilization = production / capacity if capacity > 0 else 0
@@ -153,23 +153,23 @@ class DecisionVariablesPlotter:
     def plot_decision_variables(self, strategies_data: Dict[str, Any], 
                               save_path: Optional[str] = None) -> plt.Figure:
         """
-        绘制决策变量对比图
+        Plot decision variables comparison chart
         
         Args:
-            strategies_data: 包含所有策略数据的字典
-            save_path: 保存路径（可选）
+            strategies_data: Dictionary containing all strategy data
+            save_path: Save path (optional)
             
         Returns:
-            matplotlib图形对象
+            matplotlib figure object
         """
-        # 创建子图布局 (3行2列)
+        # Create subplot layout (3 rows, 2 columns)
         fig, axes = plt.subplots(3, 2, figsize=self.figsize)
         fig.suptitle('ISRU Decision Variables Comparison Analysis', fontsize=16, fontweight='bold')
         
-        # 扁平化axes数组以便索引
+        # Flatten axes array for indexing
         axes_flat = axes.flatten()
         
-        # 定义要绘制的变量和对应的子图
+        # Define variables to plot and corresponding subplots
         plot_configs = [
             ('production', 'Production (kg)', 0),
             ('capacity', 'Capacity (kg)', 1),
@@ -179,13 +179,13 @@ class DecisionVariablesPlotter:
             ('utilization', 'Utilization Rate', 5)
         ]
         
-        # 为每个策略提取数据并绘图
+        # Extract data for each strategy and plot
         all_variables = {}
         for strategy_name, data in strategies_data.items():
             if data:
                 all_variables[strategy_name] = self.extract_decision_variables(data)
         
-        # 绘制每个变量
+        # Plot each variable
         for var_name, var_label, ax_idx in plot_configs:
             ax = axes_flat[ax_idx]
             
@@ -194,7 +194,7 @@ class DecisionVariablesPlotter:
                     time_steps = variables.get('time_steps', range(len(variables[var_name])))
                     values = variables[var_name]
                     
-                    # 确保时间步长和数值长度一致
+                    # Ensure time steps and values have consistent length
                     min_len = min(len(time_steps), len(values))
                     time_steps_plot = time_steps[:min_len]
                     values_plot = values[:min_len]
@@ -210,37 +210,37 @@ class DecisionVariablesPlotter:
             ax.grid(True, alpha=0.3)
             ax.legend(fontsize=9)
             
-            # 特殊处理利用率图表
+            # Special handling for utilization chart
             if var_name == 'utilization':
                 ax.set_ylim(0, 1.1)
                 ax.axhline(y=1.0, color='red', linestyle='--', alpha=0.5, label='Full Capacity')
         
-        # 调整布局
+        # Adjust layout
         plt.tight_layout()
         
-        # 显示图表（交互模式）
+        # Show chart (interactive mode)
         plt.show()
         
-        # 保存图表（如果指定了路径）
+        # Save chart (if path specified)
         if save_path:
             fig.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"图表已保存到: {save_path}")
+            print(f"Chart saved to: {save_path}")
         
         return fig
     
     def plot_demand_vs_supply(self, strategies_data: Dict[str, Any]) -> plt.Figure:
         """
-        绘制需求与供应对比图 - 修复版本
+        Plot demand vs supply comparison chart - Fixed version
         
         Args:
-            strategies_data: 包含所有策略数据的字典
+            strategies_data: Dictionary containing all strategy data
             
         Returns:
-            matplotlib图形对象
+            matplotlib figure object
         """
         fig, ax = plt.subplots(1, 1, figsize=(12, 8))
         
-        demand_plotted = False  # 标记是否已绘制需求线
+        demand_plotted = False  # Flag whether demand line has been plotted
         
         for strategy_name, data in strategies_data.items():
             if not data:
@@ -255,19 +255,19 @@ class DecisionVariablesPlotter:
             production = variables.get('production', [])
             earth_supply = variables.get('earth_supply', [])
             
-            # 计算总供应（生产+地球供应）
+            # Calculate total supply (production + earth supply)
             total_supply = [p + e for p, e in zip(production, earth_supply)]
             
-            # 绘制需求线（所有策略的需求应该相同，只绘制一次）
+            # Plot demand line (demand should be same for all strategies, plot only once)
             if not demand_plotted and demand:
-                # 需求数据通常比时间步长多1个（包含初始值），创建对应的时间轴
+                # Demand data usually has one more point than time steps (includes initial value), create corresponding time axis
                 demand_time_steps = list(range(len(demand)))
-                ax.plot(demand_time_steps, demand, 
-                       color='black', linewidth=3, linestyle='--', 
+                ax.plot(demand_time_steps, demand,
+                       color='black', linewidth=3, linestyle='--',
                        label='Demand', alpha=0.8)
                 demand_plotted = True
             
-            # 绘制总供应线
+            # Plot total supply line
             min_len = min(len(time_steps), len(total_supply))
             if min_len > 0:
                 ax.plot(time_steps[:min_len], total_supply[:min_len],
@@ -288,17 +288,17 @@ class DecisionVariablesPlotter:
     
     def plot_cost_analysis(self, strategies_data: Dict[str, Any]) -> plt.Figure:
         """
-        绘制成本分析图
+        Plot cost analysis chart
         
         Args:
-            strategies_data: 包含所有策略数据的字典
+            strategies_data: Dictionary containing all strategy data
             
         Returns:
-            matplotlib图形对象
+            matplotlib figure object
         """
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
         
-        # 提取成本数据
+        # Extract cost data
         strategies = []
         expansion_costs = []
         operational_costs = []
@@ -320,7 +320,7 @@ class DecisionVariablesPlotter:
             total_costs.append(metrics.get('total_cost', 0))
             npvs.append(metrics.get('npv', 0))
         
-        # 绘制成本构成堆叠柱状图
+        # Plot cost composition stacked bar chart
         x = np.arange(len(strategies))
         width = 0.6
         
@@ -339,7 +339,7 @@ class DecisionVariablesPlotter:
         ax1.legend()
         ax1.grid(True, alpha=0.3, axis='y')
         
-        # 绘制NPV对比
+        # Plot NPV comparison
         colors = [self.strategy_colors[name] for name in strategies_data.keys() if strategies_data[name]]
         bars = ax2.bar(x, npvs, width, color=colors, alpha=0.8)
         
@@ -349,7 +349,7 @@ class DecisionVariablesPlotter:
         ax2.set_xticklabels(strategies)
         ax2.grid(True, alpha=0.3, axis='y')
         
-        # 在柱状图上添加数值标签
+        # Add value labels on bar chart
         for bar, npv in zip(bars, npvs):
             height = bar.get_height()
             ax2.text(bar.get_x() + bar.get_width()/2., height,
@@ -363,13 +363,13 @@ class DecisionVariablesPlotter:
     
     def plot_npv_cdf(self, strategies_data: Dict[str, Any]) -> plt.Figure:
         """
-        绘制NPV累积分布函数(CDF)图
+        Plot NPV Cumulative Distribution Function (CDF) chart
         
         Args:
-            strategies_data: 包含所有策略数据的字典
+            strategies_data: Dictionary containing all strategy data
             
         Returns:
-            matplotlib图形对象
+            matplotlib figure object
         """
         fig, ax = plt.subplots(1, 1, figsize=(12, 8))
         
@@ -377,29 +377,29 @@ class DecisionVariablesPlotter:
             if not data or 'results' not in data:
                 continue
                 
-            # 提取所有仿真的NPV值
+            # Extract NPV values from all simulations
             npv_values = []
             for result in data['results']:
                 npv = result.get('performance_metrics', {}).get('npv', 0)
-                npv_values.append(npv / 10000)  # 转换为万元
+                npv_values.append(npv / 10000)  # Convert to 10K CNY
             
             if npv_values:
-                # 排序NPV值
+                # Sort NPV values
                 npv_sorted = np.sort(npv_values)
-                # 计算累积概率
+                # Calculate cumulative probability
                 cumulative_prob = np.arange(1, len(npv_sorted) + 1) / len(npv_sorted)
                 
-                # 绘制CDF曲线
+                # Plot CDF curve
                 ax.plot(npv_sorted, cumulative_prob,
                        color=self.strategy_colors[strategy_name],
                        label=self.strategy_labels[strategy_name],
                        linewidth=2, marker='o', markersize=3, alpha=0.8)
                 
-                # 添加统计信息
+                # Add statistical information
                 mean_npv = np.mean(npv_values)
                 median_npv = np.median(npv_values)
                 
-                # 在图上标记均值和中位数
+                # Mark mean and median on chart
                 mean_prob = np.interp(mean_npv, npv_sorted, cumulative_prob)
                 median_prob = 0.5
                 
@@ -408,9 +408,9 @@ class DecisionVariablesPlotter:
                           label=f'E[NPV] {self.strategy_labels[strategy_name]}')
                 ax.axvline(x=median_npv, color=self.strategy_colors[strategy_name],
                           linestyle=':', alpha=0.6, linewidth=1)
-        
-        # 添加零NPV参考线
-        ax.axvline(x=0, color='red', linestyle='-', alpha=0.5, linewidth=1, label='Break-even (NPV=0)')
+       
+       # Add zero NPV reference line
+       ax.axvline(x=0, color='red', linestyle='-', alpha=0.5, linewidth=1, label='Break-even (NPV=0)')
         
         ax.set_title('NPV Cumulative Distribution Function (CDF)', fontsize=14, fontweight='bold')
         ax.set_xlabel('NPV (10K CNY)', fontsize=12)
@@ -418,7 +418,7 @@ class DecisionVariablesPlotter:
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=10)
         
-        # 设置y轴范围为0-1
+        # Set y-axis range to 0-1
         ax.set_ylim(0, 1)
         
         plt.tight_layout()
@@ -428,14 +428,14 @@ class DecisionVariablesPlotter:
     
     def create_comprehensive_dashboard(self, results_dir: str = "strategies/simulation_results", time_horizon: int = 10) -> List[plt.Figure]:
         """
-        创建综合仪表板
+        Create comprehensive dashboard
         
         Args:
-            results_dir: 结果目录路径
-            time_horizon: 时间跨度（年）
+            results_dir: Results directory path
+            time_horizon: Time horizon (years)
             
         Returns:
-            图形对象列表
+            List of figure objects
         """
         print("Loading simulation data...")
         strategies_data = self.load_simulation_data(results_dir, time_horizon)
@@ -449,22 +449,22 @@ class DecisionVariablesPlotter:
         figures = []
         
         try:
-            # 1. 主要决策变量对比图
+            # 1. Main decision variables comparison chart
             print("Generating decision variables comparison chart...")
             fig1 = self.plot_decision_variables(strategies_data)
             figures.append(fig1)
             
-            # 2. 需求与供应对比图
+            # 2. Demand vs supply comparison chart
             print("Generating demand vs supply comparison chart...")
             fig2 = self.plot_demand_vs_supply(strategies_data)
             figures.append(fig2)
             
-            # 3. 成本分析图
+            # 3. Cost analysis chart
             print("Generating cost analysis chart...")
             fig3 = self.plot_cost_analysis(strategies_data)
             figures.append(fig3)
             
-            # 4. NPV累积分布函数图
+            # 4. NPV cumulative distribution function chart
             print("Generating NPV CDF chart...")
             fig4 = self.plot_npv_cdf(strategies_data)
             figures.append(fig4)
@@ -478,36 +478,36 @@ class DecisionVariablesPlotter:
 
 def main():
     """
-    主函数 - 用于测试和独立运行
+    Main function - for testing and standalone execution
     
-    运行示例:
+    Usage example:
         python strategies/visualization/strategy_visualizer.py
     """
-    print("=== ISRU策略可视化器测试 ===")
+    print("=== ISRU Strategy Visualizer Test ===")
     
-    # 创建绘图器
+    # Create plotter
     plotter = DecisionVariablesPlotter(figsize=(16, 12))
     
-    # 测试不同时间跨度
+    # Test different time horizons
     for time_horizon in [10, 50]:
-        print(f"\n测试时间跨度: T{time_horizon}")
+        print(f"\nTesting time horizon: T{time_horizon}")
         
-        # 生成综合仪表板
+        # Generate comprehensive dashboard
         figures = plotter.create_comprehensive_dashboard(
             results_dir="strategies/simulation_results",
             time_horizon=time_horizon
         )
         
         if figures:
-            print(f"成功生成 {len(figures)} 个图表")
+            print(f"Successfully generated {len(figures)} charts")
             
-            # 保持图表显示
-            input(f"按回车键关闭 T{time_horizon} 的图表...")
+            # Keep charts displayed
+            input(f"Press Enter to close T{time_horizon} charts...")
             plt.close('all')
         else:
-            print(f"未能生成 T{time_horizon} 的图表")
+            print(f"Failed to generate T{time_horizon} charts")
     
-    print("\n测试完成！")
+    print("\nTest completed!")
 
 
 if __name__ == "__main__":

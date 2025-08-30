@@ -1,6 +1,6 @@
 """
-NPV vs T 批量分析脚本
-对T=1到50年进行批量优化求解，收集NPV数据用于后续分析
+NPV vs T Batch Analysis Script
+Performs batch optimization solving for T=1 to 50 years, collecting NPV data for subsequent analysis
 """
 
 import json
@@ -11,51 +11,51 @@ import os
 from datetime import datetime
 import time
 
-# 添加项目根目录到Python路径
+# Add project root directory to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# 导入求解函数
+# Import solving function
 from optimal.optimal_solu import solve_isru_optimization
 
 def batch_solve_npv_analysis(t_min=1, t_max=50, random_seed=42, output_dir="optimal/results"):
     """
-    批量求解不同T值的ISRU优化问题
+    Batch solve ISRU optimization problems for different T values
     
     Args:
-        t_min: 最小T值
-        t_max: 最大T值  
-        random_seed: 随机种子
-        output_dir: 输出目录
+        t_min: Minimum T value
+        t_max: Maximum T value
+        random_seed: Random seed
+        output_dir: Output directory
         
     Returns:
-        pandas.DataFrame: 包含所有结果的数据框
+        pandas.DataFrame: Data frame containing all results
     """
     
-    print(f"🚀 开始批量NPV分析：T={t_min}到{t_max}年")
-    print(f"📁 结果将保存到: {output_dir}")
+    print(f"🚀 Starting batch NPV analysis: T={t_min} to {t_max} years")
+    print(f"📁 Results will be saved to: {output_dir}")
     print("="*60)
     
-    # 确保输出目录存在
+    # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     
-    # 存储结果的列表
+    # List to store results
     results = []
     failed_cases = []
     
-    # 记录总开始时间
+    # Record total start time
     total_start_time = time.time()
     
-    # 批量求解
+    # Batch solving
     for T in range(t_min, t_max + 1):
-        print(f"📊 正在求解 T={T}年...")
+        print(f"📊 Solving T={T} years...")
         
         try:
-            # 求解单个案例
+            # Solve single case
             start_time = time.time()
             result = solve_isru_optimization(T, random_seed=random_seed, verbose=False)
             solve_time = time.time() - start_time
             
-            # 记录结果
+            # Record result
             result_record = {
                 'T': T,
                 'NPV': result['npv'],
@@ -68,15 +68,15 @@ def batch_solve_npv_analysis(t_min=1, t_max=50, random_seed=42, output_dir="opti
             
             results.append(result_record)
             
-            # 打印进度
+            # Print progress
             if result['status'] == 'optimal':
-                print(f"   ✅ NPV = {result['npv']:,.2f} (用时: {solve_time:.2f}s)")
+                print(f"   ✅ NPV = {result['npv']:,.2f} (Time: {solve_time:.2f}s)")
             else:
-                print(f"   ❌ 失败: {result['status']} (用时: {solve_time:.2f}s)")
+                print(f"   ❌ Failed: {result['status']} (Time: {solve_time:.2f}s)")
                 failed_cases.append(T)
                 
         except Exception as e:
-            print(f"   💥 异常: {str(e)}")
+            print(f"   💥 Exception: {str(e)}")
             failed_cases.append(T)
             results.append({
                 'T': T,
@@ -88,50 +88,50 @@ def batch_solve_npv_analysis(t_min=1, t_max=50, random_seed=42, output_dir="opti
                 'Demand_Std': None
             })
     
-    # 计算总用时
+    # Calculate total time
     total_time = time.time() - total_start_time
     
-    # 转换为DataFrame
+    # Convert to DataFrame
     df_results = pd.DataFrame(results)
     
-    # 打印汇总统计
+    # Print summary statistics
     print("\n" + "="*60)
-    print("📈 批量分析完成！")
-    print(f"⏱️  总用时: {total_time:.2f}秒")
-    print(f"📊 成功求解: {len(df_results[df_results['Status'] == 'optimal'])} / {len(df_results)}")
+    print("📈 Batch analysis completed!")
+    print(f"⏱️  Total time: {total_time:.2f} seconds")
+    print(f"📊 Successfully solved: {len(df_results[df_results['Status'] == 'optimal'])} / {len(df_results)}")
     
     if failed_cases:
-        print(f"❌ 失败案例: {failed_cases}")
+        print(f"❌ Failed cases: {failed_cases}")
     
-    # 如果有成功的案例，打印NPV统计
+    # If there are successful cases, print NPV statistics
     successful_results = df_results[df_results['Status'] == 'optimal']
     if not successful_results.empty:
-        print(f"💰 NPV范围: {successful_results['NPV'].min():,.2f} 到 {successful_results['NPV'].max():,.2f}")
-        print(f"📈 最优T值: T={successful_results.loc[successful_results['NPV'].idxmax(), 'T']}")
+        print(f"💰 NPV range: {successful_results['NPV'].min():,.2f} to {successful_results['NPV'].max():,.2f}")
+        print(f"📈 Optimal T value: T={successful_results.loc[successful_results['NPV'].idxmax(), 'T']}")
     
-    # 保存结果
+    # Save results
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     csv_filename = f"{output_dir}/npv_vs_time_{timestamp}.csv"
     df_results.to_csv(csv_filename, index=False)
-    print(f"💾 结果已保存到: {csv_filename}")
+    print(f"💾 Results saved to: {csv_filename}")
     
     return df_results, csv_filename
 
 def main():
-    """主函数"""
-    print("NPV vs T 批量分析工具")
+    """Main function"""
+    print("NPV vs T Batch Analysis Tool")
     print("=" * 60)
     
-    # 运行批量分析
+    # Run batch analysis
     df_results, csv_file = batch_solve_npv_analysis(t_min=1, t_max=50)
     
-    # 简单统计输出
-    print(f"\n📋 快速预览:")
+    # Simple statistical output
+    print(f"\n📋 Quick preview:")
     print(df_results.head(10))
     
-    print(f"\n🎯 下一步:")
-    print(f"   1. 查看完整结果: {csv_file}")
-    print(f"   2. 运行可视化脚本: python optimal/visualization.py")
+    print(f"\n🎯 Next steps:")
+    print(f"   1. View complete results: {csv_file}")
+    print(f"   2. Run visualization script: python optimal/visualization.py")
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 """
-ISRU氧气生产优化模型
-整合所有模型组件的完整优化模型
+ISRU Oxygen Production Optimization Model
+Complete optimization model integrating all model components
 """
 
 import logging
@@ -17,18 +17,19 @@ logger = logging.getLogger(__name__)
 
 class ISRUOptimizationModel:
     """
-    ISRU氧气生产优化模型
+    ISRU Oxygen Production Optimization Model
     
-    这是一个完整的Pyomo优化模型，用于优化月球氧气生产系统的部署和运营。
-    模型考虑了需求不确定性、技术约束和成本因素。
+    This is a complete Pyomo optimization model for optimizing the deployment and operation
+    of lunar oxygen production systems. The model considers demand uncertainty, technical
+    constraints, and cost factors.
     """
     
     def __init__(self, params: Dict[str, Any]):
         """
-        初始化优化模型
+        Initialize optimization model
         
         Args:
-            params: 参数字典，包含所有模型参数
+            params: Parameter dictionary containing all model parameters
         """
         self.params = params
         self.model = None
@@ -37,87 +38,87 @@ class ISRUOptimizationModel:
         
     def build_model(self, demand_path: list) -> ConcreteModel:
         """
-        构建完整的优化模型
+        Build complete optimization model
         
         Args:
-            demand_path: 需求路径列表
+            demand_path: Demand path list
             
         Returns:
-            完整的Pyomo模型
+            Complete Pyomo model
         """
         self.demand_path = demand_path
         
-        # 验证需求路径长度
+        # Validate demand path length
         T = self.params['economics']['T']
-        expected_length = T + 1  # 包括时间0到T
+        expected_length = T + 1  # Including time 0 to T
         
         if len(demand_path) != expected_length:
             raise ValueError(
-                f"需求路径长度错误: 期望 {expected_length} (T={T} + 1), "
-                f"实际 {len(demand_path)}"
+                f"Demand path length error: expected {expected_length} (T={T} + 1), "
+                f"actual {len(demand_path)}"
             )
         
-        # 创建模型
+        # Create model
         self.model = ConcreteModel(name="ISRU_Oxygen_Optimization")
         
-        # 定义变量
-        logger.info("定义决策变量...")
+        # Define variables
+        logger.info("Defining decision variables...")
         self.model = define_variables(self.model, self.params)
         
-        # 定义约束
-        logger.info("定义约束条件...")
+        # Define constraints
+        logger.info("Defining constraints...")
         self.model = define_constraints(self.model, self.params, demand_path)
         
-        # 定义目标函数
-        logger.info("定义目标函数...")
+        # Define objective function
+        logger.info("Defining objective function...")
         self.model = define_objective(self.model, self.params)
         
-        logger.info("模型构建完成")
+        logger.info("Model construction completed")
         return self.model
     
     def solve(self, solver_name: str = 'glpk', solver_options: Optional[Dict] = None) -> Dict[str, Any]:
         """
-        求解优化模型
+        Solve optimization model
         
         Args:
-            solver_name: 求解器名称
-            solver_options: 求解器选项
+            solver_name: Solver name
+            solver_options: Solver options
             
         Returns:
-            求解结果字典
+            Solution result dictionary
         """
         if self.model is None:
-            raise ValueError("模型尚未构建，请先调用build_model()")
+            raise ValueError("Model not built yet, please call build_model() first")
         
         try:
             # 导入求解器
             from pyomo.opt import SolverFactory
             
-            # 创建求解器
+            # Create solver
             solver = SolverFactory(solver_name)
             
             if solver_options:
-                for key, opt_val in solver_options.items():   # 避免使用 value
+                for key, opt_val in solver_options.items():   # Avoid using 'value'
                     solver.options[key] = opt_val
             
-            # 求解
-            logger.info(f"使用{solver_name}求解器求解模型...")
+            # Solve
+            logger.info(f"Solving model using {solver_name} solver...")
             results = solver.solve(self.model, tee=False)
             
-            # 检查求解状态
+            # Check solution status
             if str(results.solver.termination_condition).lower() == 'optimal':
-                logger.info("模型求解成功")
+                logger.info("Model solved successfully")
                 
-                # 验证约束
+                # Validate constraints
                 if validate_constraints(self.model):
-                    logger.info("所有约束验证通过")
+                    logger.info("All constraints validated")
                 else:
-                    logger.warning("存在约束违反")
+                    logger.warning("Constraint violations detected")
                 
-                # 提取解
+                # Extract solution
                 self.solution = self._extract_solution()
                 
-                # 计算详细成本
+                # Calculate detailed costs
                 self.solution['costs'] = calculate_detailed_costs(self.model, self.params)
                 
                 return {
@@ -127,7 +128,7 @@ class ISRUOptimizationModel:
                     'solver_results': results
                 }
             else:
-                logger.error(f"求解失败: {results.solver.termination_condition}")
+                logger.error(f"Solution failed: {results.solver.termination_condition}")
                 return {
                     'status': 'failed',
                     'termination_condition': str(results.solver.termination_condition),
@@ -135,14 +136,14 @@ class ISRUOptimizationModel:
                 }
                 
         except Exception as e:
-            logger.error(f"求解过程中出错: {e}")
+            logger.error(f"Error during solving: {e}")
             return {
                 'status': 'error',
                 'error': str(e)
             }
     
     def _extract_solution(self) -> Dict[str, Any]:
-        """提取求解结果"""
+        """Extract solution results"""
         if self.model is None:
             return {}
         
@@ -160,11 +161,11 @@ class ISRUOptimizationModel:
         return solution
     
     def get_solution_dataframe(self) -> pd.DataFrame:
-        """将解转换为DataFrame格式"""
+        """Convert solution to DataFrame format"""
         if self.solution is None:
-            raise ValueError("模型尚未求解，请先调用solve()")
+            raise ValueError("Model not solved yet, please call solve() first")
         
-        # 创建DataFrame
+        # Create DataFrame
         df = pd.DataFrame({
             'time': list(self.solution['Qt'].keys()),
             'demand': self.demand_path,
@@ -180,45 +181,45 @@ class ISRUOptimizationModel:
         return df
     
     def save_solution(self, filepath: str) -> None:
-        """保存求解结果到文件"""
+        """Save solution results to file"""
         if self.solution is None:
-            raise ValueError("模型尚未求解，请先调用solve()")
+            raise ValueError("Model not solved yet, please call solve() first")
         
         df = self.get_solution_dataframe()
         df.to_csv(filepath, index=False)
-        logger.info(f"求解结果已保存到: {filepath}")
+        logger.info(f"Solution results saved to: {filepath}")
     
     def print_solution_summary(self) -> None:
-        """打印求解结果摘要"""
+        """Print solution results summary"""
         if self.solution is None:
-            print("模型尚未求解")
+            print("Model not solved yet")
             return
         
         T = self.params['economics']['T']
         
         print(f"\n{'='*60}")
-        print(f"ISRU优化结果 (T={T}年)")
+        print(f"ISRU Optimization Results (T={T} years)")
         print(f"{'='*60}")
         
-        # 核心指标
-        print(f"\n核心指标")
+        # Core metrics
+        print(f"\nCore Metrics")
         print(f"{'─'*40}")
-        print(f"净现值 (NPV)      : ${self.solution['NPV']:>15,.2f}")
-        print(f"求解状态          : {'最优解' if self.solution else '失败'}")
+        print(f"Net Present Value : ${self.solution['NPV']:>15,.2f}")
+        print(f"Solution Status   : {'Optimal' if self.solution else 'Failed'}")
         
-        # 输入参数 (关键假设)
-        print(f"\n关键输入参数")
+        # Input parameters (key assumptions)
+        print(f"\nKey Input Parameters")
         print(f"{'─'*40}")
         econ = self.params['economics']
         demand = self.params['demand']
-        print(f"时间范围          : {T:>15} 年")
-        print(f"贴现率            : {econ['r']*100:>14.1f}%")
-        print(f"初始需求 (D0)     : {demand['D0']:>11,.0f} kg/年")
-        print(f"需求增长率 (μ)    : {demand['mu']*100:>14.1f}%")
-        print(f"需求波动率 (σ)    : {demand['sigma']*100:>14.1f}%")
+        print(f"Time Horizon      : {T:>15} years")
+        print(f"Discount Rate     : {econ['r']*100:>14.1f}%")
+        print(f"Initial Demand    : {demand['D0']:>11,.0f} kg/year")
+        print(f"Demand Growth (μ) : {demand['mu']*100:>14.1f}%")
+        print(f"Demand Volatility : {demand['sigma']*100:>14.1f}%")
         
-        # 决策变量汇总
-        print(f"\n决策变量汇总")
+        # Decision variables summary
+        print(f"\nDecision Variables Summary")
         print(f"{'─'*40}")
         total_delivery = sum(self.solution['Qt'].values())
         total_shortage = sum(self.solution['St'].values())
@@ -227,14 +228,14 @@ class ISRUOptimizationModel:
         total_deployment = sum(self.solution['delta_Mt'].values())
         total_leo_mass = sum(self.solution['M_leo'].values())
         
-        print(f"总交付氧气        : {total_delivery:>11,.0f} kg")
-        print(f"总短缺量          : {total_shortage:>11,.0f} kg")
-        print(f"总剩余量          : {total_excess:>11,.0f} kg")
-        print(f"最大ISRU质量      : {max_isru_mass:>11,.0f} kg")
-        print(f"总新增部署        : {total_deployment:>11,.0f} kg")
-        print(f"总LEO运输质量     : {total_leo_mass:>11,.0f} kg")
+        print(f"Total Oxygen Delivery : {total_delivery:>11,.0f} kg")
+        print(f"Total Shortage        : {total_shortage:>11,.0f} kg")
+        print(f"Total Excess          : {total_excess:>11,.0f} kg")
+        print(f"Max ISRU Mass         : {max_isru_mass:>11,.0f} kg")
+        print(f"Total New Deployment  : {total_deployment:>11,.0f} kg")
+        print(f"Total LEO Transport   : {total_leo_mass:>11,.0f} kg")
         
-        # 经济分析
+        # Economic analysis
         if 'costs' in self.solution:
             from .objective import print_cost_breakdown
             print_cost_breakdown(self.solution['costs'])
@@ -242,19 +243,19 @@ class ISRUOptimizationModel:
         print(f"\n{'='*60}")
 
 
-# 便捷函数
-def create_and_solve_model(params: Dict[str, Any], demand_path: list, 
+# Convenience function
+def create_and_solve_model(params: Dict[str, Any], demand_path: list,
                           solver_name: str = 'glpk') -> Dict[str, Any]:
     """
-    便捷函数：创建并求解模型
+    Convenience function: create and solve model
     
     Args:
-        params: 参数字典
-        demand_path: 需求路径
-        solver_name: 求解器名称
+        params: Parameter dictionary
+        demand_path: Demand path
+        solver_name: Solver name
         
     Returns:
-        求解结果
+        Solution results
     """
     model = ISRUOptimizationModel(params)
     model.build_model(demand_path)
@@ -262,23 +263,23 @@ def create_and_solve_model(params: Dict[str, Any], demand_path: list,
 
 
 if __name__ == "__main__":
-    # 测试代码
+    # Test code
     import json
     
-    # 加载参数
+    # Load parameters
     with open('data/parameters.json', 'r') as f:
         params = json.load(f)
     
-    # 创建需求路径（使用平均需求）
+    # Create demand path (using average demand)
     T = params['economics']['T']
     D0 = params['demand']['D0']
     demand_path = [0] + [D0 * (1.02 ** t) for t in range(1, T + 1)]
     
-    # 创建并求解模型
+    # Create and solve model
     result = create_and_solve_model(params, demand_path)
     
     if result['status'] == 'optimal':
-        print("模型求解成功！")
-        print(f"最优目标值: ${result['objective_value']:,.2f}")
+        print("Model solved successfully!")
+        print(f"Optimal objective value: ${result['objective_value']:,.2f}")
     else:
-        print(f"求解失败: {result['status']}")
+        print(f"Solution failed: {result['status']}")

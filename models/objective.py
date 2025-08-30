@@ -1,6 +1,6 @@
 """
-Pyomo模型目标函数定义
-定义ISRU氧气生产优化问题的目标函数
+Pyomo Model Objective Function Definition
+Define objective function for ISRU oxygen production optimization problem
 """
 
 from pyomo.environ import Objective, quicksum, value, ConcreteModel, maximize
@@ -9,17 +9,17 @@ from pyomo.environ import Objective, quicksum, value, ConcreteModel, maximize
 def define_objective(model: ConcreteModel, params: dict) -> ConcreteModel:
     econ = params['economics']
     tech = params['technology']
-    costs = params['costs']   # 👉 关键：这里加上
+    costs = params['costs']   # Key: added here
     
     discount_factor = [(1 + econ['r']) ** (-t) for t in model.T]
 
-    # 收入
+    # Revenue
     revenue = quicksum(
         econ['P_m'] * model.Qt[t] * discount_factor[t]
         for t in model.T
     )
     
-    # 成本项
+    # Cost components
     launch_cost = quicksum(
         costs['c_L'] * model.M_leo[t] * discount_factor[t]
         for t in model.T
@@ -60,7 +60,7 @@ def define_objective(model: ConcreteModel, params: dict) -> ConcreteModel:
     return model
 
 def calculate_detailed_costs(model: ConcreteModel, params: dict) -> dict:
-    """计算详细的成本分解"""
+    """Calculate detailed cost breakdown"""
     econ = params['economics']
     tech = params['technology']
     costs = params['costs']
@@ -113,37 +113,37 @@ def calculate_detailed_costs(model: ConcreteModel, params: dict) -> dict:
     return detailed_costs
 
 def print_cost_breakdown(costs: dict) -> None:
-    """打印成本分解"""
-    print(f"\n经济分析")
+    """Print cost breakdown"""
+    print(f"\nEconomic Analysis")
     print(f"{'─'*40}")
     
-    # 收入部分
-    print(f"收入")
-    print(f"  总收入            : ${costs['revenue']:>15,.2f}")
+    # Revenue section
+    print(f"Revenue")
+    print(f"  Total Revenue     : ${costs['revenue']:>15,.2f}")
     
-    # 成本部分 - 按逻辑分组
-    print(f"\n成本构成")
-    print(f"  开发成本          : ${costs['development_cost']:>15,.2f}")
-    print(f"  运营成本          : ${costs['operating_cost']:>15,.2f}")
-    print(f"  发射成本          : ${costs['launch_cost']:>15,.2f}")
-    print(f"  存储成本          : ${costs['storage_cost']:>15,.2f}")
-    print(f"  副产物成本        : ${costs['byproduct_cost']:>15,.2f}")
-    print(f"  地球供氧成本      : ${costs['earth_supply_cost']:>15,.2f}")
+    # Cost section - grouped by logic
+    print(f"\nCost Components")
+    print(f"  Development Cost  : ${costs['development_cost']:>15,.2f}")
+    print(f"  Operating Cost    : ${costs['operating_cost']:>15,.2f}")
+    print(f"  Launch Cost       : ${costs['launch_cost']:>15,.2f}")
+    print(f"  Storage Cost      : ${costs['storage_cost']:>15,.2f}")
+    print(f"  Byproduct Cost    : ${costs['byproduct_cost']:>15,.2f}")
+    print(f"  Earth Supply Cost : ${costs['earth_supply_cost']:>15,.2f}")
     
-    # 惩罚成本（如果有）
+    # Penalty costs (if any)
     shortage_cost = costs.get('shortage_cost', 0)
     if shortage_cost > 0:
-        print(f"  短缺惩罚          : ${shortage_cost:>15,.2f}")
+        print(f"  Shortage Penalty  : ${shortage_cost:>15,.2f}")
     
     build_cost = costs.get('build_cost', 0)
     if build_cost > 0:
-        print(f"  建设成本          : ${build_cost:>15,.2f}")
+        print(f"  Construction Cost : ${build_cost:>15,.2f}")
     
-    # 汇总
+    # Summary
     print(f"  {'─'*32}")
-    print(f"  总成本            : ${costs['total_cost']:>15,.2f}")
+    print(f"  Total Cost        : ${costs['total_cost']:>15,.2f}")
     
-    # 净现值
-    print(f"\n最终结果")
-    print(f"  净现值 (NPV)      : ${costs['NPV']:>15,.2f}")
+    # Net present value
+    print(f"\nFinal Result")
+    print(f"  Net Present Value : ${costs['NPV']:>15,.2f}")
 

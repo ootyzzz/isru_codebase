@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-策略仿真引擎 - 核心仿真器
-基于规则驱动的策略执行，非优化求解
+Strategy Simulation Engine - Core Simulator
+Rule-driven strategy execution, not optimization solving
 """
 
 import sys
@@ -11,7 +11,7 @@ import numpy as np
 import json
 from dataclasses import asdict
 
-# 添加项目根目录到路径
+# Add project root directory to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -22,7 +22,7 @@ from analysis.gbm_demand import GBMDemandGenerator
 
 
 class SimulationResult:
-    """仿真结果数据结构"""
+    """Simulation result data structure"""
     
     def __init__(self, strategy_name: str, T: int):
         self.strategy_name = strategy_name
@@ -34,7 +34,7 @@ class SimulationResult:
         self.simulation_params: Dict = {}
     
     def to_dict(self) -> Dict:
-        """转换为字典格式，便于序列化"""
+        """Convert to dictionary format for serialization"""
         return {
             'strategy_name': self.strategy_name,
             'T': self.T,
@@ -47,20 +47,20 @@ class SimulationResult:
 
 
 class StrategySimulationEngine:
-    """策略仿真引擎"""
+    """Strategy simulation engine"""
     
     def __init__(self, params: Dict):
         """
-        初始化仿真引擎
+        Initialize simulation engine
         
         Args:
-            params: 系统参数字典
+            params: System parameters dictionary
         """
         self.params = params
         self.demand_generator = self._create_demand_generator()
         
     def _create_demand_generator(self) -> GBMDemandGenerator:
-        """创建需求生成器"""
+        """Create demand generator"""
         demand_params = self.params['demand']
         return GBMDemandGenerator(
             D0=demand_params['D0'],
@@ -69,47 +69,47 @@ class StrategySimulationEngine:
             dt=demand_params['dt']
         )
     
-    def run_single_simulation(self, 
-                            strategy_name: str, 
-                            T: int, 
+    def run_single_simulation(self,
+                            strategy_name: str,
+                            T: int,
                             seed: Optional[int] = None,
                             demand_path: Optional[List[float]] = None) -> SimulationResult:
         """
-        运行单次策略仿真
+        Run single strategy simulation
         
         Args:
-            strategy_name: 策略名称
-            T: 时间范围
-            seed: 随机种子
-            demand_path: 预定义的需求路径（可选）
+            strategy_name: Strategy name
+            T: Time horizon
+            seed: Random seed
+            demand_path: Predefined demand path (optional)
             
         Returns:
-            仿真结果
+            Simulation result
         """
-        # 获取策略参数
+        # Get strategy parameters
         strategies = StrategyDefinitions.get_all_strategies(T)
         if strategy_name not in strategies:
-            raise ValueError(f"未知策略: {strategy_name}")
+            raise ValueError(f"Unknown strategy: {strategy_name}")
         
         strategy = strategies[strategy_name]
         
-        # 生成或使用需求路径
+        # Generate or use demand path
         if demand_path is None:
             demand_path = self.demand_generator.generate_single_path(T, seed=seed)
         
-        # 确保需求路径长度正确
+        # Ensure demand path length is correct
         if len(demand_path) != T + 1:
-            # 调整长度，去掉t=0的初始点
+            # Adjust length, remove t=0 initial point
             demand_path = demand_path[1:T+1] if len(demand_path) > T else demand_path[:T]
         
-        # 初始化仿真组件
+        # Initialize simulation components
         decision_engine = DecisionEngine(strategy, self.params)
         
-        # 新策略不需要在初始化时部署，所有部署都通过决策逻辑处理
+        # New strategies don't need initial deployment, all deployments handled by decision logic
         initial_capacity = 0.0
         initial_deployed_mass = 0.0
         
-        # 创建初始状态
+        # Create initial state
         initial_state = SystemState(
             current_time=0,
             total_capacity=initial_capacity,
@@ -120,7 +120,7 @@ class StrategySimulationEngine:
         
         state_manager = StateManager(initial_state)
         
-        # 创建结果对象
+        # Create result object
         result = SimulationResult(strategy_name, T)
         result.demand_path = demand_path
         result.simulation_params = {
@@ -130,78 +130,78 @@ class StrategySimulationEngine:
             'seed': seed
         }
         
-        # 执行仿真循环
+        # Execute simulation loop
         for t in range(T):
             current_demand = float(demand_path[t]) if t < len(demand_path) else 0.0
             
-            # 获取需求预测（简单的线性预测）
+            # Get demand forecast (simple linear prediction)
             demand_forecast = self._generate_demand_forecast(demand_path, t, forecast_horizon=3)
             
-            # 做出决策
+            # Make decision
             decision = decision_engine.make_decision(state_manager.state, demand_forecast)
             
-            # 更新状态
+            # Update state
             new_state = state_manager.update_state(decision, current_demand, self.params)
             
-            # 记录结果
+            # Record results
             result.decisions.append(decision)
-            result.states.append(SystemState(**asdict(new_state)))  # 创建副本
+            result.states.append(SystemState(**asdict(new_state)))  # Create copy
         
-        # 计算性能指标
+        # Calculate performance metrics
         result.performance_metrics = state_manager.calculate_performance_metrics(self.params)
         
         return result
     
-    def _generate_demand_forecast(self, demand_path: List[float], 
-                                current_time: int, 
+    def _generate_demand_forecast(self, demand_path: List[float],
+                                current_time: int,
                                 forecast_horizon: int = 3) -> List[float]:
         """
-        生成简单的需求预测
+        Generate simple demand forecast
         
         Args:
-            demand_path: 完整需求路径
-            current_time: 当前时间
-            forecast_horizon: 预测时间范围
+            demand_path: Complete demand path
+            current_time: Current time
+            forecast_horizon: Forecast time horizon
             
         Returns:
-            预测的需求序列
+            Predicted demand sequence
         """
         if current_time >= len(demand_path) - 1:
             return []
         
-        # 简单线性趋势预测
+        # Simple linear trend prediction
         available_future = list(demand_path[current_time + 1:current_time + 1 + forecast_horizon])
         
         if len(available_future) < forecast_horizon and current_time > 0:
-            # 如果未来数据不足，基于历史趋势预测
+            # If future data insufficient, predict based on historical trends
             recent_demands = demand_path[max(0, current_time - 2):current_time + 1]
             if len(recent_demands) >= 2:
                 growth_rate = (recent_demands[-1] / recent_demands[0]) ** (1 / (len(recent_demands) - 1)) - 1
                 last_demand = demand_path[current_time]
                 
-                # 补充预测值
+                # Supplement predicted values
                 for i in range(len(available_future), forecast_horizon):
                     predicted_demand = last_demand * ((1 + growth_rate) ** (i + 1))
                     available_future.append(predicted_demand)
         
         return available_future[:forecast_horizon]
     
-    def run_monte_carlo_simulation(self, 
-                                 strategy_name: str, 
-                                 T: int, 
+    def run_monte_carlo_simulation(self,
+                                 strategy_name: str,
+                                 T: int,
                                  n_simulations: int = 100,
                                  base_seed: int = 42) -> List[SimulationResult]:
         """
-        运行蒙特卡洛仿真
+        Run Monte Carlo simulation
         
         Args:
-            strategy_name: 策略名称
-            T: 时间范围
-            n_simulations: 仿真次数
-            base_seed: 基础随机种子
+            strategy_name: Strategy name
+            T: Time horizon
+            n_simulations: Number of simulations
+            base_seed: Base random seed
             
         Returns:
-            仿真结果列表
+            List of simulation results
         """
         results = []
         
@@ -212,27 +212,27 @@ class StrategySimulationEngine:
         
         return results
     
-    def compare_strategies(self, 
-                         strategy_names: List[str], 
-                         T: int, 
+    def compare_strategies(self,
+                         strategy_names: List[str],
+                         T: int,
                          n_simulations: int = 100,
                          base_seed: int = 42) -> Dict[str, List[SimulationResult]]:
         """
-        比较多个策略
+        Compare multiple strategies
         
         Args:
-            strategy_names: 策略名称列表
-            T: 时间范围
-            n_simulations: 每个策略的仿真次数
-            base_seed: 基础随机种子
+            strategy_names: List of strategy names
+            T: Time horizon
+            n_simulations: Number of simulations per strategy
+            base_seed: Base random seed
             
         Returns:
-            策略比较结果
+            Strategy comparison results
         """
         comparison_results = {}
         
         for strategy_name in strategy_names:
-            print(f"正在仿真 {strategy_name} 策略...")
+            print(f"Simulating {strategy_name} strategy...")
             results = self.run_monte_carlo_simulation(strategy_name, T, n_simulations, base_seed)
             comparison_results[strategy_name] = results
         
@@ -240,25 +240,25 @@ class StrategySimulationEngine:
     
     def calculate_strategy_statistics(self, results: List[SimulationResult]) -> Dict[str, float]:
         """
-        计算策略统计信息
+        Calculate strategy statistics
         
         Args:
-            results: 仿真结果列表
+            results: List of simulation results
             
         Returns:
-            统计信息字典
+            Statistics dictionary
         """
         if not results:
             return {}
         
-        # 提取关键指标
+        # Extract key metrics
         npvs = [r.performance_metrics.get('npv', 0) for r in results]
         utilizations = [r.performance_metrics.get('avg_utilization', 0) for r in results]
         self_sufficiency_rates = [r.performance_metrics.get('self_sufficiency_rate', 0) for r in results]
         total_costs = [r.performance_metrics.get('total_cost', 0) for r in results]
         
         return {
-            # NPV统计
+            # NPV statistics
             'npv_mean': float(np.mean(npvs)),
             'npv_std': float(np.std(npvs)),
             'npv_min': float(np.min(npvs)),
@@ -266,59 +266,59 @@ class StrategySimulationEngine:
             'npv_p5': float(np.percentile(npvs, 5)),
             'npv_p95': float(np.percentile(npvs, 95)),
             
-            # 利用率统计
+            # Utilization statistics
             'utilization_mean': float(np.mean(utilizations)),
             'utilization_std': float(np.std(utilizations)),
             
-            # 自给自足率统计
+            # Self-sufficiency statistics
             'self_sufficiency_mean': float(np.mean(self_sufficiency_rates)),
             'self_sufficiency_std': float(np.std(self_sufficiency_rates)),
             
-            # 成本统计
+            # Cost statistics
             'total_cost_mean': float(np.mean(total_costs)),
             'total_cost_std': float(np.std(total_costs)),
             
-            # 风险指标
+            # Risk indicators
             'npv_coefficient_of_variation': float(np.std(npvs) / np.mean(npvs)) if np.mean(npvs) != 0 else 0,
             'probability_positive_npv': float(np.mean([npv > 0 for npv in npvs])),
             
-            # 仿真元信息
+            # Simulation metadata
             'n_simulations': len(results),
             'strategy_name': results[0].strategy_name if results else 'unknown'
         }
 
 
 if __name__ == "__main__":
-    # 测试代码
-    print("=== 策略仿真引擎测试 ===")
+    # Test code
+    print("=== Strategy Simulation Engine Test ===")
     
-    # 加载参数
+    # Load parameters
     params_path = project_root / "data" / "parameters.json"
     with open(params_path, 'r') as f:
         params = json.load(f)
     
-    # 创建仿真引擎
+    # Create simulation engine
     engine = StrategySimulationEngine(params)
     
-    # 测试单次仿真
-    print("\n--- 单次仿真测试 ---")
+    # Test single simulation
+    print("\n--- Single Simulation Test ---")
     result = engine.run_single_simulation("upfront_deployment", T=10, seed=42)
-    print(f"策略: {result.strategy_name}")
-    print(f"时间范围: {result.T}")
-    print(f"最终NPV: ${result.performance_metrics.get('npv', 0):,.0f}")
-    print(f"平均利用率: {result.performance_metrics.get('avg_utilization', 0):.1%}")
-    print(f"自给自足率: {result.performance_metrics.get('self_sufficiency_rate', 0):.1%}")
+    print(f"Strategy: {result.strategy_name}")
+    print(f"Time Horizon: {result.T}")
+    print(f"Final NPV: ${result.performance_metrics.get('npv', 0):,.0f}")
+    print(f"Average Utilization: {result.performance_metrics.get('avg_utilization', 0):.1%}")
+    print(f"Self-Sufficiency Rate: {result.performance_metrics.get('self_sufficiency_rate', 0):.1%}")
     
-    # 测试蒙特卡洛仿真
-    print("\n--- 蒙特卡洛仿真测试 ---")
+    # Test Monte Carlo simulation
+    print("\n--- Monte Carlo Simulation Test ---")
     mc_results = engine.run_monte_carlo_simulation("gradual_deployment", T=10, n_simulations=10, base_seed=42)
     stats = engine.calculate_strategy_statistics(mc_results)
-    print(f"NPV均值: ${stats['npv_mean']:,.0f}")
-    print(f"NPV标准差: ${stats['npv_std']:,.0f}")
-    print(f"平均利用率: {stats['utilization_mean']:.1%}")
+    print(f"NPV Mean: ${stats['npv_mean']:,.0f}")
+    print(f"NPV Std Dev: ${stats['npv_std']:,.0f}")
+    print(f"Average Utilization: {stats['utilization_mean']:.1%}")
     
-    # 测试策略比较
-    print("\n--- 策略比较测试 ---")
+    # Test strategy comparison
+    print("\n--- Strategy Comparison Test ---")
     comparison = engine.compare_strategies(["upfront_deployment", "flexible_deployment"], T=10, n_simulations=5)
     for strategy, results in comparison.items():
         stats = engine.calculate_strategy_statistics(results)

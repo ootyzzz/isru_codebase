@@ -402,16 +402,16 @@ class PerformanceAnalyzer:
         """计算策略排名"""
         strategies = [k for k in comparison.keys() if k != 'ranking']
         
-        # 定义评分权重
+        # Define scoring weights
         weights = {
             'npv_mean': 0.3,
             'sharpe_ratio': 0.2,
-            'probability_loss': -0.2,  # 负权重，损失概率越低越好
+            'probability_loss': -0.2,  # Negative weight, lower loss probability is better
             'utilization_mean': 0.15,
             'self_sufficiency_mean': 0.15
         }
         
-        # 计算综合得分
+        # Calculate comprehensive score
         scores = {}
         for strategy in strategies:
             score = 0
@@ -425,13 +425,13 @@ class PerformanceAnalyzer:
                 else:
                     value = 0
                 
-                # 标准化值（简单线性缩放）
+                # Normalize value (simple linear scaling)
                 normalized_value = min(max(value, 0), 1) if metric != 'npv_mean' else value / 1e6
                 score += weight * normalized_value
             
             scores[strategy] = score
         
-        # 排序
+        # Sort
         overall_ranking = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         
         return {
@@ -440,7 +440,7 @@ class PerformanceAnalyzer:
         }
     
     def _calculate_horizon_trends(self, horizon_analysis: Dict[str, Dict]) -> Dict[str, Any]:
-        """计算时间跨度趋势"""
+        """Calculate time horizon trends"""
         trends = {}
         
         for strategy, horizon_data in horizon_analysis.items():
@@ -450,7 +450,7 @@ class PerformanceAnalyzer:
             horizons = sorted(horizon_data.keys())
             npv_means = [horizon_data[h]['npv_mean'] for h in horizons]
             
-            # 计算趋势斜率
+            # Calculate trend slope
             if len(horizons) >= 2:
                 slope = np.polyfit(horizons, npv_means, 1)[0]
                 trends[strategy] = {
@@ -462,16 +462,16 @@ class PerformanceAnalyzer:
         return trends
     
     def _generate_strategy_recommendations(self, comparison: Dict[str, Any]) -> List[str]:
-        """生成策略建议"""
+        """Generate strategy recommendations"""
         recommendations = []
         
         ranking = comparison.get('ranking', {})
         if 'overall_ranking' in ranking:
             best_strategy = ranking['overall_ranking'][0][0]
-            recommendations.append(f"推荐策略: {best_strategy.title()}")
-            recommendations.append(f"   该策略在综合评估中表现最佳")
+            recommendations.append(f"Recommended Strategy: {best_strategy.title()}")
+            recommendations.append(f"   This strategy performs best in comprehensive evaluation")
             
-            # 分析各策略特点
+            # Analyze characteristics of each strategy
             for strategy_name, strategy_data in comparison.items():
                 if strategy_name == 'ranking':
                     continue
@@ -481,44 +481,44 @@ class PerformanceAnalyzer:
                 risk = strategy_data.get('risk', {})
                 
                 recommendations.append(f"")
-                recommendations.append(f"{strategy_name.title()} 策略特点:")
+                recommendations.append(f"{strategy_name.title()} Strategy Characteristics:")
                 
-                # 财务特点
+                # Financial characteristics
                 if financial.get('npv_mean', 0) > 0:
-                    recommendations.append(f"   + 预期盈利: ${financial.get('npv_mean', 0):,.0f}")
+                    recommendations.append(f"   + Expected Profit: ${financial.get('npv_mean', 0):,.0f}")
                 else:
-                    recommendations.append(f"   - 预期亏损: ${financial.get('npv_mean', 0):,.0f}")
+                    recommendations.append(f"   - Expected Loss: ${financial.get('npv_mean', 0):,.0f}")
                 
-                # 风险特点
+                # Risk characteristics
                 if risk.get('volatility', 0) < 1e6:
-                    recommendations.append(f"   + 低风险策略")
+                    recommendations.append(f"   + Low Risk Strategy")
                 else:
-                    recommendations.append(f"   ! 高风险策略")
+                    recommendations.append(f"   ! High Risk Strategy")
                 
-                # 运营特点
+                # Operational characteristics
                 if operational.get('utilization_mean', 0) > 0.8:
-                    recommendations.append(f"   + 高效利用产能")
+                    recommendations.append(f"   + High Capacity Utilization")
                 
                 if operational.get('self_sufficiency_mean', 0) > 0.9:
-                    recommendations.append(f"   + 高自给自足率")
+                    recommendations.append(f"   + High Self-Sufficiency Rate")
         
         return recommendations
 
 
 if __name__ == "__main__":
-    # 测试代码
-    print("=== 性能分析器测试 ===")
+    # Test code
+    print("=== Performance Analyzer Test ===")
     
-    # 这里需要实际的仿真结果来测试
-    # 由于测试环境限制，这里只做基本功能测试
+    # Actual simulation results needed for testing
+    # Due to test environment limitations, only basic functionality testing here
     
     analyzer = PerformanceAnalyzer()
     
-    # 测试基本统计函数
+    # Test basic statistical functions
     test_data = [100, 150, 120, 180, 200, 90, 160, 140, 170, 130]
     
-    print(f"偏度: {analyzer._calculate_skewness(test_data):.3f}")
-    print(f"峰度: {analyzer._calculate_kurtosis(test_data):.3f}")
-    print(f"下行偏差: {analyzer._calculate_downside_deviation(test_data):.3f}")
-    print(f"索提诺比率: {analyzer._calculate_sortino_ratio(test_data):.3f}")
-    print(f"最大回撤: {analyzer._calculate_max_drawdown(test_data):.3f}")
+    print(f"Skewness: {analyzer._calculate_skewness(test_data):.3f}")
+    print(f"Kurtosis: {analyzer._calculate_kurtosis(test_data):.3f}")
+    print(f"Downside Deviation: {analyzer._calculate_downside_deviation(test_data):.3f}")
+    print(f"Sortino Ratio: {analyzer._calculate_sortino_ratio(test_data):.3f}")
+    print(f"Max Drawdown: {analyzer._calculate_max_drawdown(test_data):.3f}")

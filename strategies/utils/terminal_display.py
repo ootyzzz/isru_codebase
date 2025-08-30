@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-终端显示工具
-提供美观的终端输出，包括进度条、表格、图表等
+Terminal Display Tools
+Provide beautiful terminal output including progress bars, tables, charts, etc.
 """
 
 import sys
@@ -13,7 +13,7 @@ import numpy as np
 
 @dataclass
 class TableColumn:
-    """表格列定义"""
+    """Table column definition"""
     name: str
     width: int
     align: str = 'left'  # 'left', 'right', 'center'
@@ -21,9 +21,9 @@ class TableColumn:
 
 
 class TerminalDisplay:
-    """终端显示工具类"""
+    """Terminal display utility class"""
     
-    # 颜色代码
+    # Color codes
     COLORS = {
         'red': '\033[91m',
         'green': '\033[92m',
@@ -37,7 +37,7 @@ class TerminalDisplay:
         'end': '\033[0m'
     }
     
-    # 特殊字符
+    # Special characters
     CHARS = {
         'box_top_left': '┌',
         'box_top_right': '┐',
@@ -60,14 +60,14 @@ class TerminalDisplay:
     
     @classmethod
     def colorize(cls, text: str, color: str) -> str:
-        """给文本添加颜色"""
+        """Add color to text"""
         if color in cls.COLORS:
             return f"{cls.COLORS[color]}{text}{cls.COLORS['end']}"
         return text
     
     @classmethod
     def print_header(cls, title: str, width: int = 80, color: str = 'cyan'):
-        """打印标题头部"""
+        """Print title header"""
         print()
         print(cls.colorize('═' * width, color))
         title_line = f"  {title}  "
@@ -79,16 +79,16 @@ class TerminalDisplay:
     
     @classmethod
     def print_section(cls, title: str, color: str = 'yellow'):
-        """打印章节标题"""
+        """Print section title"""
         print()
         print(cls.colorize(f"- {title}", color))
         print(cls.colorize('─' * (len(title) + 3), color))
     
     @classmethod
-    def print_progress_bar(cls, current: int, total: int, 
-                          prefix: str = '', suffix: str = '', 
+    def print_progress_bar(cls, current: int, total: int,
+                          prefix: str = '', suffix: str = '',
                           width: int = 50, color: str = 'green'):
-        """打印进度条"""
+        """Print progress bar"""
         if total == 0:
             percent = 100
         else:
@@ -101,30 +101,30 @@ class TerminalDisplay:
         print(cls.colorize(progress_text, color), end='', flush=True)
         
         if current >= total:
-            print()  # 完成后换行
+            print()  # New line after completion
     
     @classmethod
-    def print_table(cls, data: List[Dict], columns: List[TableColumn], 
+    def print_table(cls, data: List[Dict], columns: List[TableColumn],
                    title: Optional[str] = None, show_index: bool = False):
-        """打印表格"""
+        """Print table"""
         if not data:
-            print("无数据显示")
+            print("No data to display")
             return
         
-        # 计算列宽
+        # Calculate column widths
         if show_index:
             index_width = len(str(len(data))) + 2
             total_width = index_width + sum(col.width for col in columns) + len(columns) + 1
         else:
             total_width = sum(col.width for col in columns) + len(columns) + 1
         
-        # 打印标题
+        # Print title
         if title:
             print()
             print(cls.colorize(f"[TABLE] {title}", 'bold'))
             print()
         
-        # 打印表格顶部
+        # Print table top
         if show_index:
             print(cls.CHARS['box_top_left'] + cls.CHARS['box_horizontal'] * (index_width - 1), end='')
             print(cls.CHARS['box_t_down'], end='')
@@ -137,7 +137,7 @@ class TerminalDisplay:
                 print(cls.CHARS['box_t_down'], end='')
         print(cls.CHARS['box_top_right'])
         
-        # 打印表头
+        # Print table header
         if show_index:
             print(cls.CHARS['box_vertical'] + ' ' * (index_width - 1), end='')
             print(cls.CHARS['box_vertical'], end='')
@@ -150,7 +150,7 @@ class TerminalDisplay:
             print(cls.CHARS['box_vertical'], end='')
         print()
         
-        # 打印分隔线
+        # Print separator line
         if show_index:
             print(cls.CHARS['box_t_right'] + cls.CHARS['box_horizontal'] * (index_width - 1), end='')
             print(cls.CHARS['box_cross'], end='')
@@ -163,7 +163,7 @@ class TerminalDisplay:
                 print(cls.CHARS['box_cross'], end='')
         print(cls.CHARS['box_t_left'])
         
-        # 打印数据行
+        # Print data rows
         for idx, row in enumerate(data):
             if show_index:
                 index_text = cls._format_cell(str(idx + 1), index_width - 1, 'right')
@@ -181,7 +181,7 @@ class TerminalDisplay:
                 print(cls.CHARS['box_vertical'], end='')
             print()
         
-        # 打印表格底部
+        # Print table bottom
         if show_index:
             print(cls.CHARS['box_bottom_left'] + cls.CHARS['box_horizontal'] * (index_width - 1), end='')
             print(cls.CHARS['box_t_up'], end='')
@@ -197,7 +197,7 @@ class TerminalDisplay:
     
     @classmethod
     def _format_cell(cls, text: str, width: int, align: str) -> str:
-        """格式化单元格文本"""
+        """Format cell text"""
         if len(text) > width:
             text = text[:width-3] + '...'
         
@@ -211,26 +211,26 @@ class TerminalDisplay:
             return f" {text:<{width-1}}"
     
     @classmethod
-    def print_comparison_table(cls, comparison_data: Dict[str, Dict[str, float]], 
-                             title: str = "策略对比分析"):
-        """打印策略对比表格"""
+    def print_comparison_table(cls, comparison_data: Dict[str, Dict[str, float]],
+                             title: str = "Strategy Comparison Analysis"):
+        """Print strategy comparison table"""
         if not comparison_data:
-            print("无对比数据")
+            print("No comparison data")
             return
         
-        # 准备表格数据
+        # Prepare table data
         strategies = list(comparison_data.keys())
         metrics = list(next(iter(comparison_data.values())).keys())
         
-        # 定义列
-        columns = [TableColumn("指标", 20, 'left')]
+        # Define columns
+        columns = [TableColumn("Metric", 20, 'left')]
         for strategy in strategies:
             columns.append(TableColumn(strategy.title(), 15, 'right', cls._format_number))
         
-        # 准备数据
+        # Prepare data
         table_data = []
         for metric in metrics:
-            row = {"指标": cls._format_metric_name(metric)}
+            row = {"Metric": cls._format_metric_name(metric)}
             for strategy in strategies:
                 row[strategy.title()] = comparison_data[strategy].get(metric, 0)
             table_data.append(row)
@@ -239,22 +239,22 @@ class TerminalDisplay:
     
     @classmethod
     def _format_metric_name(cls, metric: str) -> str:
-        """格式化指标名称"""
+        """Format metric name"""
         name_map = {
-            'npv_mean': 'NPV均值',
-            'npv_std': 'NPV标准差',
-            'npv_min': 'NPV最小值',
-            'npv_max': 'NPV最大值',
-            'utilization_mean': '平均利用率',
-            'self_sufficiency_mean': '自给自足率',
-            'total_cost_mean': '平均总成本',
-            'probability_positive_npv': '正NPV概率'
+            'npv_mean': 'NPV Mean',
+            'npv_std': 'NPV Std Dev',
+            'npv_min': 'NPV Min',
+            'npv_max': 'NPV Max',
+            'utilization_mean': 'Avg Utilization',
+            'self_sufficiency_mean': 'Self-Sufficiency',
+            'total_cost_mean': 'Avg Total Cost',
+            'probability_positive_npv': 'Positive NPV Prob'
         }
         return name_map.get(metric, metric)
     
     @classmethod
     def _format_number(cls, value: Any) -> str:
-        """格式化数字显示"""
+        """Format number display"""
         if isinstance(value, (int, float)):
             if abs(value) >= 1e6:
                 return f"{value/1e6:.1f}M"
@@ -268,13 +268,13 @@ class TerminalDisplay:
     
     @classmethod
     def print_simulation_status(cls, strategy: str, T: int, current: int, total: int):
-        """打印仿真状态"""
+        """Print simulation status"""
         status_text = f"{strategy.title()} (T={T})"
         cls.print_progress_bar(current, total, prefix=status_text, suffix=f"{current}/{total}")
     
     @classmethod
     def print_summary_box(cls, title: str, data: Dict[str, Any], color: str = 'green'):
-        """打印摘要框"""
+        """Print summary box"""
         max_key_length = max(len(str(k)) for k in data.keys()) if data else 0
         max_value_length = max(len(str(v)) for v in data.values()) if data else 0
         box_width = max(len(title) + 4, max_key_length + max_value_length + 6, 40)
@@ -282,16 +282,16 @@ class TerminalDisplay:
         print()
         print(cls.colorize(cls.CHARS['box_top_left'] + cls.CHARS['box_horizontal'] * (box_width - 2) + cls.CHARS['box_top_right'], color))
         
-        # 标题
+        # Title
         title_line = f"{cls.CHARS['box_vertical']} {title:^{box_width-4}} {cls.CHARS['box_vertical']}"
         print(cls.colorize(title_line, color))
         
         if data:
-            # 分隔线
+            # Separator line
             sep_line = f"{cls.CHARS['box_t_right']}{cls.CHARS['box_horizontal'] * (box_width - 2)}{cls.CHARS['box_t_left']}"
             print(cls.colorize(sep_line, color))
             
-            # 数据行
+            # Data rows
             for key, value in data.items():
                 if isinstance(value, float):
                     if abs(value) >= 1e6:
@@ -313,9 +313,9 @@ class TerminalDisplay:
     
     @classmethod
     def print_ascii_chart(cls, data: List[float], title: str = "", width: int = 60, height: int = 10):
-        """打印ASCII图表"""
+        """Print ASCII chart"""
         if not data:
-            print("无数据绘制图表")
+            print("No data to plot chart")
             return
         
         print()
@@ -323,7 +323,7 @@ class TerminalDisplay:
             print(cls.colorize(f"[CHART] {title}", 'bold'))
             print()
         
-        # 标准化数据
+        # Normalize data
         min_val = min(data)
         max_val = max(data)
         if max_val == min_val:
@@ -331,7 +331,7 @@ class TerminalDisplay:
         else:
             normalized = [int((val - min_val) / (max_val - min_val) * (height - 1)) for val in data]
         
-        # 绘制图表
+        # Draw chart
         for y in range(height - 1, -1, -1):
             line = ""
             for x in range(len(data)):
@@ -340,14 +340,14 @@ class TerminalDisplay:
                 else:
                     line += " "
             
-            # 添加Y轴标签
+            # Add Y-axis labels
             y_val = min_val + (max_val - min_val) * y / (height - 1)
             print(f"{y_val:8.1f} │{line}")
         
-        # X轴
+        # X-axis
         print(" " * 9 + "└" + "─" * len(data))
         
-        # X轴标签
+        # X-axis labels
         x_labels = ""
         for i in range(0, len(data), max(1, len(data) // 10)):
             x_labels += f"{i:>6}"
@@ -356,46 +356,46 @@ class TerminalDisplay:
 
 
 if __name__ == "__main__":
-    # 测试代码
-    print("=== 终端显示工具测试 ===")
+    # Test code
+    print("=== Terminal Display Tools Test ===")
     
-    # 测试标题
-    TerminalDisplay.print_header("ISRU策略仿真分析系统", width=60)
+    # Test title
+    TerminalDisplay.print_header("ISRU Strategy Simulation Analysis System", width=60)
     
-    # 测试章节
-    TerminalDisplay.print_section("仿真进度")
+    # Test section
+    TerminalDisplay.print_section("Simulation Progress")
     
-    # 测试进度条
+    # Test progress bar
     for i in range(101):
-        TerminalDisplay.print_progress_bar(i, 100, prefix="Conservative", suffix="完成")
+        TerminalDisplay.print_progress_bar(i, 100, prefix="Conservative", suffix="Complete")
         time.sleep(0.01)
     
-    # 测试表格
+    # Test table
     test_data = [
-        {"策略": "Conservative", "NPV": 2450000, "利用率": 0.873, "成本": 1200000},
-        {"策略": "Aggressive", "NPV": 2680000, "利用率": 0.918, "成本": 1450000},
-        {"策略": "Moderate", "NPV": 2590000, "利用率": 0.895, "成本": 1350000}
+        {"Strategy": "Conservative", "NPV": 2450000, "Utilization": 0.873, "Cost": 1200000},
+        {"Strategy": "Aggressive", "NPV": 2680000, "Utilization": 0.918, "Cost": 1450000},
+        {"Strategy": "Moderate", "NPV": 2590000, "Utilization": 0.895, "Cost": 1350000}
     ]
     
     columns = [
-        TableColumn("策略", 12, 'left'),
+        TableColumn("Strategy", 12, 'left'),
         TableColumn("NPV", 12, 'right', TerminalDisplay._format_number),
-        TableColumn("利用率", 10, 'right', lambda x: f"{x:.1%}"),
-        TableColumn("成本", 12, 'right', TerminalDisplay._format_number)
+        TableColumn("Utilization", 10, 'right', lambda x: f"{x:.1%}"),
+        TableColumn("Cost", 12, 'right', TerminalDisplay._format_number)
     ]
     
-    TerminalDisplay.print_table(test_data, columns, "策略对比结果", show_index=True)
+    TerminalDisplay.print_table(test_data, columns, "Strategy Comparison Results", show_index=True)
     
-    # 测试摘要框
+    # Test summary box
     summary_data = {
-        "总仿真次数": 1000,
-        "最佳策略": "Aggressive",
-        "平均NPV": 2573333.33,
-        "成功率": 0.95
+        "Total Simulations": 1000,
+        "Best Strategy": "Aggressive",
+        "Average NPV": 2573333.33,
+        "Success Rate": 0.95
     }
     
-    TerminalDisplay.print_summary_box("仿真摘要", summary_data)
+    TerminalDisplay.print_summary_box("Simulation Summary", summary_data)
     
-    # 测试ASCII图表
+    # Test ASCII chart
     test_chart_data = [10, 15, 12, 18, 25, 22, 30, 28, 35, 32, 40, 38, 45]
-    TerminalDisplay.print_ascii_chart(test_chart_data, "NPV趋势图", width=50, height=8)
+    TerminalDisplay.print_ascii_chart(test_chart_data, "NPV Trend Chart", width=50, height=8)

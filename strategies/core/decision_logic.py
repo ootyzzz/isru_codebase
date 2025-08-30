@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-决策逻辑引擎 - 新策略版本
-实现三种新部署策略的具体决策逻辑
+Decision Logic Engine - New Strategy Version
+Implement specific decision logic for three new deployment strategies
 """
 
 import sys
@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import numpy as np
 
-# 添加项目根目录到路径
+# Add project root directory to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -18,52 +18,52 @@ from strategies.core.state_manager import SystemState, Decision
 
 
 class DecisionEngine:
-    """新策略决策引擎"""
+    """New strategy decision engine"""
     
     def __init__(self, strategy: StrategyParams, params: Dict):
         """
-        初始化决策引擎
+        Initialize decision engine
         
         Args:
-            strategy: 策略参数
-            params: 系统参数
+            strategy: Strategy parameters
+            params: System parameters
         """
         self.strategy = strategy
         self.params = params
         
-        # 从参数中提取成本信息
+        # Extract cost information from parameters
         costs = params.get('costs', {})
-        self.capacity_cost_per_kg = costs.get('c_dev', 10000)  # 产能建设成本
-        self.operational_cost_per_kg = costs.get('c_op', 3000)  # 运营成本
-        self.earth_supply_cost_per_kg = costs.get('c_E', 20000)  # 地球补给成本
+        self.capacity_cost_per_kg = costs.get('c_dev', 10000)  # Capacity construction cost
+        self.operational_cost_per_kg = costs.get('c_op', 3000)  # Operational cost
+        self.earth_supply_cost_per_kg = costs.get('c_E', 20000)  # Earth supply cost
         
-        # 技术参数
+        # Technology parameters
         tech = params.get('technology', {})
-        self.efficiency_ratio = tech.get('eta', 2)  # 产能效率比
+        self.efficiency_ratio = tech.get('eta', 2)  # Capacity efficiency ratio
         
-        # 需求参数
+        # Demand parameters
         demand_params = params.get('demand', {})
-        self.D0 = demand_params.get('D0', 10)  # 初始需求
-        self.mu = demand_params.get('mu', 0.2)  # 需求增长率
-        self.sigma = demand_params.get('sigma', 0.2)  # 需求波动率
+        self.D0 = demand_params.get('D0', 10)  # Initial demand
+        self.mu = demand_params.get('mu', 0.2)  # Demand growth rate
+        self.sigma = demand_params.get('sigma', 0.2)  # Demand volatility
     
     def make_decision(self, state: SystemState, demand_forecast: Optional[List[float]] = None) -> Decision:
         """
-        根据新策略和当前状态做出决策
+        Make decisions based on new strategy and current state
         
         Args:
-            state: 当前系统状态
-            demand_forecast: 需求预测（可选）
+            state: Current system state
+            demand_forecast: Demand forecast (optional)
             
         Returns:
-            决策结果
+            Decision result
         """
         decision = Decision(time=state.current_time)
         
-        # 1. 计算最终需求（基于时间跨度T）
+        # 1. Calculate final demand (based on time horizon T)
         final_demand = self._estimate_final_demand(state)
         
-        # 2. 根据策略计算当年的部署量
+        # 2. Calculate current year deployment based on strategy
         deployment_amount = self._calculate_deployment_amount(state, final_demand)
         
         if deployment_amount > 0:
@@ -72,33 +72,33 @@ class DecisionEngine:
             decision.expansion_cost = self._calculate_expansion_cost(deployment_amount)
             decision.decision_reason = f"{self.strategy.deployment_type} strategy deployment"
         
-        # 3. 计算生产计划
+        # 3. Calculate production plan
         decision.planned_production = self._calculate_production_plan(state)
         decision.operational_cost = self._calculate_operational_cost(decision.planned_production)
         
-        # 4. 计算地球补给需求
+        # 4. Calculate earth supply requirements
         production_shortfall = max(0, state.current_demand - decision.planned_production)
         decision.earth_supply_request = production_shortfall
         decision.supply_cost = self._calculate_supply_cost(decision.earth_supply_request)
         
-        # 5. 设置库存目标
+        # 5. Set inventory target
         decision.inventory_target = self._calculate_inventory_target(state)
         
         return decision
     
     def _estimate_final_demand(self, state: SystemState) -> float:
         """
-        估算最终年份的需求
+        Estimate final year demand
         
         Args:
-            state: 当前系统状态
+            state: Current system state
             
         Returns:
-            最终年份的预期需求
+            Expected demand in final year
         """
-        # 使用几何布朗运动模型估算最终需求
+        # Use geometric Brownian motion model to estimate final demand
         # D_T = D0 * exp((mu - 0.5*sigma^2)*T + sigma*sqrt(T)*Z)
-        # 这里使用期望值：D_T = D0 * exp(mu*T)
+        # Here use expected value: D_T = D0 * exp(mu*T)
         
         T = self.strategy.time_horizon
         final_demand = self.D0 * np.exp(self.mu * T)
@@ -107,25 +107,25 @@ class DecisionEngine:
     
     def _calculate_deployment_amount(self, state: SystemState, final_demand: float) -> float:
         """
-        根据策略计算当年的部署量
+        Calculate current year deployment based on strategy
         
         Args:
-            state: 当前系统状态
-            final_demand: 最终需求
+            state: Current system state
+            final_demand: Final demand
             
         Returns:
-            当年的新增部署量
+            New deployment amount for current year
         """
         current_year = state.current_time
         
-        # 获取上一年的供需信息（用于灵活策略）
+        # Get previous year supply-demand information (for flexible strategy)
         previous_supply = 0
         previous_demand = 0
         
         if len(state.demand_history) > 0 and len(state.capacity_history) > 0:
             previous_demand = state.demand_history[-1]
             previous_capacity = state.capacity_history[-1] if state.capacity_history else 0
-            # 假设上一年的供应量等于产能（简化）
+            # Assume previous year supply equals capacity (simplified)
             previous_supply = previous_capacity
         
         return calculate_deployment_for_year(
@@ -137,64 +137,64 @@ class DecisionEngine:
         )
     
     def _calculate_production_plan(self, state: SystemState) -> float:
-        """计算生产计划"""
-        # 生产计划受产能限制
+        """Calculate production plan"""
+        # Production plan limited by capacity
         max_production = state.total_capacity
         
-        # 根据需求和库存情况调整生产计划
+        # Adjust production plan based on demand and inventory
         target_production = state.current_demand
         
-        # 考虑库存情况
-        if state.inventory > state.current_demand * 0.1:  # 库存超过10%的年需求
-            # 减少生产，避免库存积压
+        # Consider inventory situation
+        if state.inventory > state.current_demand * 0.1:  # Inventory exceeds 10% of annual demand
+            # Reduce production to avoid inventory buildup
             target_production *= 0.9
         
         return min(target_production, max_production)
     
     def _calculate_inventory_target(self, state: SystemState) -> float:
-        """计算库存目标"""
-        # 基础目标：10%的年需求
+        """Calculate inventory target"""
+        # Base target: 10% of annual demand
         base_target = state.current_demand * 0.1
         
-        # 根据策略类型调整
+        # Adjust based on strategy type
         if self.strategy.deployment_type == "upfront":
-            # 一次性部署策略：保持较高库存
+            # Upfront deployment strategy: maintain higher inventory
             return base_target * 1.5
         elif self.strategy.deployment_type == "gradual":
-            # 渐进部署策略：中等库存
+            # Gradual deployment strategy: medium inventory
             return base_target * 1.2
         else:  # flexible
-            # 灵活部署策略：较低库存，依赖快速响应
+            # Flexible deployment strategy: lower inventory, rely on quick response
             return base_target * 0.8
     
     def _calculate_expansion_cost(self, expansion_amount: float) -> float:
-        """计算扩张成本"""
-        # 产能建设成本
+        """Calculate expansion cost"""
+        # Capacity construction cost
         capacity_cost = expansion_amount * self.capacity_cost_per_kg
         
-        # 规模经济效应
-        if expansion_amount > 100:  # 大规模扩张有折扣
+        # Economies of scale effect
+        if expansion_amount > 100:  # Large-scale expansion gets discount
             capacity_cost *= 0.9
         
         return capacity_cost
     
     def _calculate_operational_cost(self, production_amount: float) -> float:
-        """计算运营成本"""
+        """Calculate operational cost"""
         return production_amount * self.operational_cost_per_kg
     
     def _calculate_supply_cost(self, supply_amount: float) -> float:
-        """计算地球补给成本"""
+        """Calculate earth supply cost"""
         return supply_amount * self.earth_supply_cost_per_kg
 
 
 if __name__ == "__main__":
-    # 测试代码
-    print("=== 新策略决策逻辑引擎测试 ===")
+    # Test code
+    print("=== New Strategy Decision Logic Engine Test ===")
     
-    # 导入策略定义
+    # Import strategy definitions
     from strategies.core.strategy_definitions import StrategyDefinitions
     
-    # 测试参数
+    # Test parameters
     params = {
         'costs': {
             'c_dev': 10000,
@@ -211,32 +211,32 @@ if __name__ == "__main__":
         }
     }
     
-    # 测试每种新策略
+    # Test each new strategy
     time_horizon = 20
     strategies = StrategyDefinitions.get_all_strategies(time_horizon)
     
     for name, strategy in strategies.items():
-        print(f"\n=== {name.upper()} 策略测试 ===")
+        print(f"\n=== {name.upper()} Strategy Test ===")
         
         engine = DecisionEngine(strategy, params)
         
-        # 创建测试状态
+        # Create test state
         test_state = SystemState(
             current_time=5,
             total_capacity=50.0,
-            current_demand=60.0,  # 需求超过产能
+            current_demand=60.0,  # Demand exceeds capacity
             inventory=5.0,
             demand_history=[40, 45, 50, 55, 60],
             capacity_history=[30, 35, 40, 45, 50]
         )
         
-        # 做出决策
+        # Make decision
         decision = engine.make_decision(test_state)
         
-        print(f"决策结果:")
-        print(f"  产能扩张: {decision.capacity_expansion:.1f}")
-        print(f"  新增部署: {decision.new_deployment:.1f}")
-        print(f"  计划产量: {decision.planned_production:.1f}")
-        print(f"  地球补给: {decision.earth_supply_request:.1f}")
-        print(f"  扩张成本: ${decision.expansion_cost:,.0f}")
-        print(f"  决策原因: {decision.decision_reason}")
+        print(f"Decision Results:")
+        print(f"  Capacity Expansion: {decision.capacity_expansion:.1f}")
+        print(f"  New Deployment: {decision.new_deployment:.1f}")
+        print(f"  Planned Production: {decision.planned_production:.1f}")
+        print(f"  Earth Supply: {decision.earth_supply_request:.1f}")
+        print(f"  Expansion Cost: ${decision.expansion_cost:,.0f}")
+        print(f"  Decision Reason: {decision.decision_reason}")
