@@ -11,7 +11,7 @@ ISRU策略仿真系统主入口
     python strategies/main.py --visualize
     
     # 运行单个策略的蒙特卡洛仿真
-    python strategies/main.py monte-carlo --strategy aggressive --time-horizon 30 --n-simulations 500 --visualize
+    python strategies/main.py monte-carlo --strategy flexible_deployment --time-horizon 30 --n-simulations 500 --visualize
     
     # 运行策略对比分析
     python strategies/main.py compare --time-horizon 25 --n-simulations 200 --visualize --save
@@ -20,10 +20,10 @@ ISRU策略仿真系统主入口
     python strategies/main.py visualize
     
     # 导出结果到Excel
-    python strategies/main.py results export --strategies conservative aggressive moderate --time-horizons 10 20 30
+    python strategies/main.py results export --strategies upfront_deployment gradual_deployment flexible_deployment --time-horizons 10 20 30
 
 主要功能:
-    - 策略仿真: 支持保守、激进、温和三种ISRU策略
+    - 策略仿真: 支持Upfront Deployment、Gradual Deployment、Flexible Deployment三种ISRU策略
     - 时间跨度分析: 可设置10-50年的仿真时间跨度
     - 蒙特卡洛仿真: 支持多次随机仿真以评估策略稳健性
     - 可视化分析: 自动生成决策变量、成本分析等图表

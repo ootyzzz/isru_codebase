@@ -59,7 +59,7 @@ python strategies/main.py --time-horizon 20 --visualize --n-simulations 100
 python strategies/main.py --visualize
 
 # 单个策略的蒙特卡洛仿真
-python strategies/main.py monte-carlo --strategy aggressive --time-horizon 30 --n-simulations 500 --visualize
+python strategies/main.py monte-carlo --strategy flexible_deployment --time-horizon 30 --n-simulations 500 --visualize
 
 # 策略对比分析并保存结果
 python strategies/main.py compare --time-horizon 25 --n-simulations 200 --visualize --save
@@ -68,7 +68,7 @@ python strategies/main.py compare --time-horizon 25 --n-simulations 200 --visual
 python strategies/main.py visualize
 
 # 导出结果到Excel
-python strategies/main.py results export --strategies conservative aggressive moderate --time-horizons 10 20 30
+python strategies/main.py results export --strategies upfront_deployment gradual_deployment flexible_deployment --time-horizons 10 20 30
 ```
 
 ### 3. 基本命令
@@ -84,7 +84,7 @@ python strategies/main.py compare
 python strategies/main.py horizon
 
 # 单次仿真
-python strategies/main.py single --strategy moderate
+python strategies/main.py single --strategy gradual_deployment
 ```
 
 ## 📊 主要功能
@@ -98,7 +98,7 @@ python strategies/main.py single --strategy moderate
 python strategies/main.py compare --time-horizon 30 --n-simulations 100
 
 # 指定策略对比
-python strategies/main.py compare --strategies conservative aggressive --n-simulations 50
+python strategies/main.py compare --strategies upfront_deployment flexible_deployment --n-simulations 50
 
 # 详细分析报告
 python strategies/main.py compare --detailed-analysis --save
@@ -126,7 +126,7 @@ python strategies/main.py compare --detailed-analysis --save
 python strategies/main.py horizon --time-horizons 10 20 30 40 50
 
 # 自定义时间跨度
-python strategies/main.py horizon --time-horizons 15 25 35 --strategies moderate aggressive
+python strategies/main.py horizon --time-horizons 15 25 35 --strategies gradual_deployment flexible_deployment
 ```
 
 ### 3. 蒙特卡洛仿真
@@ -135,10 +135,10 @@ python strategies/main.py horizon --time-horizons 15 25 35 --strategies moderate
 
 ```bash
 # 蒙特卡洛仿真
-python strategies/main.py monte-carlo --strategy conservative --n-simulations 1000
+python strategies/main.py monte-carlo --strategy upfront_deployment --n-simulations 1000
 
 # 保存结果
-python strategies/main.py monte-carlo --strategy aggressive --n-simulations 500 --save
+python strategies/main.py monte-carlo --strategy flexible_deployment --n-simulations 500 --save
 ```
 
 ### 4. 并行批量仿真
@@ -155,7 +155,7 @@ python strategies/main.py parallel --max-workers 4 --time-horizons 10 20 30
 
 ## 🎯 三种策略详解
 
-### 1. Conservative（一次性全部部署策略）
+### 1. Upfront Deployment（一次性全部部署策略）
 - **特点**：前期大量投资，一次性部署到位
 - **部署方式**：第一年部署最终的总部署量（基于T年的需求预期）
 - **后续年份**：不再新增部署，仅维持运营
@@ -163,7 +163,7 @@ python strategies/main.py parallel --max-workers 4 --time-horizons 10 20 30
 - **劣势**：前期资金压力大，可能存在产能过剩
 - **适用场景**：资金充足，需求预测准确，追求长期稳定
 
-### 2. Moderate（平均分布部署策略）
+### 2. Gradual Deployment（平均分布部署策略）
 - **特点**：均匀分布投资，稳步扩张
 - **部署方式**：将总部署量平均分配到T年中的每一年
 - **计算方法**：每年新增量 = 最终总部署量 / T
@@ -172,7 +172,7 @@ python strategies/main.py parallel --max-workers 4 --time-horizons 10 20 30
 - **劣势**：可能在前期无法满足需求，需要地球补给
 - **适用场景**：资金有限，追求稳健发展，风险厌恶
 
-### 3. Aggressive（灵活部署策略）
+### 3. Flexible Deployment（灵活部署策略）
 - **特点**：响应式部署，根据实际供需情况动态调整
 - **部署逻辑**：如果第t年供应量相比需求量少了n，那么第t+1年就新增部署n
 - **决策规则**：
@@ -231,8 +231,8 @@ python strategies/main.py parallel --max-workers 4 --time-horizons 10 20 30
 ```
 simulation_results/
 ├── T10/
-│   ├── conservative_detailed.json    # 详细仿真数据
-│   ├── conservative_summary.json     # 统计摘要
+│   ├── upfront_deployment_detailed.json    # 详细仿真数据
+│   ├── upfront_deployment_summary.json     # 统计摘要
 │   └── ...
 ├── T20/
 └── ...

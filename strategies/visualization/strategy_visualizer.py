@@ -20,7 +20,6 @@ ISRU策略可视化器
     fig3 = plotter.plot_cost_analysis(strategies_data)
 
 支持的时间跨度: T10, T20, T30, T40, T50
-支持的策略: conservative (保守), moderate (温和), aggressive (激进)
 """
 
 import matplotlib.pyplot as plt
