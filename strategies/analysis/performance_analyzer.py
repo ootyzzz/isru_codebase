@@ -269,7 +269,7 @@ class PerformanceAnalyzer:
         comparison = self.compare_strategies(strategy_results)
         ranking = comparison.get('ranking', {})
         
-        report_lines.append("📊 执行摘要")
+        report_lines.append("执行摘要")
         report_lines.append("-" * 40)
         if 'overall_ranking' in ranking:
             for i, (strategy, score) in enumerate(ranking['overall_ranking'], 1):
@@ -278,12 +278,12 @@ class PerformanceAnalyzer:
         
         # 详细分析
         for strategy_name, results in strategy_results.items():
-            report_lines.append(f"🔍 {strategy_name.title()} 策略详细分析")
+            report_lines.append(f"[分析] {strategy_name.title()} 策略详细分析")
             report_lines.append("-" * 50)
             
             # 财务性能
             financial = self.analyze_financial_performance(results)
-            report_lines.append("💰 财务性能:")
+            report_lines.append("财务性能:")
             report_lines.append(f"  NPV均值: ${financial.get('npv_mean', 0):,.0f}")
             report_lines.append(f"  NPV标准差: ${financial.get('npv_std', 0):,.0f}")
             report_lines.append(f"  盈利概率: {(1-financial.get('probability_loss', 0)):.1%}")
@@ -291,14 +291,14 @@ class PerformanceAnalyzer:
             
             # 运营性能
             operational = self.analyze_operational_performance(results)
-            report_lines.append("⚙️ 运营性能:")
+            report_lines.append("运营性能:")
             report_lines.append(f"  平均利用率: {operational.get('utilization_mean', 0):.1%}")
             report_lines.append(f"  自给自足率: {operational.get('self_sufficiency_mean', 0):.1%}")
             report_lines.append(f"  产能扩张次数: {operational.get('avg_capacity_expansions', 0):.1f}")
             
             # 风险特征
             risk = self.analyze_risk_profile(results)
-            report_lines.append("⚠️ 风险特征:")
+            report_lines.append("风险特征:")
             report_lines.append(f"  波动率: ${risk.get('volatility', 0):,.0f}")
             report_lines.append(f"  下行风险: ${risk.get('downside_risk', 0):,.0f}")
             report_lines.append(f"  索提诺比率: {risk.get('sortino_ratio', 0):.2f}")
@@ -306,7 +306,7 @@ class PerformanceAnalyzer:
             report_lines.append("")
         
         # 策略建议
-        report_lines.append("💡 策略建议")
+        report_lines.append("策略建议")
         report_lines.append("-" * 40)
         report_lines.extend(self._generate_strategy_recommendations(comparison))
         
@@ -468,7 +468,7 @@ class PerformanceAnalyzer:
         ranking = comparison.get('ranking', {})
         if 'overall_ranking' in ranking:
             best_strategy = ranking['overall_ranking'][0][0]
-            recommendations.append(f"🏆 推荐策略: {best_strategy.title()}")
+            recommendations.append(f"推荐策略: {best_strategy.title()}")
             recommendations.append(f"   该策略在综合评估中表现最佳")
             
             # 分析各策略特点
@@ -481,26 +481,26 @@ class PerformanceAnalyzer:
                 risk = strategy_data.get('risk', {})
                 
                 recommendations.append(f"")
-                recommendations.append(f"📋 {strategy_name.title()} 策略特点:")
+                recommendations.append(f"{strategy_name.title()} 策略特点:")
                 
                 # 财务特点
                 if financial.get('npv_mean', 0) > 0:
-                    recommendations.append(f"   ✓ 预期盈利: ${financial.get('npv_mean', 0):,.0f}")
+                    recommendations.append(f"   + 预期盈利: ${financial.get('npv_mean', 0):,.0f}")
                 else:
-                    recommendations.append(f"   ✗ 预期亏损: ${financial.get('npv_mean', 0):,.0f}")
+                    recommendations.append(f"   - 预期亏损: ${financial.get('npv_mean', 0):,.0f}")
                 
                 # 风险特点
                 if risk.get('volatility', 0) < 1e6:
-                    recommendations.append(f"   ✓ 低风险策略")
+                    recommendations.append(f"   + 低风险策略")
                 else:
-                    recommendations.append(f"   ⚠️ 高风险策略")
+                    recommendations.append(f"   ! 高风险策略")
                 
                 # 运营特点
                 if operational.get('utilization_mean', 0) > 0.8:
-                    recommendations.append(f"   ✓ 高效利用产能")
+                    recommendations.append(f"   + 高效利用产能")
                 
                 if operational.get('self_sufficiency_mean', 0) > 0.9:
-                    recommendations.append(f"   ✓ 高自给自足率")
+                    recommendations.append(f"   + 高自给自足率")
         
         return recommendations
 

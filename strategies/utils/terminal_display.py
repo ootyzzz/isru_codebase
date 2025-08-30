@@ -81,7 +81,7 @@ class TerminalDisplay:
     def print_section(cls, title: str, color: str = 'yellow'):
         """打印章节标题"""
         print()
-        print(cls.colorize(f"🔹 {title}", color))
+        print(cls.colorize(f"- {title}", color))
         print(cls.colorize('─' * (len(title) + 3), color))
     
     @classmethod
@@ -121,7 +121,7 @@ class TerminalDisplay:
         # 打印标题
         if title:
             print()
-            print(cls.colorize(f"📊 {title}", 'bold'))
+            print(cls.colorize(f"[TABLE] {title}", 'bold'))
             print()
         
         # 打印表格顶部
@@ -320,7 +320,7 @@ class TerminalDisplay:
         
         print()
         if title:
-            print(cls.colorize(f"📈 {title}", 'bold'))
+            print(cls.colorize(f"[CHART] {title}", 'bold'))
             print()
         
         # 标准化数据

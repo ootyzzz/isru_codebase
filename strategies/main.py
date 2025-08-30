@@ -1,33 +1,33 @@
 #!/usr/bin/env python3
 """
-ISRU策略仿真系统主入口
-重构后的策略仿真和对比分析系统
+ISRU Strategy Simulation System Main Entry
+Refactored strategy simulation and comparison analysis system
 
-快速开始示例:
-    # 运行50年时间跨度的策略对比仿真并显示可视化图表
+Quick Start Examples:
+    # Run 50-year time horizon strategy comparison simulation with visualization
     python strategies/main.py --time-horizon 50 --visualize --n-simulations 1000
-    
-    # 运行10年时间跨度的策略对比仿真（默认）
+
+    # Run 10-year time horizon strategy comparison simulation (default)
     python strategies/main.py --visualize
-    
-    # 运行单个策略的蒙特卡洛仿真
+
+    # Run single strategy Monte Carlo simulation
     python strategies/main.py monte-carlo --strategy flexible_deployment --time-horizon 30 --n-simulations 500 --visualize
-    
-    # 运行策略对比分析
+
+    # Run strategy comparison analysis
     python strategies/main.py compare --time-horizon 25 --n-simulations 200 --visualize --save
-    
-    # 显示已有结果的可视化图表
+
+    # Display visualization charts for existing results
     python strategies/main.py visualize
-    
-    # 导出结果到Excel
+
+    # Export results to Excel
     python strategies/main.py results export --strategies upfront_deployment gradual_deployment flexible_deployment --time-horizons 10 20 30
 
-主要功能:
-    - 策略仿真: 支持Upfront Deployment、Gradual Deployment、Flexible Deployment三种ISRU策略
-    - 时间跨度分析: 可设置10-50年的仿真时间跨度
-    - 蒙特卡洛仿真: 支持多次随机仿真以评估策略稳健性
-    - 可视化分析: 自动生成决策变量、成本分析等图表
-    - 结果管理: 支持结果保存、加载、导出等功能
+Main Features:
+    - Strategy Simulation: Support for Upfront Deployment, Gradual Deployment, Flexible Deployment ISRU strategies
+    - Time Horizon Analysis: Configurable 10-50 year simulation time horizons
+    - Monte Carlo Simulation: Support for multiple random simulations to evaluate strategy robustness
+    - Visualization Analysis: Automatically generate decision variables, cost analysis charts
+    - Result Management: Support for result saving, loading, exporting functions
 """
 
 import sys
@@ -72,7 +72,7 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
         time_horizon: 时间跨度（年）
     """
     if not VISUALIZATION_AVAILABLE:
-        print("❌ Visualization feature unavailable, please check if matplotlib and other dependencies are installed")
+        print("ERROR: Visualization feature unavailable, please check if matplotlib and other dependencies are installed")
         return
     
     try:
@@ -85,8 +85,8 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
         figures = plotter.create_comprehensive_dashboard(results_dir, time_horizon)
         
         if figures:
-            print(f"✅ Successfully generated {len(figures)} charts")
-            print("📊 Charts displayed, close chart windows to continue...")
+            print(f"SUCCESS: Successfully generated {len(figures)} charts")
+            print("INFO: Charts displayed, close chart windows to continue...")
             
             # 等待用户关闭图表
             try:
@@ -97,10 +97,10 @@ def show_visualization(results_dir: str = "strategies/simulation_results", time_
                 print("\nUser interrupted, closing all charts...")
                 plt.close('all')
         else:
-            print("❌ Failed to generate charts, please check if simulation data is available")
+            print("ERROR: Failed to generate charts, please check if simulation data is available")
             
     except Exception as e:
-        print(f"❌ Error occurred during visualization: {e}")
+        print(f"ERROR: Error occurred during visualization: {e}")
         print("Please ensure simulation has been run and result data has been generated")
 
 
@@ -153,10 +153,10 @@ def run_default_simulation_with_visualization(args):
         if args.visualize:
             show_visualization(time_horizon=time_horizon)
         else:
-            print("\n💡 Tip: Use --visualize parameter to view chart analysis")
+            print("\nTIP: Use --visualize parameter to view chart analysis")
             
     except Exception as e:
-        print(f"❌ Error occurred during simulation: {e}")
+        print(f"ERROR: Error occurred during simulation: {e}")
         return
 
 
@@ -560,7 +560,7 @@ def handle_results_command(args):
             TerminalDisplay.print_summary_box("导出完成", summary_data, 'green')
             
         except Exception as e:
-            print(f"❌ 导出失败: {e}")
+            print(f"ERROR: 导出失败: {e}")
     
     elif args.results_command == 'list':
         TerminalDisplay.print_header("可用结果列表", width=70)
@@ -568,21 +568,21 @@ def handle_results_command(args):
         available = runner.get_available_results()
         
         if not available:
-            print("📭 暂无可用结果")
+            print("INFO: 暂无可用结果")
             print("请先运行仿真生成结果：")
             print("  python strategies/main.py compare --save")
         else:
             for time_horizon, strategies in available.items():
                 TerminalDisplay.print_section(f"{time_horizon} 时间跨度")
                 for strategy in strategies:
-                    print(f"  ✅ {strategy.title()} 策略")
+                    print(f"  - {strategy.title()} 策略")
     
     elif args.results_command == 'cleanup':
         TerminalDisplay.print_header("清理旧结果", width=70)
         
         print(f"清理 {args.keep_days} 天前的结果文件...")
         runner.cleanup_old_results(args.keep_days)
-        print("✅ 清理完成")
+        print("SUCCESS: 清理完成")
     
     elif args.results_command == 'load':
         TerminalDisplay.print_header("加载历史结果", width=70)
@@ -613,7 +613,7 @@ def handle_results_command(args):
                 print(f"  最小值: £{min(npvs_gbp):,.0f}")
                 print(f"  最大值: £{max(npvs_gbp):,.0f}")
         else:
-            print(f"❌ 未找到 {args.strategy} 策略在 T={args.time_horizon} 的结果")
+            print(f"ERROR: 未找到 {args.strategy} 策略在 T={args.time_horizon} 的结果")
             print("可用结果:")
             available = runner.get_available_results()
             for th, strategies in available.items():

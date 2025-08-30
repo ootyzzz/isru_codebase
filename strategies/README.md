@@ -1,322 +1,362 @@
-# ISRU策略仿真系统 - 重构版本
+# ISRU Strategy Simulation System - Refactored Version
 
-## 🎯 系统概述
+## System Overview
 
-这是一个完全重构的ISRU（原位资源利用）策略仿真系统，用于分析和比较不同部署策略在月球氧气生产中的表现。
+This is a completely refactored ISRU (In-Situ Resource Utilization) strategy simulation system for analyzing and comparing different deployment strategies in lunar oxygen production.
 
-### 🔄 重构亮点
+### Refactoring Highlights
 
-- ✅ **真正的策略仿真**：基于规则驱动，非优化求解
-- ✅ **策略差异化**：三种策略显示明显不同的性能特征
-- ✅ **美观的终端输出**：进度条、表格、图表等可视化
-- ✅ **全面的性能分析**：财务、运营、风险三维度评估
-- ✅ **批量仿真支持**：蒙特卡洛、时间跨度、并行分析
+- **True Strategy Simulation**: Rule-driven, not optimization-based
+- **Strategy Differentiation**: Three strategies show distinctly different performance characteristics
+- **Beautiful Terminal Output**: Progress bars, tables, charts and other visualizations
+- **Comprehensive Performance Analysis**: Financial, operational, and risk three-dimensional assessment
+- **Batch Simulation Support**: Monte Carlo, time horizon, and parallel analysis
 
-## 📁 项目结构
+## Project Structure
 
 ```
 strategies/
-├── core/                          # 核心仿真引擎
-│   ├── strategy_definitions.py    # 策略参数定义
-│   ├── simulation_engine.py       # 仿真引擎
-│   ├── decision_logic.py          # 决策逻辑
-│   └── state_manager.py           # 状态管理
-├── analysis/                      # 分析工具
-│   ├── batch_runner.py            # 批量仿真执行器
-│   └── performance_analyzer.py    # 性能分析器
-├── utils/                         # 工具模块
-│   └── terminal_display.py        # 终端显示工具
-├── visualization/                 # 可视化模块
-│   ├── strategy_visualizer.py     # 策略可视化器
-│   └── example_usage.py           # 使用示例
-├── simulation_results/            # 仿真结果存储
-│   ├── raw/                       # 原始数据（按时间跨度分类）
-│   ├── summary/                   # 统计摘要
-│   ├── reports/                   # 分析报告
-│   └── exports/                   # 导出文件
-└── main.py                        # 主程序入口
+├── core/                          # Core simulation engine
+│   ├── strategy_definitions.py    # Strategy parameter definitions
+│   ├── simulation_engine.py       # Simulation engine
+│   ├── decision_logic.py          # Decision logic
+│   └── state_manager.py           # State management
+├── analysis/                      # Analysis tools
+│   ├── batch_runner.py            # Batch simulation executor
+│   └── performance_analyzer.py    # Performance analyzer
+├── utils/                         # Utility modules
+│   └── terminal_display.py        # Terminal display tools
+├── visualization/                 # Visualization module
+│   ├── strategy_visualizer.py     # Strategy visualizer
+│   └── example_usage.py           # Usage examples
+├── simulation_results/            # Simulation results storage
+│   ├── raw/                       # Raw data (classified by time horizon)
+│   ├── summary/                   # Statistical summaries
+│   ├── reports/                   # Analysis reports
+│   └── exports/                   # Export files
+└── main.py                        # Main program entry
 ```
 
-## 🚀 快速开始
+## Quick Start
 
-### 1. 环境准备
+### 1. Environment Setup
+
+#### Method 1: Using Conda Environment (Recommended)
 
 ```bash
-# 激活conda环境
+# Create and activate conda environment
+conda env create -f environment.yml
 conda activate isru
 
-# 确保在项目根目录
-cd c:/Users/feifa/Documents/lgy/isru_codebase
+# Ensure in project root directory
+cd /path/to/your/isru_codebase
 ```
 
-### 2. 推荐使用示例
+#### Method 2: Using pip Installation
 
 ```bash
-# 🔥 最常用：运行50年时间跨度的策略对比仿真并显示可视化图表
+# Create virtual environment (optional but recommended)
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Note: GLPK solver needs separate installation
+# Windows: Download and install GLPK binary files
+# Linux: sudo apt-get install glpk-utils
+# Mac: brew install glpk
+```
+
+#### Core Dependencies Description
+
+- **numpy**: Numerical computation foundation library
+- **pandas**: Data processing and analysis
+- **matplotlib/seaborn**: Data visualization
+- **pyomo**: Optimization modeling framework
+- **scipy**: Scientific computing library (optional, for advanced statistical analysis)
+- **pyyaml**: YAML configuration file parsing
+
+#### Verify Installation
+
+```bash
+# Test if environment is correctly configured
+python -c "import numpy, pandas, matplotlib, pyomo; print('Environment configured successfully!')"
+
+# Test strategy simulation system
+python strategies/main.py --help
+```
+
+### 2. Recommended Usage Examples
+
+```bash
+# Most common: Run 20-year time horizon strategy comparison simulation with visualization
 python strategies/main.py --time-horizon 20 --visualize --n-simulations 100
 
-# 快速测试：运行10年时间跨度的策略对比仿真（默认）
+# Quick test: Run 10-year time horizon strategy comparison simulation (default)
 python strategies/main.py --visualize
 
-# 单个策略的蒙特卡洛仿真
+# Single strategy Monte Carlo simulation
 python strategies/main.py monte-carlo --strategy flexible_deployment --time-horizon 30 --n-simulations 500 --visualize
 
-# 策略对比分析并保存结果
+# Strategy comparison analysis and save results
 python strategies/main.py compare --time-horizon 25 --n-simulations 200 --visualize --save
 
-# 显示已有结果的可视化图表
+# Display visualization charts for existing results
 python strategies/main.py visualize
 
-# 导出结果到Excel
+# Export results to Excel
 python strategies/main.py results export --strategies upfront_deployment gradual_deployment flexible_deployment --time-horizons 10 20 30
 ```
 
-### 3. 基本命令
+### 3. Basic Commands
 
 ```bash
-# 查看所有可用命令
+# View all available commands
 python strategies/main.py --help
 
-# 策略对比（推荐开始）
+# Strategy comparison (recommended start)
 python strategies/main.py compare
 
-# 时间跨度分析
+# Time horizon analysis
 python strategies/main.py horizon
 
-# 单次仿真
+# Single simulation
 python strategies/main.py single --strategy gradual_deployment
 ```
 
-## 📊 主要功能
+## Main Features
 
-### 1. 策略对比分析
+### 1. Strategy Comparison Analysis
 
-比较三种策略在相同条件下的表现：
+Compare three strategies under the same conditions:
 
 ```bash
-# 基本对比
+# Basic comparison
 python strategies/main.py compare --time-horizon 30 --n-simulations 100
 
-# 指定策略对比
+# Specified strategy comparison
 python strategies/main.py compare --strategies upfront_deployment flexible_deployment --n-simulations 50
 
-# 详细分析报告
+# Detailed analysis report
 python strategies/main.py compare --detailed-analysis --save
 ```
 
-**输出示例：**
+**Output Example:**
 ```
-📊 T=10年策略对比
+T=10 Year Strategy Comparison
 ┌────────────────────┬───────────────┬───────────────┬───────────────┐
-│ 指标                │  Conservative │    Aggressive │      Moderate │
+│ Metric             │ Upfront_Depl  │ Gradual_Depl  │ Flexible_Depl │
 ├────────────────────┼───────────────┼───────────────┼───────────────┤
-│ NPV均值             │          1.3M │          1.7M │          1.7M │
-│ NPV标准差           │        327.1K │        524.9K │        509.6K │
-│ 平均利用率          │         87.4% │         53.5% │         65.8% │
-│ 自给自足率          │         72.4% │         84.2% │         83.3% │
+│ NPV Mean           │          1.3M │          1.7M │          1.7M │
+│ NPV Std Dev        │        327.1K │        524.9K │        509.6K │
+│ Avg Utilization    │         87.4% │         53.5% │         65.8% │
+│ Self-Sufficiency   │         72.4% │         84.2% │         83.3% │
 └────────────────────┴───────────────┴───────────────┴───────────────┘
 ```
 
-### 2. 时间跨度影响分析
+### 2. Time Horizon Impact Analysis
 
-分析不同时间跨度对策略表现的影响：
+Analyze the impact of different time horizons on strategy performance:
 
 ```bash
-# 标准时间跨度分析
+# Standard time horizon analysis
 python strategies/main.py horizon --time-horizons 10 20 30 40 50
 
-# 自定义时间跨度
+# Custom time horizons
 python strategies/main.py horizon --time-horizons 15 25 35 --strategies gradual_deployment flexible_deployment
 ```
 
-### 3. 蒙特卡洛仿真
+### 3. Monte Carlo Simulation
 
-对单个策略进行大量随机仿真：
+Perform large-scale random simulations for a single strategy:
 
 ```bash
-# 蒙特卡洛仿真
+# Monte Carlo simulation
 python strategies/main.py monte-carlo --strategy upfront_deployment --n-simulations 1000
 
-# 保存结果
+# Save results
 python strategies/main.py monte-carlo --strategy flexible_deployment --n-simulations 500 --save
 ```
 
-### 4. 并行批量仿真
+### 4. Parallel Batch Simulation
 
-高效执行大规模仿真：
+Efficiently execute large-scale simulations:
 
 ```bash
-# 并行仿真所有策略和时间跨度
+# Parallel simulation of all strategies and time horizons
 python strategies/main.py parallel --n-simulations 100
 
-# 指定并行进程数
+# Specify number of parallel processes
 python strategies/main.py parallel --max-workers 4 --time-horizons 10 20 30
 ```
 
-## 🎯 三种策略详解
+## Three Strategies Detailed
 
-### 1. Upfront Deployment（一次性全部部署策略）
-- **特点**：前期大量投资，一次性部署到位
-- **部署方式**：第一年部署最终的总部署量（基于T年的需求预期）
-- **后续年份**：不再新增部署，仅维持运营
-- **优势**：避免后期扩张成本，充分利用规模经济
-- **劣势**：前期资金压力大，可能存在产能过剩
-- **适用场景**：资金充足，需求预测准确，追求长期稳定
+### 1. Upfront Deployment Strategy
+- **Characteristics**: Large upfront investment, deploy all capacity at once
+- **Deployment Method**: Deploy total final deployment in the first year (based on T-year demand forecast)
+- **Subsequent Years**: No new deployments, only maintain operations
+- **Advantages**: Avoid later expansion costs, fully utilize economies of scale
+- **Disadvantages**: High upfront capital pressure, potential overcapacity
+- **Applicable Scenarios**: Sufficient funding, accurate demand forecasting, pursuing long-term stability
 
-### 2. Gradual Deployment（平均分布部署策略）
-- **特点**：均匀分布投资，稳步扩张
-- **部署方式**：将总部署量平均分配到T年中的每一年
-- **计算方法**：每年新增量 = 最终总部署量 / T
-- **前提假设**：系统在开始时就知道时间跨度T，能够确定每年的新增量
-- **优势**：资金压力分散，风险相对较低
-- **劣势**：可能在前期无法满足需求，需要地球补给
-- **适用场景**：资金有限，追求稳健发展，风险厌恶
+### 2. Gradual Deployment Strategy
+- **Characteristics**: Evenly distributed investment, steady expansion
+- **Deployment Method**: Distribute total deployment evenly across T years
+- **Calculation Method**: Annual increment = Final total deployment / T
+- **Assumption**: System knows time horizon T at the beginning, can determine annual increments
+- **Advantages**: Distributed capital pressure, relatively low risk
+- **Disadvantages**: May not meet early demand, requires Earth supply
+- **Applicable Scenarios**: Limited funding, pursuing steady development, risk averse
 
-### 3. Flexible Deployment（灵活部署策略）
-- **特点**：响应式部署，根据实际供需情况动态调整
-- **部署逻辑**：如果第t年供应量相比需求量少了n，那么第t+1年就新增部署n
-- **决策规则**：
-  - 如果 Supply_t < Demand_t，则 新增部署_{t+1} = Demand_t - Supply_t
-  - 如果 Supply_t ≥ Demand_t，则 新增部署_{t+1} = 0
-- **特点**：刻舟求剑式的策略，总是试图弥补上一年的缺口
-- **优势**：响应市场需求，避免过度投资
-- **劣势**：可能存在滞后性，无法预测性规划
-- **适用场景**：市场不确定性高，需要灵活应对
+### 3. Flexible Deployment Strategy
+- **Characteristics**: Responsive deployment, dynamically adjust based on actual supply-demand conditions
+- **Deployment Logic**: If year t supply is n less than demand, then deploy additional n in year t+1
+- **Decision Rules**:
+  - If Supply_t < Demand_t, then New_Deployment_{t+1} = Demand_t - Supply_t
+  - If Supply_t ≥ Demand_t, then New_Deployment_{t+1} = 0
+- **Characteristics**: Reactive strategy, always trying to fill the previous year's gap
+- **Advantages**: Respond to market demand, avoid over-investment
+- **Disadvantages**: May have lag, cannot plan predictively
+- **Applicable Scenarios**: High market uncertainty, need flexible response
 
-## 📈 性能指标说明
+## Performance Metrics Description
 
-### 财务指标
-- **NPV（净现值）**：项目的财务价值
-- **NPV标准差**：收益的波动性
-- **成功率**：NPV为正的概率
-- **夏普比率**：风险调整后收益
+### Financial Metrics
+- **NPV (Net Present Value)**: Financial value of the project
+- **NPV Standard Deviation**: Revenue volatility
+- **Success Rate**: Probability of positive NPV
+- **Sharpe Ratio**: Risk-adjusted return
 
-### 运营指标
-- **平均利用率**：产能使用效率
-- **自给自足率**：本地生产占总需求比例
-- **产能扩张次数**：策略的扩张频率
-- **最终产能**：项目结束时的总产能
+### Operational Metrics
+- **Average Utilization**: Capacity usage efficiency
+- **Self-Sufficiency Rate**: Local production as proportion of total demand
+- **Capacity Expansion Count**: Strategy expansion frequency
+- **Final Capacity**: Total capacity at project end
 
-### 风险指标
-- **波动率**：NPV的标准差
-- **下行风险**：负收益的风险
-- **最大回撤**：最大损失幅度
-- **索提诺比率**：下行风险调整收益
+### Risk Metrics
+- **Volatility**: Standard deviation of NPV
+- **Downside Risk**: Risk of negative returns
+- **Maximum Drawdown**: Maximum loss magnitude
+- **Sortino Ratio**: Downside risk-adjusted return
 
-## 🔧 高级用法
+## Advanced Usage
 
-### 1. 自定义参数
+### 1. Custom Parameters
 
-修改 `data/parameters.json` 中的参数：
+Modify parameters in `data/parameters.json`:
 
 ```json
 {
   "demand": {
-    "D0": 10,        // 初始需求
-    "mu": 0.2,       // 需求增长率
-    "sigma": 0.2     // 需求波动率
+    "D0": 10,        // Initial demand
+    "mu": 0.2,       // Demand growth rate
+    "sigma": 0.2     // Demand volatility
   },
   "costs": {
-    "c_dev": 10000,  // 开发成本
-    "c_op": 3000,    // 运营成本
-    "c_E": 20000     // 地球补给成本
+    "c_dev": 10000,  // Development cost
+    "c_op": 3000,    // Operating cost
+    "c_E": 20000     // Earth supply cost
   }
 }
 ```
 
-### 2. 结果文件
+### 2. Result Files
 
-仿真结果自动保存在 `strategies/simulation_results/` 目录：
+Simulation results are automatically saved in `strategies/simulation_results/` directory:
 
 ```
 simulation_results/
 ├── T10/
-│   ├── upfront_deployment_detailed.json    # 详细仿真数据
-│   ├── upfront_deployment_summary.json     # 统计摘要
+│   ├── upfront_deployment_detailed.json    # Detailed simulation data
+│   ├── upfront_deployment_summary.json     # Statistical summary
 │   └── ...
 ├── T20/
 └── ...
 ```
 
-### 3. 与全局最优解对比
+### 3. Global Optimal Solution Comparison
 
 ```bash
-# 与test_fixed_model.py的最优解对比
+# Compare with optimal solution from test_fixed_model.py
 python strategies/main.py optimal --time-horizon 30
 ```
 
-## 🎨 可视化功能
+## Visualization Features
 
-系统提供两种可视化方式：
+The system provides two visualization methods:
 
-### 终端可视化
-- **进度条**：实时显示仿真进度
-- **表格**：结构化显示对比结果
-- **摘要框**：突出显示关键指标
-- **ASCII图表**：简单的趋势可视化
+### Terminal Visualization
+- **Progress Bars**: Real-time simulation progress display
+- **Tables**: Structured comparison results display
+- **Summary Boxes**: Highlight key metrics
+- **ASCII Charts**: Simple trend visualization
 
-### 图形可视化（新增）
-使用 `--visualize` 参数启用图形可视化：
+### Graphical Visualization
+Use `--visualize` parameter to enable graphical visualization:
 
 ```bash
-# 启用可视化图表
+# Enable visualization charts
 python strategies/main.py --visualize --time-horizon 50 --n-simulations 100
 ```
 
-**可视化图表包括：**
-1. **决策变量对比图**：生产量、产能、库存、地球供应、产能扩张、利用率
-2. **需求与供应对比图**：需求曲线与各策略供应能力对比
-3. **成本分析图**：成本构成堆叠图和NPV对比图
+**Visualization Charts Include:**
+1. **Decision Variable Comparison Charts**: Production, capacity, inventory, Earth supply, capacity expansion, utilization
+2. **Demand vs Supply Comparison Charts**: Demand curves vs strategy supply capacity comparison
+3. **Cost Analysis Charts**: Cost composition stacked charts and NPV comparison charts
 
-**图表特点：**
-- 支持中文显示
-- 三种策略用不同颜色区分
-- 交互式图表，可放大缩小
-- 自动适配时间跨度（T10, T20, T30, T40, T50）
+**Chart Features:**
+- Support English display
+- Three strategies distinguished by different colors
+- Interactive charts, zoomable
+- Auto-adapt to time horizons (T10, T20, T30, T40, T50)
 
-## 🔍 故障排除
+## Troubleshooting
 
-### 常见问题
+### Common Issues
 
 1. **ImportError: No module named 'seaborn'**
-   - 解决：可视化模块是可选的，不影响核心功能
+   - Solution: Visualization module is optional, does not affect core functionality
 
-2. **策略结果相同**
-   - 检查：确保使用新的仿真系统，不是旧的strategy_runner.py
+2. **Strategy results are identical**
+   - Check: Ensure using new simulation system, not old strategy_runner.py
 
-3. **内存不足**
-   - 解决：减少仿真次数或使用并行仿真
+3. **Out of memory**
+   - Solution: Reduce simulation count or use parallel simulation
 
-### 性能优化
+### Performance Optimization
 
 ```bash
-# 减少仿真次数进行快速测试
+# Reduce simulation count for quick testing
 python strategies/main.py compare --n-simulations 20
 
-# 使用并行处理提高效率
+# Use parallel processing for efficiency
 python strategies/main.py parallel --max-workers 8
 ```
 
-## 📚 技术架构
+## Technical Architecture
 
-### 核心设计原则
+### Core Design Principles
 
-1. **规则驱动**：策略基于预定义规则执行，非优化求解
-2. **状态管理**：清晰的状态转换和历史记录
-3. **模块化**：核心组件独立，易于扩展
-4. **可视化**：美观的终端输出和进度显示
+1. **Rule-Driven**: Strategies execute based on predefined rules, not optimization solving
+2. **State Management**: Clear state transitions and historical records
+3. **Modular**: Core components are independent, easy to extend
+4. **Visualization**: Beautiful terminal output and progress display
 
-### 扩展指南
+### Extension Guide
 
-添加新策略：
+Adding new strategies:
 
 ```python
-# 在 strategies/core/strategy_definitions.py 中添加
+# Add in strategies/core/strategy_definitions.py
 @staticmethod
 def get_new_strategy() -> StrategyParams:
     return StrategyParams(
         name="new_strategy",
-        description="新策略描述",
+        description="New strategy description",
         initial_deployment_ratio=0.8,
         utilization_threshold=0.75,
         expansion_ratio=0.3,
@@ -325,33 +365,33 @@ def get_new_strategy() -> StrategyParams:
     )
 ```
 
-## 🎯 使用建议
+## Usage Recommendations
 
-### 研究场景
+### Research Scenarios
 
-1. **策略选择**：使用 `compare` 命令比较策略
-2. **时间规划**：使用 `horizon` 分析长期影响
-3. **风险评估**：关注NPV标准差和成功率
-4. **敏感性分析**：修改参数后重新仿真
+1. **Strategy Selection**: Use `compare` command to compare strategies
+2. **Time Planning**: Use `horizon` to analyze long-term impacts
+3. **Risk Assessment**: Focus on NPV standard deviation and success rate
+4. **Sensitivity Analysis**: Re-simulate after modifying parameters
 
-### 最佳实践
+### Best Practices
 
-1. **先小后大**：从小规模仿真开始测试
-2. **保存结果**：重要分析使用 `--save` 参数
-3. **多次运行**：使用不同随机种子验证结果
-4. **文档记录**：记录参数设置和分析结论
+1. **Start Small**: Begin testing with small-scale simulations
+2. **Save Results**: Use `--save` parameter for important analyses
+3. **Multiple Runs**: Use different random seeds to verify results
+4. **Document**: Record parameter settings and analysis conclusions
 
-## 📞 支持
+## Support
 
-如有问题或建议，请检查：
+For questions or suggestions, please check:
 
-1. 参数文件格式是否正确
-2. 环境依赖是否满足
-3. 文件路径是否正确
-4. 仿真参数是否合理
+1. Whether parameter file format is correct
+2. Whether environment dependencies are satisfied
+3. Whether file paths are correct
+4. Whether simulation parameters are reasonable
 
 ---
 
-**重构完成时间**：2025年8月27日  
-**版本**：2.0  
-**状态**：生产就绪 ✅
+**Refactoring Completion Date**: August 27, 2025  
+**Version**: 2.0  
+**Status**: Production Ready

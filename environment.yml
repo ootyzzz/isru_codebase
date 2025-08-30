@@ -3,15 +3,16 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9
+  - python=3.13
   - pyomo
   - glpk
   - numpy
   - pandas
   - scipy
   - matplotlib
+  - seaborn
   - pyyaml
   - jupyter
-  - seaborn
   - pytest
-prefix: /opt/miniconda3/envs/isru
+  - pathlib  # 虽然是标准库，但明确列出
+
