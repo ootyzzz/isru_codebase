@@ -9,6 +9,7 @@ import time
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 import numpy as np
+from tabulate import tabulate
 
 
 @dataclass
@@ -213,29 +214,35 @@ class TerminalDisplay:
     @classmethod
     def print_comparison_table(cls, comparison_data: Dict[str, Dict[str, float]],
                              title: str = "Strategy Comparison Analysis"):
-        """Print strategy comparison table"""
+        """Print strategy comparison table using tabulate"""
         if not comparison_data:
             print("No comparison data")
             return
         
-        # Prepare table data
+        print()
+        print(cls.colorize(f"[TABLE] {title}", 'bold'))
+        print()
+        
+        # Prepare table data for tabulate
         strategies = list(comparison_data.keys())
         metrics = list(next(iter(comparison_data.values())).keys())
         
-        # Define columns
-        columns = [TableColumn("Metric", 20, 'left')]
-        for strategy in strategies:
-            columns.append(TableColumn(strategy.title(), 15, 'right', cls._format_number))
+        # Create headers
+        headers = ["Metric"] + [strategy.replace('_', ' ').title() for strategy in strategies]
         
-        # Prepare data
-        table_data = []
+        # Create table rows
+        table_rows = []
         for metric in metrics:
-            row = {"Metric": cls._format_metric_name(metric)}
+            row = [cls._format_metric_name(metric)]
             for strategy in strategies:
-                row[strategy.title()] = comparison_data[strategy].get(metric, 0)
-            table_data.append(row)
+                value = comparison_data[strategy].get(metric, 0)
+                row.append(cls._format_number(value))
+            table_rows.append(row)
         
-        cls.print_table(table_data, columns, title)
+        # Print table using tabulate
+        table_str = tabulate(table_rows, headers=headers, tablefmt="grid", stralign="center")
+        print(table_str)
+        print()
     
     @classmethod
     def _format_metric_name(cls, metric: str) -> str:
@@ -248,9 +255,15 @@ class TerminalDisplay:
             'utilization_mean': 'Avg Utilization',
             'self_sufficiency_mean': 'Self-Sufficiency',
             'total_cost_mean': 'Avg Total Cost',
-            'probability_positive_npv': 'Positive NPV Prob'
+            'probability_positive_npv': 'Positive NPV Prob',
+            # Chinese metric names (for backward compatibility)
+            'NPV均值': 'NPV Mean',
+            'NPV标准差': 'NPV Std Dev',
+            '平均利用率': 'Avg Utilization',
+            '自给自足率': 'Self-Sufficiency',
+            '正NPV概率': 'Positive NPV Prob'
         }
-        return name_map.get(metric, metric)
+        return name_map.get(metric, metric.replace('_', ' ').title())
     
     @classmethod
     def _format_number(cls, value: Any) -> str:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-性能分析器
-提供全面的策略性能分析和对比功能
+Performance Analyzer
+Provide comprehensive strategy performance analysis and comparison functionality
 """
 
 import sys
@@ -28,47 +28,47 @@ from strategies.utils.terminal_display import TerminalDisplay
 
 
 class PerformanceAnalyzer:
-    """性能分析器"""
+    """Performance analyzer"""
     
     def __init__(self, results_dir: Optional[Path] = None):
         """
-        初始化性能分析器
+        Initialize performance analyzer
         
         Args:
-            results_dir: 结果目录
+            results_dir: Results directory
         """
         self.results_dir = results_dir or Path(__file__).parent.parent / "simulation_results"
         
-        # 设置matplotlib中文字体（如果可用）
+        # Set matplotlib fonts (if available)
         if HAS_PLOTTING:
-            plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans']
+            plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial']
             plt.rcParams['axes.unicode_minus'] = False
             
-            # 设置seaborn样式
+            # Set seaborn style
             sns.set_style("whitegrid")
             sns.set_palette("husl")
     
     def analyze_financial_performance(self, results: List[SimulationResult]) -> Dict[str, Any]:
         """
-        分析财务性能
+        Analyze financial performance
         
         Args:
-            results: 仿真结果列表
+            results: Simulation results list
             
         Returns:
-            财务性能分析结果
+            Financial performance analysis results
         """
         if not results:
             return {}
         
-        # 提取财务指标
+        # Extract financial metrics
         npvs = [r.performance_metrics.get('npv', 0) for r in results]
         revenues = [r.performance_metrics.get('total_revenue', 0) for r in results]
         costs = [r.performance_metrics.get('total_cost', 0) for r in results]
         
-        # 计算财务统计
+        # Calculate financial statistics
         financial_stats = {
-            # NPV分析
+            # NPV analysis
             'npv_mean': float(np.mean(npvs)),
             'npv_median': float(np.median(npvs)),
             'npv_std': float(np.std(npvs)),
@@ -79,18 +79,18 @@ class PerformanceAnalyzer:
             'npv_skewness': float(self._calculate_skewness(npvs)),
             'npv_kurtosis': float(self._calculate_kurtosis(npvs)),
             
-            # 风险指标
+            # Risk indicators
             'var_95': float(np.percentile(npvs, 5)),  # 95% VaR
             'cvar_95': float(np.mean([npv for npv in npvs if npv <= np.percentile(npvs, 5)])),  # 95% CVaR
             'probability_loss': float(np.mean([npv < 0 for npv in npvs])),
             'downside_deviation': float(self._calculate_downside_deviation(npvs)),
             
-            # 收益成本分析
+            # Revenue cost analysis
             'revenue_mean': float(np.mean(revenues)),
             'cost_mean': float(np.mean(costs)),
             'profit_margin_mean': float(np.mean([(r-c)/r for r, c in zip(revenues, costs) if r > 0])),
             
-            # 稳定性指标
+            # Stability indicators
             'coefficient_of_variation': float(np.std(npvs) / np.mean(npvs)) if np.mean(npvs) != 0 else float('inf'),
             'sharpe_ratio': float(np.mean(npvs) / np.std(npvs)) if np.std(npvs) != 0 else 0
         }
@@ -99,42 +99,42 @@ class PerformanceAnalyzer:
     
     def analyze_operational_performance(self, results: List[SimulationResult]) -> Dict[str, Any]:
         """
-        分析运营性能
+        Analyze operational performance
         
         Args:
-            results: 仿真结果列表
+            results: Simulation results list
             
         Returns:
-            运营性能分析结果
+            Operational performance analysis results
         """
         if not results:
             return {}
         
-        # 提取运营指标
+        # Extract operational metrics
         utilizations = [r.performance_metrics.get('avg_utilization', 0) for r in results]
         self_sufficiency_rates = [r.performance_metrics.get('self_sufficiency_rate', 0) for r in results]
         capacity_expansions = [r.performance_metrics.get('capacity_expansions', 0) for r in results]
         final_capacities = [r.performance_metrics.get('final_capacity', 0) for r in results]
         
-        # 计算运营统计
+        # Calculate operational statistics
         operational_stats = {
-            # 利用率分析
+            # Utilization analysis
             'utilization_mean': float(np.mean(utilizations)),
             'utilization_std': float(np.std(utilizations)),
             'utilization_min': float(np.min(utilizations)),
             'utilization_max': float(np.max(utilizations)),
             
-            # 自给自足分析
+            # Self-sufficiency analysis
             'self_sufficiency_mean': float(np.mean(self_sufficiency_rates)),
             'self_sufficiency_std': float(np.std(self_sufficiency_rates)),
             'full_self_sufficiency_rate': float(np.mean([rate >= 0.99 for rate in self_sufficiency_rates])),
             
-            # 产能管理
+            # Capacity management
             'avg_capacity_expansions': float(np.mean(capacity_expansions)),
             'final_capacity_mean': float(np.mean(final_capacities)),
             'final_capacity_std': float(np.mean(final_capacities)),
             
-            # 效率指标
+            # Efficiency indicators
             'capacity_utilization_efficiency': float(np.mean([u for u in utilizations if u <= 1.0])),
             'expansion_frequency': float(np.mean([exp/len(r.decisions) for r, exp in zip(results, capacity_expansions) if r.decisions]))
         }
@@ -143,37 +143,37 @@ class PerformanceAnalyzer:
     
     def analyze_risk_profile(self, results: List[SimulationResult]) -> Dict[str, Any]:
         """
-        分析风险特征
+        Analyze risk profile
         
         Args:
-            results: 仿真结果列表
+            results: Simulation results list
             
         Returns:
-            风险特征分析结果
+            Risk profile analysis results
         """
         if not results:
             return {}
         
         npvs = [r.performance_metrics.get('npv', 0) for r in results]
         
-        # 风险分析
+        # Risk analysis
         risk_stats = {
-            # 基本风险指标
+            # Basic risk indicators
             'volatility': float(np.std(npvs)),
             'downside_risk': float(self._calculate_downside_deviation(npvs)),
             'upside_potential': float(self._calculate_upside_potential(npvs)),
             
-            # 极值分析
+            # Extreme value analysis
             'max_drawdown': float(self._calculate_max_drawdown(npvs)),
             'tail_risk_5pct': float(np.percentile(npvs, 5)),
             'tail_risk_1pct': float(np.percentile(npvs, 1)),
             
-            # 分布特征
+            # Distribution characteristics
             'skewness': float(self._calculate_skewness(npvs)),
             'kurtosis': float(self._calculate_kurtosis(npvs)),
             'is_normal_distribution': bool(self._test_normality(npvs)),
             
-            # 风险调整收益
+            # Risk-adjusted returns
             'risk_adjusted_return': float(np.mean(npvs) / np.std(npvs)) if np.std(npvs) != 0 else 0,
             'sortino_ratio': float(self._calculate_sortino_ratio(npvs)),
             'calmar_ratio': float(self._calculate_calmar_ratio(npvs))
@@ -183,13 +183,13 @@ class PerformanceAnalyzer:
     
     def compare_strategies(self, strategy_results: Dict[str, List[SimulationResult]]) -> Dict[str, Any]:
         """
-        比较多个策略的性能
+        Compare performance of multiple strategies
         
         Args:
-            strategy_results: 策略结果字典
+            strategy_results: Strategy results dictionary
             
         Returns:
-            策略比较分析结果
+            Strategy comparison analysis results
         """
         comparison = {}
         
@@ -200,7 +200,7 @@ class PerformanceAnalyzer:
                 'risk': self.analyze_risk_profile(results)
             }
         
-        # 计算相对排名
+        # Calculate relative ranking
         ranking = self._calculate_strategy_ranking(comparison)
         comparison['ranking'] = ranking
         
@@ -208,17 +208,17 @@ class PerformanceAnalyzer:
     
     def analyze_time_horizon_impact(self, horizon_results: Dict[int, Dict[str, List[SimulationResult]]]) -> Dict[str, Any]:
         """
-        分析时间跨度对策略性能的影响
+        Analyze impact of time horizon on strategy performance
         
         Args:
-            horizon_results: 时间跨度结果字典
+            horizon_results: Time horizon results dictionary
             
         Returns:
-            时间跨度影响分析结果
+            Time horizon impact analysis results
         """
         horizon_analysis = {}
         
-        # 按策略分析时间跨度影响
+        # Analyze time horizon impact by strategy
         strategies = set()
         for horizon_data in horizon_results.values():
             strategies.update(horizon_data.keys())
@@ -239,7 +239,7 @@ class PerformanceAnalyzer:
             
             horizon_analysis[strategy] = strategy_horizon_data
         
-        # 计算时间跨度趋势
+        # Calculate time horizon trends
         trends = self._calculate_horizon_trends(horizon_analysis)
         horizon_analysis['trends'] = trends
         
@@ -248,72 +248,72 @@ class PerformanceAnalyzer:
     def generate_performance_report(self, strategy_results: Dict[str, List[SimulationResult]], 
                                   output_file: Optional[Path] = None) -> str:
         """
-        生成性能分析报告
+        Generate performance analysis report
         
         Args:
-            strategy_results: 策略结果字典
-            output_file: 输出文件路径
+            strategy_results: Strategy results dictionary
+            output_file: Output file path
             
         Returns:
-            报告内容
+            Report content
         """
         report_lines = []
         
-        # 报告标题
+        # Report title
         report_lines.append("=" * 80)
-        report_lines.append("ISRU策略性能分析报告")
+        report_lines.append("ISRU Strategy Performance Analysis Report")
         report_lines.append("=" * 80)
         report_lines.append("")
         
-        # 执行摘要
+        # Executive summary
         comparison = self.compare_strategies(strategy_results)
         ranking = comparison.get('ranking', {})
         
-        report_lines.append("执行摘要")
+        report_lines.append("Executive Summary")
         report_lines.append("-" * 40)
         if 'overall_ranking' in ranking:
             for i, (strategy, score) in enumerate(ranking['overall_ranking'], 1):
-                report_lines.append(f"{i}. {strategy.title()}: 综合得分 {score:.2f}")
+                report_lines.append(f"{i}. {strategy.title()}: Overall Score {score:.2f}")
         report_lines.append("")
         
-        # 详细分析
+        # Detailed analysis
         for strategy_name, results in strategy_results.items():
-            report_lines.append(f"[分析] {strategy_name.title()} 策略详细分析")
+            report_lines.append(f"[Analysis] {strategy_name.title()} Strategy Detailed Analysis")
             report_lines.append("-" * 50)
             
-            # 财务性能
+            # Financial performance
             financial = self.analyze_financial_performance(results)
-            report_lines.append("财务性能:")
-            report_lines.append(f"  NPV均值: ${financial.get('npv_mean', 0):,.0f}")
-            report_lines.append(f"  NPV标准差: ${financial.get('npv_std', 0):,.0f}")
-            report_lines.append(f"  盈利概率: {(1-financial.get('probability_loss', 0)):.1%}")
-            report_lines.append(f"  夏普比率: {financial.get('sharpe_ratio', 0):.2f}")
+            report_lines.append("Financial Performance:")
+            report_lines.append(f"  NPV Mean: ${financial.get('npv_mean', 0):,.0f}")
+            report_lines.append(f"  NPV Std Dev: ${financial.get('npv_std', 0):,.0f}")
+            report_lines.append(f"  Profit Probability: {(1-financial.get('probability_loss', 0)):.1%}")
+            report_lines.append(f"  Sharpe Ratio: {financial.get('sharpe_ratio', 0):.2f}")
             
-            # 运营性能
+            # Operational performance
             operational = self.analyze_operational_performance(results)
-            report_lines.append("运营性能:")
-            report_lines.append(f"  平均利用率: {operational.get('utilization_mean', 0):.1%}")
-            report_lines.append(f"  自给自足率: {operational.get('self_sufficiency_mean', 0):.1%}")
-            report_lines.append(f"  产能扩张次数: {operational.get('avg_capacity_expansions', 0):.1f}")
+            report_lines.append("Operational Performance:")
+            report_lines.append(f"  Average Utilization: {operational.get('utilization_mean', 0):.1%}")
+            report_lines.append(f"  Self-Sufficiency Rate: {operational.get('self_sufficiency_mean', 0):.1%}")
+            report_lines.append(f"  Capacity Expansions: {operational.get('avg_capacity_expansions', 0):.1f}")
             
-            # 风险特征
+            # Risk characteristics
             risk = self.analyze_risk_profile(results)
-            report_lines.append("风险特征:")
-            report_lines.append(f"  波动率: ${risk.get('volatility', 0):,.0f}")
-            report_lines.append(f"  下行风险: ${risk.get('downside_risk', 0):,.0f}")
-            report_lines.append(f"  索提诺比率: {risk.get('sortino_ratio', 0):.2f}")
+            report_lines.append("Risk Characteristics:")
+            report_lines.append(f"  Volatility: ${risk.get('volatility', 0):,.0f}")
+            report_lines.append(f"  Downside Risk: ${risk.get('downside_risk', 0):,.0f}")
+            report_lines.append(f"  Sortino Ratio: {risk.get('sortino_ratio', 0):.2f}")
             
             report_lines.append("")
         
-        # 策略建议
-        report_lines.append("策略建议")
+        # Strategy recommendations
+        report_lines.append("Strategy Recommendations")
         report_lines.append("-" * 40)
         report_lines.extend(self._generate_strategy_recommendations(comparison))
         
-        # 生成报告文本
+        # Generate report text
         report_text = "\n".join(report_lines)
         
-        # 保存报告
+        # Save report
         if output_file:
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(report_text)
@@ -321,7 +321,7 @@ class PerformanceAnalyzer:
         return report_text
     
     def _calculate_skewness(self, data: List[float]) -> float:
-        """计算偏度"""
+        """Calculate skewness"""
         if len(data) < 3:
             return 0.0
         
@@ -334,7 +334,7 @@ class PerformanceAnalyzer:
         return skew
     
     def _calculate_kurtosis(self, data: List[float]) -> float:
-        """计算峰度"""
+        """Calculate kurtosis"""
         if len(data) < 4:
             return 0.0
         
@@ -347,17 +347,17 @@ class PerformanceAnalyzer:
         return kurt
     
     def _calculate_downside_deviation(self, data: List[float], target: float = 0) -> float:
-        """计算下行偏差"""
+        """Calculate downside deviation"""
         downside_returns = [min(0, x - target) for x in data]
         return np.sqrt(np.mean([x ** 2 for x in downside_returns]))
     
     def _calculate_upside_potential(self, data: List[float], target: float = 0) -> float:
-        """计算上行潜力"""
+        """Calculate upside potential"""
         upside_returns = [max(0, x - target) for x in data]
         return np.mean(upside_returns)
     
     def _calculate_max_drawdown(self, data: List[float]) -> float:
-        """计算最大回撤"""
+        """Calculate maximum drawdown"""
         if not data:
             return 0.0
         
@@ -367,7 +367,7 @@ class PerformanceAnalyzer:
         return float(np.min(drawdown))
     
     def _calculate_sortino_ratio(self, data: List[float], target: float = 0) -> float:
-        """计算索提诺比率"""
+        """Calculate Sortino ratio"""
         excess_return = np.mean(data) - target
         downside_dev = self._calculate_downside_deviation(data, target)
         
@@ -377,7 +377,7 @@ class PerformanceAnalyzer:
         return excess_return / downside_dev
     
     def _calculate_calmar_ratio(self, data: List[float]) -> float:
-        """计算卡尔玛比率"""
+        """Calculate Calmar ratio"""
         annual_return = np.mean(data)
         max_drawdown = abs(self._calculate_max_drawdown(data))
         
@@ -387,19 +387,19 @@ class PerformanceAnalyzer:
         return annual_return / max_drawdown
     
     def _test_normality(self, data: List[float]) -> bool:
-        """测试数据是否符合正态分布"""
+        """Test whether data follows normal distribution"""
         try:
             from scipy import stats
             _, p_value = stats.normaltest(data)
-            return p_value > 0.05  # 5%显著性水平
+            return p_value > 0.05  # 5% significance level
         except ImportError:
-            # 如果没有scipy，使用简单的偏度和峰度检验
+            # If scipy is not available, use simple skewness and kurtosis test
             skew = abs(self._calculate_skewness(data))
             kurt = abs(self._calculate_kurtosis(data))
             return skew < 2 and kurt < 7
     
     def _calculate_strategy_ranking(self, comparison: Dict[str, Dict]) -> Dict[str, Any]:
-        """计算策略排名"""
+        """Calculate strategy ranking"""
         strategies = [k for k in comparison.keys() if k != 'ranking']
         
         # Define scoring weights

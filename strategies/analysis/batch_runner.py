@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-批量仿真执行器
-支持多策略、多时间跨度的批量仿真和对比分析
+Batch Simulation Runner
+Support multi-strategy, multi-time-horizon batch simulation and comparative analysis
 """
 
 import sys
@@ -24,24 +24,24 @@ from strategies.utils.result_manager import ResultManager
 
 
 class BatchSimulationRunner:
-    """批量仿真执行器"""
+    """Batch simulation runner"""
     
     def __init__(self, params: Dict, results_dir: Optional[Path] = None):
         """
-        初始化批量仿真执行器
+        Initialize batch simulation runner
         
         Args:
-            params: 系统参数
-            results_dir: 结果保存目录
+            params: System parameters
+            results_dir: Results save directory
         """
         self.params = params
         self.results_dir = results_dir or Path(__file__).parent.parent / "simulation_results"
         
-        # 创建仿真引擎和结果管理器
+        # Create simulation engine and result manager
         self.engine = StrategySimulationEngine(params)
         self.result_manager = ResultManager(self.results_dir)
         
-        # 默认配置
+        # Default configuration
         self.default_strategies = ["upfront_deployment", "gradual_deployment", "flexible_deployment"]
         self.default_time_horizons = [10, 20, 30, 40, 50]
         self.default_n_simulations = 100
@@ -54,25 +54,25 @@ class BatchSimulationRunner:
                         save_results: bool = True,
                         show_progress: bool = True) -> Tuple[List[SimulationResult], Dict[str, float]]:
         """
-        运行单个策略的批量仿真
+        Run batch simulation for single strategy
         
         Args:
-            strategy_name: 策略名称
-            T: 时间范围
-            n_simulations: 仿真次数
-            base_seed: 基础随机种子
-            save_results: 是否保存结果
-            show_progress: 是否显示进度
+            strategy_name: Strategy name
+            T: Time horizon
+            n_simulations: Number of simulations
+            base_seed: Base random seed
+            save_results: Whether to save results
+            show_progress: Whether to show progress
             
         Returns:
-            (仿真结果列表, 统计信息)
+            (simulation results list, statistics)
         """
         if show_progress:
-            TerminalDisplay.print_section(f"运行 {strategy_name.title()} 策略 (T={T})")
+            TerminalDisplay.print_section(f"Running {strategy_name.title()} Strategy (T={T})")
         
         results = []
         
-        # 运行仿真
+        # Run simulations
         for i in range(n_simulations):
             if show_progress and i % 10 == 0:
                 TerminalDisplay.print_simulation_status(strategy_name, T, i, n_simulations)
@@ -84,10 +84,10 @@ class BatchSimulationRunner:
         if show_progress:
             TerminalDisplay.print_simulation_status(strategy_name, T, n_simulations, n_simulations)
         
-        # 计算统计信息
+        # Calculate statistics
         stats = self.engine.calculate_strategy_statistics(results)
         
-        # 保存结果
+        # Save results
         if save_results:
             metadata = {
                 'n_simulations': n_simulations,
@@ -98,7 +98,7 @@ class BatchSimulationRunner:
                 strategy_name, T, results, stats, metadata
             )
             if show_progress:
-                print(f"结果已保存: {len(saved_files)} 个文件")
+                print(f"Results saved: {len(saved_files)} files")
         
         return results, stats
     
@@ -110,24 +110,24 @@ class BatchSimulationRunner:
                               save_results: bool = True,
                               show_progress: bool = True) -> Dict[str, Tuple[List[SimulationResult], Dict[str, float]]]:
         """
-        运行策略对比仿真
+        Run strategy comparison simulation
         
         Args:
-            strategies: 策略列表
-            T: 时间范围
-            n_simulations: 每个策略的仿真次数
-            base_seed: 基础随机种子
-            save_results: 是否保存结果
-            show_progress: 是否显示进度
+            strategies: Strategy list
+            T: Time horizon
+            n_simulations: Number of simulations per strategy
+            base_seed: Base random seed
+            save_results: Whether to save results
+            show_progress: Whether to show progress
             
         Returns:
-            策略对比结果
+            Strategy comparison results
         """
         if strategies is None:
             strategies = self.default_strategies
         
         if show_progress:
-            TerminalDisplay.print_header(f"策略对比仿真 (T={T}年)", width=70)
+            TerminalDisplay.print_header(f"Strategy Comparison Simulation (T={T} years)", width=70)
         
         comparison_results = {}
         
@@ -137,11 +137,11 @@ class BatchSimulationRunner:
             )
             comparison_results[strategy] = (results, stats)
         
-        # 显示对比结果
+        # Display comparison results
         if show_progress:
             self._display_comparison_results(comparison_results, T)
         
-        # 保存对比结果
+        # Save comparison results
         if save_results:
             self.result_manager.save_comparison_results(comparison_results, T, "strategy_comparison")
         
@@ -155,18 +155,18 @@ class BatchSimulationRunner:
                                  save_results: bool = True,
                                  show_progress: bool = True) -> Dict[int, Dict[str, Tuple[List[SimulationResult], Dict[str, float]]]]:
         """
-        运行时间跨度分析
+        Run time horizon analysis
         
         Args:
-            time_horizons: 时间跨度列表
-            strategies: 策略列表
-            n_simulations: 每个策略的仿真次数
-            base_seed: 基础随机种子
-            save_results: 是否保存结果
-            show_progress: 是否显示进度
+            time_horizons: Time horizon list
+            strategies: Strategy list
+            n_simulations: Number of simulations per strategy
+            base_seed: Base random seed
+            save_results: Whether to save results
+            show_progress: Whether to show progress
             
         Returns:
-            时间跨度分析结果
+            Time horizon analysis results
         """
         if time_horizons is None:
             time_horizons = self.default_time_horizons
@@ -174,24 +174,24 @@ class BatchSimulationRunner:
             strategies = self.default_strategies
         
         if show_progress:
-            TerminalDisplay.print_header("时间跨度分析", width=70)
+            TerminalDisplay.print_header("Time Horizon Analysis", width=70)
         
         horizon_results = {}
         
         for T in time_horizons:
             if show_progress:
-                TerminalDisplay.print_section(f"时间跨度: {T}年")
+                TerminalDisplay.print_section(f"Time Horizon: {T} years")
             
             comparison = self.run_strategy_comparison(
                 strategies, T, n_simulations, base_seed, save_results, False
             )
             horizon_results[T] = comparison
         
-        # 显示时间跨度分析结果
+        # Display time horizon analysis results
         if show_progress:
             self._display_horizon_analysis(horizon_results)
         
-        # 保存时间跨度分析结果
+        # Save time horizon analysis results
         if save_results:
             self.result_manager.save_horizon_analysis(horizon_results, strategies)
         
@@ -205,18 +205,18 @@ class BatchSimulationRunner:
                           max_workers: Optional[int] = None,
                           save_results: bool = True) -> Dict[int, Dict[str, Tuple[List[SimulationResult], Dict[str, float]]]]:
         """
-        并行运行批量仿真
+        Run parallel batch simulation
         
         Args:
-            strategies: 策略列表
-            time_horizons: 时间跨度列表
-            n_simulations: 每个策略的仿真次数
-            base_seed: 基础随机种子
-            max_workers: 最大并行工作进程数
-            save_results: 是否保存结果
+            strategies: Strategy list
+            time_horizons: Time horizon list
+            n_simulations: Number of simulations per strategy
+            base_seed: Base random seed
+            max_workers: Maximum parallel worker processes
+            save_results: Whether to save results
             
         Returns:
-            并行仿真结果
+            Parallel simulation results
         """
         if strategies is None:
             strategies = self.default_strategies
@@ -225,32 +225,32 @@ class BatchSimulationRunner:
         if max_workers is None:
             max_workers = min(mp.cpu_count(), len(strategies) * len(time_horizons))
         
-        TerminalDisplay.print_header("并行批量仿真", width=70)
-        print(f"策略: {', '.join(strategies)}")
-        print(f"时间跨度: {time_horizons}")
-        print(f"仿真次数: {n_simulations}/策略")
-        print(f"并行进程: {max_workers}")
+        TerminalDisplay.print_header("Parallel Batch Simulation", width=70)
+        print(f"Strategies: {', '.join(strategies)}")
+        print(f"Time Horizons: {time_horizons}")
+        print(f"Simulations: {n_simulations}/strategy")
+        print(f"Parallel Processes: {max_workers}")
         print()
         
-        # 准备任务列表
+        # Prepare task list
         tasks = []
         for T in time_horizons:
             for strategy in strategies:
                 tasks.append((strategy, T, n_simulations, base_seed))
         
-        # 并行执行
+        # Parallel execution
         results = {}
         completed_tasks = 0
         total_tasks = len(tasks)
         
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            # 提交所有任务
+            # Submit all tasks
             future_to_task = {
-                executor.submit(self._run_single_task, task): task 
+                executor.submit(self._run_single_task, task): task
                 for task in tasks
             }
             
-            # 收集结果
+            # Collect results
             for future in as_completed(future_to_task):
                 task = future_to_task[future]
                 strategy, T, _, _ = task
@@ -258,12 +258,12 @@ class BatchSimulationRunner:
                 try:
                     task_results, task_stats = future.result()
                     
-                    # 组织结果
+                    # Organize results
                     if T not in results:
                         results[T] = {}
                     results[T][strategy] = (task_results, task_stats)
                     
-                    # 保存结果
+                    # Save results
                     if save_results:
                         metadata = {
                             'n_simulations': n_simulations,
@@ -276,22 +276,22 @@ class BatchSimulationRunner:
                     
                     completed_tasks += 1
                     TerminalDisplay.print_progress_bar(
-                        completed_tasks, total_tasks, 
-                        prefix="总进度", 
-                        suffix=f"{completed_tasks}/{total_tasks} 任务完成"
+                        completed_tasks, total_tasks,
+                        prefix="Overall Progress",
+                        suffix=f"{completed_tasks}/{total_tasks} tasks completed"
                     )
                     
                 except Exception as e:
-                    print(f"任务 {task} 执行失败: {e}")
+                    print(f"Task {task} execution failed: {e}")
         
-        print("\n并行仿真完成！")
+        print("\nParallel simulation completed!")
         return results
     
     def _run_single_task(self, task: Tuple[str, int, int, int]) -> Tuple[List[SimulationResult], Dict[str, float]]:
-        """运行单个仿真任务（用于并行执行）"""
+        """Run single simulation task (for parallel execution)"""
         strategy, T, n_simulations, base_seed = task
         
-        # 在子进程中创建新的引擎实例
+        # Create new engine instance in subprocess
         engine = StrategySimulationEngine(self.params)
         results = []
         
@@ -308,15 +308,15 @@ class BatchSimulationRunner:
                                time_horizons: Optional[List[int]] = None,
                                output_file: Optional[Path] = None) -> Path:
         """
-        导出结果到Excel文件
+        Export results to Excel file
         
         Args:
-            strategies: 策略列表
-            time_horizons: 时间跨度列表
-            output_file: 输出文件路径
+            strategies: Strategy list
+            time_horizons: Time horizon list
+            output_file: Output file path
             
         Returns:
-            Excel文件路径
+            Excel file path
         """
         if strategies is None:
             strategies = self.default_strategies
@@ -326,81 +326,81 @@ class BatchSimulationRunner:
         return self.result_manager.export_to_excel(strategies, time_horizons, output_file)
     
     def get_available_results(self) -> Dict[str, List[str]]:
-        """获取可用的结果列表"""
+        """Get available results list"""
         return self.result_manager.get_available_results()
     
     def load_previous_results(self, strategy_name: str, T: int) -> Optional[Dict]:
-        """加载之前的仿真结果"""
+        """Load previous simulation results"""
         return self.result_manager.load_simulation_results(strategy_name, T)
     
     def cleanup_old_results(self, keep_days: int = 30):
-        """清理旧的结果文件"""
+        """Clean up old result files"""
         self.result_manager.cleanup_old_results(keep_days)
     
     def _display_comparison_results(self, comparison_results: Dict, T: int):
-        """显示策略对比结果"""
-        TerminalDisplay.print_section(f"T={T}年 策略对比结果")
+        """Display strategy comparison results"""
+        TerminalDisplay.print_section(f"T={T} Years Strategy Comparison Results")
         
-        # 准备对比数据
+        # Prepare comparison data
         comparison_data = {}
         for strategy, (results, stats) in comparison_results.items():
             comparison_data[strategy] = {
-                'NPV均值': stats['npv_mean'],
-                'NPV标准差': stats['npv_std'],
-                '平均利用率': stats['utilization_mean'],
-                '自给自足率': stats['self_sufficiency_mean'],
-                '正NPV概率': stats['probability_positive_npv']
+                'npv_mean': stats['npv_mean'],
+                'npv_std': stats['npv_std'],
+                'utilization_mean': stats['utilization_mean'],
+                'self_sufficiency_mean': stats['self_sufficiency_mean'],
+                'probability_positive_npv': stats['probability_positive_npv']
             }
         
-        # 显示对比表格
-        TerminalDisplay.print_comparison_table(comparison_data, f"T={T}年策略对比")
+        # Display comparison table
+        TerminalDisplay.print_comparison_table(comparison_data, f"T={T} Years Strategy Comparison")
         
-        # 显示最佳策略
-        best_strategy = max(comparison_data.keys(), 
-                          key=lambda s: comparison_data[s]['NPV均值'])
+        # Display best strategy
+        best_strategy = max(comparison_data.keys(),
+                          key=lambda s: comparison_data[s]['npv_mean'])
         
         best_data = {
-            "最佳策略": best_strategy.title(),
-            "NPV均值": comparison_data[best_strategy]['NPV均值'],
-            "利用率": comparison_data[best_strategy]['平均利用率'],
-            "成功率": comparison_data[best_strategy]['正NPV概率']
+            "Best Strategy": best_strategy.title(),
+            "NPV Mean": comparison_data[best_strategy]['npv_mean'],
+            "Utilization": comparison_data[best_strategy]['utilization_mean'],
+            "Success Rate": comparison_data[best_strategy]['probability_positive_npv']
         }
         
-        TerminalDisplay.print_summary_box(f"T={T}年最佳策略", best_data, 'green')
+        TerminalDisplay.print_summary_box(f"T={T} Years Best Strategy", best_data, 'green')
     
     def _display_horizon_analysis(self, horizon_results: Dict):
-        """显示时间跨度分析结果"""
-        TerminalDisplay.print_section("时间跨度分析摘要")
+        """Display time horizon analysis results"""
+        TerminalDisplay.print_section("Time Horizon Analysis Summary")
         
-        # 准备分析数据
+        # Prepare analysis data
         analysis_data = []
         for T, strategies in horizon_results.items():
             for strategy, (results, stats) in strategies.items():
                 analysis_data.append({
-                    "时间跨度": T,
-                    "策略": strategy.title(),
-                    "NPV均值": stats['npv_mean'],
-                    "NPV标准差": stats['npv_std'],
-                    "利用率": stats['utilization_mean'],
-                    "成功率": stats['probability_positive_npv']
+                    "Time Horizon": T,
+                    "Strategy": strategy.title(),
+                    "NPV Mean": stats['npv_mean'],
+                    "NPV Std": stats['npv_std'],
+                    "Utilization": stats['utilization_mean'],
+                    "Success Rate": stats['probability_positive_npv']
                 })
         
-        # 定义表格列
+        # Define table columns
         from strategies.utils.terminal_display import TableColumn
         columns = [
-            TableColumn("时间跨度", 8, 'center'),
-            TableColumn("策略", 12, 'left'),
-            TableColumn("NPV均值", 12, 'right', TerminalDisplay._format_number),
-            TableColumn("NPV标准差", 12, 'right', TerminalDisplay._format_number),
-            TableColumn("利用率", 10, 'right', lambda x: f"{x:.1%}"),
-            TableColumn("成功率", 10, 'right', lambda x: f"{x:.1%}")
+            TableColumn("Time Horizon", 8, 'center'),
+            TableColumn("Strategy", 12, 'left'),
+            TableColumn("NPV Mean", 12, 'right', TerminalDisplay._format_number),
+            TableColumn("NPV Std", 12, 'right', TerminalDisplay._format_number),
+            TableColumn("Utilization", 10, 'right', lambda x: f"{x:.1%}"),
+            TableColumn("Success Rate", 10, 'right', lambda x: f"{x:.1%}")
         ]
         
-        TerminalDisplay.print_table(analysis_data, columns, "时间跨度分析结果")
+        TerminalDisplay.print_table(analysis_data, columns, "Time Horizon Analysis Results")
 
 
 def load_parameters() -> Dict:
-    """加载系统参数"""
+    """Load system parameters"""
     params_path = project_root / "data" / "parameters.json"
     with open(params_path, 'r') as f:
         return json.load(f)
